@@ -1,5 +1,6 @@
 package com.startupcrm.crm_backend.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,5 +23,7 @@ public class Conversacion {
 
     @ManyToOne
     @JoinColumn(name = "contacto_id")
+    //@JsonBackReference
+    @JsonBackReference(value = "contacto-conversaciones")
     private Contacto contacto;
 }

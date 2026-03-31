@@ -1,5 +1,6 @@
 package com.startupcrm.crm_backend.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,5 +22,10 @@ public class Seguimiento {
 
     @ManyToOne
     @JoinColumn(name = "contacto_id")
+    @JsonBackReference(value = "contacto-seguimientos")
     private Contacto contacto;
+
+    public boolean isCompletado() {
+        return completado;
+    }
 }
