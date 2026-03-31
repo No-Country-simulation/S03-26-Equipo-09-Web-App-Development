@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="es" class="light">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CRM Intelligent · Dashboard</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-container-low": "#f3f4f5",
+                        primary: "#182442",
+                        "surface-container-lowest": "#ffffff",
+                        secondary: "#006c49",
+                        background: "#f8f9fa",
+                        "on-surface-variant": "#45464e",
+                        "outline-variant": "#c6c6ce",
+                        "surface-container": "#edeeef",
+                        "surface-container-high": "#e7e8e9",
+                        outline: "#75777e",
+                        error: "#ba1a1a",
+                    },
+                    fontFamily: { headline: ["Inter"], body: ["Inter"], label: ["Inter"] },
+                },
+            },
+        };
+    </script>
+    <style>
+        .material-symbols-outlined { font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24; }
+        .aura-gradient {
+            background: radial-gradient(circle at 0% 0%, rgba(111, 251, 190, 0.08) 0%, transparent 55%),
+                        radial-gradient(circle at 100% 100%, rgba(24, 36, 66, 0.05) 0%, transparent 55%);
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; } 
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+
+        /* ARREGLO DE RESPONSIVIDAD PARA MODO INBOX */
+        @media (max-width: 1024px) {
+            #view-inbox { flex-direction: column; height: auto !important; }
+            .inbox-responsive { width: 100% !important; height: 350px !important; shrink: 0; }
+            .main-responsive { width: 100% !important; height: 500px !important; }
+        }
+    </style>
+</head>
+<body class="bg-background font-body text-primary antialiased overflow-x-hidden">
+    <div class="min-h-screen aura-gradient">
+        
+        <header class="sticky top-0 z-50 backdrop-blur-xl bg-white/70 border-b border-outline-variant/20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-8 py-4 flex flex-wrap items-center justify-between gap-y-4">
+                <div class="flex items-center gap-4">
+                    <img src="img/logo.webp" alt="CRM Intelligent" class="h-10 w-auto">
+                    <div class="leading-tight">
+                        <div class="text-lg font-bold tracking-tighter text-primary">CRM Intelligent</div>
+                        <div class="text-[12px] uppercase tracking-widest text-secondary font-bold">Panel Administrativo</div>
+                    </div>
+                </div>
+                <div class="order-3 w-full md:order-2 md:flex-1 md:max-w-md md:mx-8">
+                    <div class="flex items-center gap-3 rounded-xl border border-outline-variant/30 bg-white/50 px-4 py-2.5 focus-within:border-secondary transition-all">
+                        <span class="material-symbols-outlined text-on-surface-variant" style="font-size: 22px">search</span>
+                        <input class="w-full bg-transparent border-0 p-0 text-base placeholder:text-on-surface-variant focus:ring-0" placeholder="Buscar cliente..." type="search" />
+                    </div>
+                </div>
+                <div class="order-2 flex items-center gap-3">
+                    <button onclick="showDevModal('Descarga de Reportes')" class="flex items-center gap-2 rounded-xl border border-outline-variant/30 bg-white/50 px-4 py-2.5 text-sm font-semibold hover:bg-white transition-all">
+                        <span class="material-symbols-outlined" style="font-size: 20px">download</span>
+                        <span class="hidden sm:inline">Reportes</span>
+                    </button>
+                    <button onclick="showDevModal('Registro de Nuevo Lead')" class="flex items-center gap-2 rounded-xl bg-primary text-white px-5 py-2.5 text-sm font-bold shadow-lg shadow-primary/20 active:scale-95 transition-all">
+                        <span class="material-symbols-outlined" style="font-size: 20px">person_add</span>
+                        <span class="hidden sm:inline">Nuevo Lead</span>
+                    </button>
+                    <div class="w-10 h-10 rounded-full bg-secondary text-white flex items-center justify-center text-sm font-bold border-2 border-white shadow-md">HA</div>
+                </div>
+            </div>
+        </header>
+
+        <div class="max-w-7xl mx-auto px-5 sm:px-8 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <aside class="lg:col-span-3">
+                <nav class="bg-white/70 backdrop-blur-xl border border-outline-variant/20 rounded-2xl p-4 sticky top-24">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="text-xs uppercase tracking-wider font-extrabold text-on-surface-variant">Módulos</div>
+                    </div>
+                    <div id="sidebar-links" class="space-y-1">
+                        <button onclick="switchView('overview')" id="btn-overview" class="view-btn w-full flex items-center gap-3 px-3 py-2 rounded-xl bg-secondary/10 text-secondary font-bold transition-all">
+                            <span class="material-symbols-outlined">space_dashboard</span> Resumen
+                        </button>
+                        <button onclick="switchView('inbox')" id="btn-inbox" class="view-btn w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-surface-container-low text-primary font-semibold transition-all">
+                            <span class="material-symbols-outlined">inbox</span> Inbox (WhatsApp/Email)
+                        </button>
+                        <button onclick="showDevModal('Funnel')" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-surface-container-low text-primary font-semibold transition-all">
+                            <span class="material-symbols-outlined">view_kanban</span> Funnel / Pipeline
+                        </button>
+                        <button onclick="showDevModal('Tareas y recordatorios')" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-surface-container-low text-primary font-semibold transition-all">
+                            <span class="material-symbols-outlined">task</span> Tareas y recordatorios
+                        </button>
+                        <button onclick="showDevModal('Contactos')" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-surface-container-low text-primary font-semibold transition-all">
+                            <span class="material-symbols-outlined">group</span> Contactos
+                        </button>
+                        <button onclick="showDevModal('Metricas')" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-surface-container-low text-primary font-semibold transition-all">
+                            <span class="material-symbols-outlined">monitoring</span> Métricas
+                        </button>
+                        <button onclick="showDevModal('Tags/filtros')" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-surface-container-low text-primary font-semibold transition-all">
+                            <span class="material-symbols-outlined">tune</span> Tags / Filtros
+                        </button>
+                        <div class="h-px bg-outline-variant/30 my-4"></div>
+                        <a class="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-error/10 text-error font-bold transition-colors group" href="hero_2.html">
+                            <span class="material-symbols-outlined text-error group-hover:scale-110 transition-transform">logout</span>
+                            <span>Cerrar sesión</span>
+                        </a>
+                    </div>
+                </nav>
+
+                <section class="mt-6 bg-white/70 backdrop-blur-xl border border-outline-variant/20 rounded-2xl p-4">
+                    <h3 class="text-[11px] uppercase tracking-widest font-extrabold text-on-surface-variant/60 mb-3 px-2">Mis Filtros Rápidos</h3>
+                    <div class="flex flex-wrap gap-2">
+                        
+                        <button onclick="showDevModal('LEAD_ACTIVO')" class="px-3 py-1.5 rounded-lg bg-blue-600/10 text-on-surface-variant text-xs font-medium border-blue-600/20 hover:bg-blue-600/20 transition-all">🔥 Lead Activo</button>
+                        <button onclick="showDevModal('EN_SEGUIMIENTO')" class="px-3 py-1.5 rounded-lg bg-surface-container text-on-surface-variant text-xs font-medium border border-outline-variant/10 hover:bg-surface-variant transition-all">⏳ Seguimiento</button>
+                        <button onclick="showDevModal('CALIFICADO')" class="px-3 py-1.5 rounded-lg bg-surface-container text-on-surface-variant text-xs font-medium border border-outline-variant/10 hover:bg-surface-variant transition-all">✅ Calificado</button>
+                        <button onclick="showDevModal('CLIENTE')" class="px-3 py-1.5 rounded-lg bg-surface-container text-on-surface-variant text-xs font-medium border border-outline-variant/10 hover:bg-surface-variant transition-all">👤 Cliente</button>
+                    </div>
+                </section>
+            </aside>
+
+            <main class="lg:col-span-9">
+                
+                <div id="view-overview" class="view-content space-y-8 animate-in fade-in duration-500">
+                    <header class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-3xl font-bold tracking-tight text-primary">Panel de Control General</h2>
+                            <p class="text-on-surface-variant text-base mt-1">Bienvenido de nuevo, Harold. Resumen de tu empresa.</p>
+                        </div>
+                        <span class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary/10 text-secondary text-xs font-bold w-fit">
+                            <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-secondary"></span></span>
+                            Sistema Online
+                        </span>
+                    </header>
+
+                    <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-white border border-outline-variant/20 rounded-2xl p-6 shadow-sm">
+                            <div class="flex justify-between items-start mb-6">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary"><span class="material-symbols-outlined" style="font-size: 32px">chat</span></div>
+                                    <div><h3 class="font-bold text-primary">WhatsApp Cloud API</h3><p class="text-xs text-on-surface-variant">Estado de la conexión</p></div>
+                                </div>
+                                <button onclick="showDevModal('Vincular WhatsApp')" class="text-sm font-bold text-secondary hover:underline">Vincular mi cuenta</button>
+                            </div>
+                            <div class="bg-surface-container-low p-3 rounded-xl flex justify-between"><span class="text-sm font-medium">Instancia: Activa</span><span class="text-[10px] font-bold text-secondary uppercase">Latencia: 120ms</span></div>
+                        </div>
+                        <div class="bg-white border border-outline-variant/20 rounded-2xl p-6 shadow-sm">
+                            <div class="flex justify-between items-start mb-6">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary"><span class="material-symbols-outlined" style="font-size: 32px">alternate_email</span></div>
+                                    <div><h3 class="font-bold text-primary">Email (Brevo/SMTP)</h3><p class="text-xs text-on-surface-variant">Marketing & Notificaciones</p></div>
+                                </div>
+                                <button onclick="showDevModal('Conectar Email')" class="text-sm font-bold text-secondary hover:underline">Conectar correo</button>
+                            </div>
+                            <div class="bg-surface-container-low p-3 rounded-xl flex justify-between"><span class="text-sm font-medium">Cuota: 2,450 / 3,000</span><span class="text-[10px] font-bold text-primary/60 uppercase">Sincronizado</span></div>
+                        </div>
+                    </section>
+
+                    <section class="bg-primary text-white rounded-3xl p-8 shadow-xl relative overflow-hidden">
+                        <div class="relative z-10 grid grid-cols-1 sm:grid-cols-3 gap-8 text-center sm:text-left">
+                            <div><p class="text-white/60 text-xs font-bold uppercase">Conversaciones Totales</p><h4 class="text-4xl font-extrabold mt-2">1,284</h4><p class="text-secondary text-sm font-bold">+15% este mes</p></div>
+                            <div><p class="text-white/60 text-xs font-bold uppercase">Respuesta Media</p><h4 class="text-4xl font-extrabold mt-2">12m</h4><p class="text-white/40 text-sm">Eficiencia del equipo</p></div>
+                            <div><p class="text-white/60 text-xs font-bold uppercase"> # Vendedores</p><h4 class="text-4xl font-extrabold mt-2">08</h4><button onclick="showDevModal('Equipo')" class="text-sm font-bold text-secondary hover:underline">Gestionar equipo →</button></div>
+                        </div>
+                    </section>
+                     <section class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <button class="p-4 bg-white border border-outline-variant/20 rounded-2xl flex flex-col items-center gap-2 hover:border-secondary transition-all">
+                        <span class="material-symbols-outlined text-secondary">person_add</span>
+                        <span class="text-sm font-bold">Añadir Vendedor</span>
+                        </button>
+                        <button onclick="showDevModal('Exportar Base Leads')" class="p-4 bg-white border border-outline-variant/20 rounded-2xl flex flex-col items-center gap-2 hover:border-secondary transition-all">
+                        <span class="material-symbols-outlined text-secondary">database</span>
+                        <span class="text-sm font-bold">Exportar Base Leads</span>
+                        </button>
+                        <button onclick="showDevModal('Ajustes del Sistema')" class="p-4 bg-white border border-outline-variant/20 rounded-2xl flex flex-col items-center gap-2 hover:border-secondary transition-all">
+                        <span class="material-symbols-outlined text-secondary">settings_suggest</span>
+                        <span class="text-sm font-bold">Ajustes del Sistema</span>
+                        </button>
+                     </section>
+                </div>
+
+                <div id="view-inbox" class="view-content hidden h-[calc(100vh-180px)] flex gap-4 animate-in slide-in-from-right duration-500">
+                     <section class="inbox-responsive w-96 bg-white column-divider flex flex-col overflow-hidden shrink-0">
+                <div class="p-4 border-b border-outline-variant bg-slate-50/50">
+                    <h3 class="font-extrabold text-primary text-sm tracking-tight mb-4">Conversaciones</h3>
+                    
+                    <div class="grid grid-cols-2 gap-2 mb-3">
+                        <select class="text-[10px] font-bold bg-white border border-outline-variant rounded-lg py-1.5">
+                            <option>Vendedor: Todos</option>
+                            <option>José</option>
+                        </select>
+                        <input type="date" class="text-[10px] font-bold bg-white border border-outline-variant rounded-lg py-1.5">
+                    </div>
+
+                    <div class="flex gap-1 p-1 bg-surface-container rounded-lg border border-outline-variant/30">
+                        <button class="flex-1 py-1 text-[9px] font-black bg-white text-primary rounded-md shadow-sm uppercase">Todos</button>
+                        <button class="flex-1 py-1 text-[9px] font-black text-on-surface-variant uppercase">WhatsApp</button>
+                        <button class="flex-1 py-1 text-[9px] font-black text-on-surface-variant uppercase">Email</button>
+                    </div>
+                </div>
+
+                <div class="flex-1 overflow-y-auto custom-scrollbar">
+                    <div onclick="openChat('Juan David', 'WhatsApp', 'José', 'EN_SEGUIMIENTO')" class="p-4 flex gap-3 bg-secondary/5 border-l-4 border-secondary border-b border-outline-variant/30 cursor-pointer">
+                       <div class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center border border-outline-variant text-secondary">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M17.472 14.382c-.301-.15-1.767-.872-2.04-.971-.272-.099-.47-.15-.669.15-.199.301-.769 1.103-.941 1.302-.172.199-.344.225-.645.075-1.079-.54-1.884-1.103-2.618-1.741-.592-.516-1.018-1.037-1.32-1.556-.171-.3-.018-.462.132-.612.135-.135.301-.35.45-.524.151-.174.2-.3.301-.5.101-.2.05-.375-.025-.526-.075-.15-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.767-.721 2.016-1.417.248-.696.248-1.291.173-1.417-.074-.126-.272-.202-.573-.352zM12.004 21.003h-.002c-1.607 0-3.181-.433-4.555-1.252l-.327-.195-3.388.887.903-3.3-.213-.339c-.901-1.433-1.377-3.093-1.376-4.798.005-5.111 4.162-9.266 9.278-9.266 2.478 0 4.807.966 6.558 2.719a9.208 9.208 0 0 1 2.714 6.554c-.005 5.112-4.162 9.268-9.279 9.268zM19.073 4.931A10.923 10.923 0 0 0 12.004 2c-6.045 0-10.963 4.918-10.966 10.963 0 1.933.504 3.82 1.46 5.484l-1.551 5.672 5.803-1.522a10.93 10.93 0 0 0 5.25 1.339h.004c6.046 0 10.964-4.918 10.967-10.964 0-2.928-1.14-5.682-3.208-7.75z"/>
+        </svg>
+    </div>   
+                        <div class="flex-1 min-w-0">
+                            <div class="flex justify-between items-center">
+                                <h4 class="text-[12px] font-bold truncate">Juan David</h4>
+                                <span class="text-[9px] font-bold text-secondary">10:45 AM</span>
+                            </div>
+                            <p class="text-[10px] text-on-surface-variant truncate">¿Que contiene la caja?</p>
+                            <div class="flex items-center justify-between mt-2">
+                                <span class="px-1.5 py-0.5 bg-secondary text-white text-[8px] font-black rounded uppercase">EN_SEGUIMIENTO</span>
+                                <span class="text-[9px] font-bold text-on-surface-variant/40 italic">José</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div onclick="openChat('Santiago', 'Email', 'Brian', 'LEAD_ACTIVO')" class="p-4 flex gap-3 border-b border-outline-variant/30 cursor-pointer hover:bg-slate-50 transition-all">
+                        <div class="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center border border-outline-variant">
+                            <span class="material-symbols-outlined" style="font-size: 18px">mail</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex justify-between items-center">
+                                <h4 class="text-[12px] font-bold text-primary truncate">Santiago</h4>
+                                <span class="text-[9px] font-bold text-on-surface-variant">Ayer</span>
+                            </div>
+                            <p class="text-[10px] text-on-surface-variant truncate">Re: Solicitud de cotización de productos...</p>
+                            <div class="flex items-center justify-between mt-2">
+                                <span class="px-1.5 py-0.5 bg-blue-600 text-white text-[8px] font-black rounded uppercase">LEAD_ACTIVO</span>
+                                <span class="text-[9px] font-bold text-on-surface-variant/40 italic">Brian</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <main id="chat-visor" class="main-responsive flex-1 flex flex-col bg-white overflow-hidden">
+                <div class="p-4 border-b-2 border-outline-variant flex justify-between items-center bg-white shadow-sm shrink-0">
+                    <div class="flex items-center gap-4">
+                        <button class="md:hidden" onclick="closeChat()"><span class="material-symbols-outlined">arrow_back</span></button>
+                        <div id="visor-avatar" class="w-10 h-10 rounded-full bg-secondary text-white flex items-center justify-center text-sm font-bold shadow-sm shrink-0"></div>
+                        <div>
+                            <h3 id="visor-name" class="text-sm font-extrabold text-primary uppercase tracking-tight">Seleccione un chat</h3>
+                            <div class="flex items-center gap-2">
+                                <span class="text-[10px] font-bold text-on-surface-variant/60 uppercase">Vendedor:</span>
+                                <span id="visor-vendedor" class="text-[10px] font-extrabold text-secondary px-2 bg-secondary/5 rounded-full">-</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="showDevModal('Reasignar')" class="px-4 py-1.5 bg-primary text-white text-[10px] font-bold rounded-xl shadow-md uppercase">Reasignar</button>
+                </div>
+
+                <div id="chat-messages" class="flex-1 p-6 overflow-y-auto space-y-6 bg-slate-50/50 aura-gradient custom-scrollbar">
+                    <div class="flex items-center justify-center h-full text-on-surface-variant/30 italic text-sm">
+                        Ninguna conversación seleccionada
+                    </div>
+                </div>
+
+                <div class="p-4 lg:p-6 bg-white border-t-2 border-outline-variant shrink-0">
+                    <div class="flex flex-col sm:flex-row items-center justify-between bg-surface-container/50 border border-outline-variant p-4 rounded-2xl gap-3">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-full bg-white border border-outline-variant text-primary flex items-center justify-center shadow-sm shrink-0">
+                                <span class="material-symbols-outlined" style="font-size: 20px">visibility</span>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <p class="text-[11px] font-black text-primary uppercase tracking-widest">Modo Supervisión Activo</p>
+                                    <span id="visor-canal" class="px-2 py-0.5 bg-secondary text-white text-[8px] font-black rounded-full uppercase">Canal: </span>
+                                </div>
+                                <p id="visor-leyenda" class="text-[10px] lg:text-[11px] text-on-surface-variant font-medium mt-0.5 italic">Bloqueado para administradores.</p>
+                            </div>
+                        </div>
+                        <div class="px-4 py-2 bg-white rounded-xl border border-outline-variant shadow-sm hidden sm:block">
+                            <span class="text-[10px] font-bold text-on-surface-variant/40 italic uppercase">Solo Observación</span>
+                        </div>
+                    </div>
+                </div>
+            </main>
+                </div>
+
+    
+        </div>
+    </div>
+
+    <div id="dev-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-primary/20 backdrop-blur-sm p-4">
+        <div class="bg-white rounded-2xl p-8 max-w-sm w-full shadow-2xl border border-outline-variant/20 text-center animate-in zoom-in duration-300">
+            <div class="w-16 h-16 bg-secondary/10 text-secondary rounded-full flex items-center justify-center mx-auto mb-4"><span class="material-symbols-outlined" style="font-size: 40px">construction</span></div>
+            <h3 class="text-xl font-bold text-primary mb-2">¡En Construcción!</h3>
+            <p class="text-on-surface-variant text-sm mb-6">La función de <span id="feature-name" class="font-bold text-secondary"></span> estará disponible pronto.</p>
+            <button onclick="closeDevModal()" class="w-full bg-primary text-white py-3 rounded-xl font-bold active:scale-95 transition-all">Entendido</button>
+        </div>
+    </div>
+
+    <script>
+        function switchView(viewId) {
+            document.querySelectorAll('.view-content').forEach(view => view.classList.add('hidden'));
+            document.getElementById('view-' + viewId).classList.remove('hidden');
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.classList.remove('bg-secondary/10', 'text-secondary', 'font-bold');
+                btn.classList.add('hover:bg-surface-container-low', 'text-primary', 'font-semibold');
+            });
+            const activeBtn = document.getElementById('btn-' + viewId);
+            activeBtn.classList.add('bg-secondary/10', 'text-secondary', 'font-bold');
+            activeBtn.classList.remove('hover:bg-surface-container-low', 'text-primary', 'font-semibold');
+        }
+
+        function showDevModal(feature) {
+            document.getElementById('feature-name').innerText = feature;
+            document.getElementById('dev-modal').classList.remove('hidden');
+        }
+
+        function closeDevModal() {
+            document.getElementById('dev-modal').classList.add('hidden');
+        }
+
+        function openChat(name, canal, vendedor, estado) {
+            document.getElementById('visor-name').innerText = name + " (" + estado + ")";
+            document.getElementById('visor-vendedor').innerText = vendedor;
+            document.getElementById('visor-canal').innerText = "Canal: " + canal;
+            document.getElementById('visor-leyenda').innerHTML = "Auditando a <strong>" + vendedor + "</strong> vía <strong>" + canal + "</strong>. Bloqueado para administradores.";
+            
+            const avatar = document.getElementById('visor-avatar');
+            const messages = document.getElementById('chat-messages');
+
+            if(canal === 'Email') {
+                avatar.innerHTML = '<span class="material-symbols-outlined" style="font-size: 20px">mail</span>';
+                avatar.className = "w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center shadow-sm shrink-0";
+                
+                // FORMATO EMAIL CON HISTORIAL DE BRIAN
+                messages.innerHTML = `
+                    <div class="bg-white border border-outline-variant/20 rounded-2xl p-6 shadow-sm">
+                        <div class="border-b pb-4 mb-4">
+                            <h4 class="font-black text-sm uppercase">Asunto: Solicitud de cotización de productos</h4>
+                            <p class="text-[10px] text-on-surface-variant/60 font-bold mt-1">De: santi22045@gmail.com · Ayer</p>
+                        </div>
+                        <p class="text-xs leading-relaxed text-on-surface-variant">Estimado equipo de MercadoDigital, solicito formalmente la cotización de todos los productos que ofrecen al precio mayorista.</p>
+                    </div>
+                    
+                    <div class="bg-primary/5 border border-primary/10 rounded-2xl p-6 shadow-sm ml-6">
+                        <div class="border-b border-primary/10 pb-4 mb-4">
+                            <h4 class="font-black text-sm text-primary uppercase">Respuesta de ${vendedor}</h4>
+                            <p class="text-[10px] text-primary/60 font-bold mt-1">brian.dev@mercadodigital.com · Hace 2 horas</p>
+                        </div>
+                        <p class="text-xs leading-relaxed text-on-surface-variant">Hola Santiago, ya hemos recibido su solicitud. Estamos preparando los documentos para enviartelos lo más pronto posible .</p>
+                        <div class="mt-4 pt-2 border-t border-primary/5 flex items-center gap-2 italic text-[9px] text-primary/40 uppercase">
+                            <span class="material-symbols-outlined" style="font-size: 14px">reply</span> Respondido por Equipo de Ventas
+                        </div>
+                    </div>
+                `;
+            } else {
+                avatar.innerText = name.substring(0,2).toUpperCase();
+                avatar.className = "w-10 h-10 rounded-full bg-secondary text-white flex items-center justify-center text-sm font-bold shadow-sm shrink-0";
+                
+                // FORMATO WHATSAPP (BURBUJAS)
+                messages.innerHTML = `
+                    <div class="flex gap-3 max-w-[85%] lg:max-w-[70%]">
+                        <div class="flex-1 bg-white p-4 rounded-2xl rounded-tl-none shadow-sm border border-outline-variant">
+                            <p class="text-[12px] text-on-surface-variant">¿que contiene la caja?</p>
+                            <p class="text-[9px] text-right mt-2 font-bold text-secondary/60 uppercase">${name} · 10:45 AM</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-3 max-w-[85%] lg:max-w-[70%] ml-auto flex-row-reverse">
+                        <div class="flex-1 bg-secondary text-white p-4 rounded-2xl rounded-tr-none shadow-md">
+                            <p class="text-[12px] leading-relaxed">¡ Señor Juan! Contiene todas las partes fundamentales, dame tu correo y te envio con detalle las caracteristicas del producto.</p>
+                            <p class="text-[9px] text-right mt-2 font-bold text-white/40 uppercase">${vendedor} · 10:52 AM</p>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        window.onclick = (e) => { if (e.target == document.getElementById('dev-modal')) closeDevModal(); }
+    </script>
+</body>
+</html>

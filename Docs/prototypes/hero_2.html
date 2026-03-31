@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-container-low": "#f3f4f5",
+                        "primary": "#182442",
+                        "tertiary": "#312300",
+                        "inverse-primary": "#bac6ec",
+                        "surface-variant": "#e1e3e4",
+                        "tertiary-fixed-dim": "#dfc38b",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary": "#006c49",
+                        "primary-fixed-dim": "#bac6ec",
+                        "background": "#f8f9fa",
+                        "on-surface-variant": "#45464e",
+                        "on-secondary-fixed": "#002113",
+                        "secondary-fixed": "#6ffbbe",
+                        "on-secondary-container": "#00714d",
+                        "on-tertiary-fixed-variant": "#574417",
+                        "surface-tint": "#525e7f",
+                        "inverse-on-surface": "#f0f1f2",
+                        "on-error-container": "#93000a",
+                        "surface": "#f8f9fa",
+                        "secondary-fixed-dim": "#4edea3",
+                        "outline-variant": "#c6c6ce",
+                        "primary-fixed": "#dae2ff",
+                        "inverse-surface": "#2e3132",
+                        "error-container": "#ffdad6",
+                        "error": "#ba1a1a",
+                        "surface-bright": "#f8f9fa",
+                        "surface-dim": "#d9dadb",
+                        "on-primary-fixed-variant": "#3a4666",
+                        "on-primary-fixed": "#0d1a38",
+                        "surface-container-high": "#e7e8e9",
+                        "on-tertiary-container": "#bca26c",
+                        "on-primary": "#ffffff",
+                        "on-surface": "#191c1d",
+                        "outline": "#75777e",
+                        "tertiary-container": "#4a380c",
+                        "on-primary-container": "#98a4c9",
+                        "primary-container": "#2e3a59",
+                        "secondary-container": "#6cf8bb",
+                        "surface-container-highest": "#e1e3e4",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-fixed-variant": "#005236",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-fixed": "#261a00",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed": "#fddfa4",
+                        "surface-container": "#edeeef",
+                        "on-background": "#191c1d"
+                    },
+                    fontFamily: {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+ <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .aura-gradient {
+            background: radial-gradient(circle at 0% 0%, rgba(111, 251, 190, 0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 100% 100%, rgba(24, 36, 66, 0.05) 0%, transparent 50%);
+        }
+        body {
+        opacity: 0; /* Empieza invisible */
+        /* Animación: nombre, duración (3s), suavizado, dirección (forwards mantiene el estado final) */
+        animation: fadeInAndColor 3s cubic-bezier(0.4, 0, 0.2, 1) forwards; 
+        
+        /* Opcional: Para que no se vea nada hasta que cargue el CSS */
+        visibility: hidden; 
+        }
+
+      /* 2. Definimos la animación */
+    @keyframes fadeInAndColor { 
+        0% { opacity: 0; visibility: visible; } /* Comienza invisible */
+        20% { opacity: 1; visibility: visible; } /* Aparece completamente a los 0.6s */
+        80% { opacity: 1; visibility: visible; } /* Se mantiene visible hasta los 2.4s */
+        100% { opacity: 0.95; visibility: visible; } /* Termina con una ligera opacidad para el efecto de aura */
+    }
+        
+  </style>
+</head>
+<body class="bg-background font-body text-on-background antialiased overflow-x-hidden">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-white/70 dark:bg-[#182442]/70 backdrop-blur-xl">
+<div class="flex justify-between items-center px-8 py-4 max-w-7xl mx-auto">
+<div class="text-xl font-bold tracking-tighter text-[#182442] dark:text-white">
+               CRM Intelligent
+            </div>
+<div class="hidden md:flex items-center gap-8 font-['Inter'] font-medium text-sm tracking-tight">
+<a class="text-[#006c49] dark:text-[#6ffbbe] font-semibold transition-colors duration-200" href="#">Soluciones</a>
+<a class="text-[#45464e] dark:text-slate-400 hover:text-[#182442] dark:hover:text-white transition-colors duration-200" href="#">Precios</a>
+<a class="text-[#45464e] dark:text-slate-400 hover:text-[#182442] dark:hover:text-white transition-colors duration-200" href="#">Acerca de</a>
+<a class="text-[#45464e] dark:text-slate-400 hover:text-[#182442] dark:hover:text-white transition-colors duration-200" href="#">Soporte</a>
+</div>
+<div class="flex items-center gap-4">
+<button id="nav-mobile-toggle" aria-controls="nav-mobile-menu" aria-expanded="false" class="md:hidden inline-flex items-center justify-center rounded-lg p-2 text-[#45464e] hover:text-[#182442] transition-colors">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<button id="nav-login" class="text-sm font-['Inter'] font-medium text-[#45464e] px-4 py-2 hover:text-[#182442] transition-colors">Iniciar Sesión</button>
+<button id="nav-get-started" class="bg-gradient-to-br from-primary to-primary-container text-white px-6 py-2.5 rounded-lg text-sm font-semibold transition-transform duration-150 active:scale-95">Registrarme</button>
+</div>
+</div>
+<!-- Mobile Menu -->
+<div id="nav-mobile-menu" class="md:hidden hidden px-8 pb-4 max-w-7xl mx-auto">
+  <div class="mt-2 rounded-xl border border-outline-variant/20 bg-surface-container-lowest shadow-[0_12px_30px_rgba(24,36,66,0.08)] overflow-hidden">
+    <a class="block px-4 py-3 text-sm font-medium text-[#182442] hover:bg-surface-container" href="#">Soluciones</a>
+    <a class="block px-4 py-3 text-sm font-medium text-[#182442] hover:bg-surface-container" href="#">Precios</a>
+    <a class="block px-4 py-3 text-sm font-medium text-[#182442] hover:bg-surface-container" href="#">Acerca de</a>
+    <a class="block px-4 py-3 text-sm font-medium text-[#182442] hover:bg-surface-container" href="#">Soporte</a>
+  </div>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="relative min-h-screen pt-20 aura-gradient">
+<div class="max-w-7xl mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center py-20 lg:py-32">
+<!-- Left Side: Content -->
+<div class="flex flex-col gap-8 items-center text-center">
+<div class="flex items-center gap-3">
+<div><img src="img/logo.webp" alt="CRM Intelligent Logo" class="h-48 w-auto"></div>
+<div class="h-[1px] w-12 bg-outline-variant/30"></div>
+</div>
+<h1 class="text-[3.5rem] leading-[1.1] font-medium tracking-tight text-primary max-w-2xl mx-auto">
+                    Centraliza tus ventas de <span class="text-secondary">WhatsApp</span> y Email en un solo lugar
+                </h1>
+<p class="text-on-surface-variant text-lg leading-relaxed max-w-lg mx-auto">
+                    Impulsa la productividad de tu PYME con nuestra interfaz unificada. Gestiona cada interacción comercial sin el ruido visual de los sistemas tradicionales.
+                </p>
+<div class="flex items-center gap-8 mt-4">
+<div class="flex flex-col gap-1">
+<span class="text-[3.5rem] font-medium text-primary leading-none">91%</span>
+<span class="text-[0.6875rem] uppercase tracking-[0.05em] text-on-surface-variant">Eficiencia en cierre</span>
+</div>
+<div class="h-12 w-[1px] bg-outline-variant/30"></div>
+<div class="flex -space-x-3">
+<img class="w-10 h-10 rounded-full border-2 border-surface-container-lowest object-cover" data-alt="portrait of a professional latin american woman smiling in a bright office setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-Zd5F0LqOVK54nOYXsN8ER-he0L9WMOXUnk-bwTncxfgPeTtzyKQZnItPG-3ggYtSp1BbTcSe--lzfAQeQBucbdeFx8rTXDuJ3CHAuIOcF4bZ1UIesL3lGzALALRRkBkpETSoowTvgwHFZOQMcNOg0p8dP2Chvn50Qn7EuyBwKM_6WZNWVrMG0Tf3TDVqaljwJYneyhltd60Q0zqeUJxU0Zu6lhXbb3k1DqUyu-he0gJZ3qD5ib-xqXvEo3vh8DodOEc7ULGgGvY"/>
+<img class="w-10 h-10 rounded-full border-2 border-surface-container-lowest object-cover" data-alt="professional hispanic man wearing glasses smiling in a modern coworking space" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDUZe7Kk8M4XjCgFo1W1P1PIQ9djVtIJZ41dBYTQZ8NC6CNWeywXlD_jgXdEcBI0Wsyq0KG0FN3GELkPb2dkcOZCdb5zPF1mb242gLhKMG597ij785kSbbS24kOM1NJeULGwybCSRwIuvBTM7fxMjhnxU1iddfXfTHp9JCsHaskqFCZsVfaGMSo8mhxfTwRCCIf291ejpYa8M11wlVepL342SObpbyH-FhgCK9Kv-dxfw6MJAPEcdmTF9scCXM_ftnK0_0aNdYtdOI"/>
+<img class="w-10 h-10 rounded-full border-2 border-surface-container-lowest object-cover" data-alt="modern entrepreneur working on a laptop in a bright airy studio" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBT8fBFI_NexU7NpHXfbS2MFmsV3ONNzaPGMYWzSfwbvSwXOP_VPN3WOfM60ij3ywcV98LI9q1FU4_UZxnumR3inVGWpmdb5K8-wllUZvSczW9pZUCsywJUn2mMInX78U1EJ1HbqvYzd1SvaROpxI9lrlWGQ7dt4qcNspPjM9UObsSLQJdlLdtkW70WeKidikiSAEX0HikjHjy40N9jcBNdLsNxZXowa1w1G5MZL2axGVF3lc4Z9-DMv3dHw7MIXodwc5dAoXVbqsU"/>
+<div class="w-10 h-10 rounded-full border-2 border-surface-container-lowest bg-surface-container-high flex items-center justify-center text-[0.6875rem] font-bold text-primary">+12k</div>
+</div>
+</div>
+<div class="flex items-center space-x-12">
+<div class="flex items-center space-x-3 group">
+<div class="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined" data-icon="chat">chat</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] uppercase tracking-wider text-on-surface-variant font-bold">Conexión</span>
+<span class="text-sm font-medium text-primary">WhatsApp Business</span>
+</div>
+</div>
+<div class="flex items-center space-x-3 group">
+<div class="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined" data-icon="mail">mail</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] uppercase tracking-wider text-on-surface-variant font-bold">Emailing</span>
+<span class="text-sm font-medium text-primary">Brevo / SMTP</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Side: Login Card -->
+<div class="relative group">
+<!-- Abstract background shapes for Aura Zero aesthetic -->
+<div class="absolute -top-12 -right-12 w-64 h-64 bg-secondary-fixed/20 rounded-full blur-[80px] -z-10"></div>
+<div class="absolute -bottom-12 -left-12 w-48 h-48 bg-primary/5 rounded-full blur-[60px] -z-10"></div>
+<div id="auth-card" class="bg-surface-container-lowest rounded-xl p-10 shadow-[0_20px_40px_rgba(24,36,66,0.06)] border border-outline-variant/15 max-w-md mx-auto">
+<div class="flex flex-col gap-6">
+<div class="space-y-2">
+<h2 id="auth-title" class="text-xl font-bold tracking-tight text-primary">Inicia sesión</h2>
+<p id="auth-subtitle" class="text-on-surface-variant text-sm">Accede a tu panel unificado y gestiona tus leads.</p>
+</div>
+<div id="login-view">
+<form id="login-form" class="space-y-4">
+<div class="space-y-1.5">
+<label class="text-[0.6875rem] uppercase tracking-[0.05em] font-semibold text-on-surface-variant px-1">Correo Corporativo</label>
+<input class="w-full bg-surface-container-lowest border border-outline-variant/20 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-secondary transition-all" placeholder="nombre@empresa.com" type="email"/>
+</div>
+<div class="space-y-1.5">
+<label class="text-[0.6875rem] uppercase tracking-[0.05em] font-semibold text-on-surface-variant px-1">Contraseña</label>
+<input class="w-full bg-surface-container-lowest border border-outline-variant/20 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-secondary transition-all" placeholder="••••••••" type="password"/>
+</div>
+<div class="pt-2">
+<button class="w-full bg-gradient-to-br from-primary to-primary-container text-white py-3.5 rounded-lg font-bold text-sm shadow-lg shadow-primary/10 transition-transform active:scale-[0.98]">
+                                    Entrar
+                                </button>
+</div>
+</form>
+<div class="flex flex-col gap-4 text-center">
+<a class="text-xs font-medium text-secondary hover:underline" href="#">¿Olvidaste tu contraseña?</a>
+<div class="h-[1px] w-full bg-surface-container"></div>
+<p class="text-xs text-on-surface-variant">
+                                ¿Eres nuevo? <a id="link-to-register" class="text-primary font-bold hover:underline" href="#">Registra tu empresa aquí</a>
+</p>
+</div>
+</div>
+
+<div id="register-view" class="hidden">
+<form id="register-form" class="space-y-4">
+<div class="space-y-1.5">
+<label class="text-[0.6875rem] uppercase tracking-[0.05em] font-semibold text-on-surface-variant px-1">Nombre</label>
+<input class="w-full bg-surface-container-lowest border border-outline-variant/20 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-secondary transition-all" placeholder="Tu nombre" type="text"/>
+</div>
+<div class="space-y-1.5">
+<label class="text-[0.6875rem] uppercase tracking-[0.05em] font-semibold text-on-surface-variant px-1">Empresa</label>
+<input class="w-full bg-surface-container-lowest border border-outline-variant/20 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-secondary transition-all" placeholder="Nombre de la empresa" type="text"/>
+</div>
+<div class="space-y-1.5">
+<label class="text-[0.6875rem] uppercase tracking-[0.05em] font-semibold text-on-surface-variant px-1">Correo corporativo</label>
+<input class="w-full bg-surface-container-lowest border border-outline-variant/20 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-secondary transition-all" placeholder="nombre@empresa.com" type="email"/>
+</div>
+<div class="space-y-1.5">
+<label class="text-[0.6875rem] uppercase tracking-[0.05em] font-semibold text-on-surface-variant px-1">Contraseña</label>
+<input class="w-full bg-surface-container-lowest border border-outline-variant/20 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-secondary transition-all" placeholder="Crea una contraseña" type="password"/>
+</div>
+<div class="pt-2">
+<button class="w-full bg-gradient-to-br from-secondary to-on-secondary-container text-white py-3.5 rounded-lg font-bold text-sm shadow-lg shadow-secondary/10 transition-transform active:scale-[0.98]">
+                                    Crear cuenta
+                                </button>
+</div>
+</form>
+<div class="flex flex-col gap-4 text-center">
+<div class="h-[1px] w-full bg-surface-container"></div>
+<p class="text-xs text-on-surface-variant">
+                                ¿Ya tienes cuenta? <a id="link-to-login" class="text-primary font-bold hover:underline" href="#">Inicia sesión</a>
+</p>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-[#f3f4f5] dark:bg-[#121a2f] w-full py-12 border-t border-slate-200/10">
+<div class="flex flex-col md:flex-row justify-between items-center px-8 max-w-7xl mx-auto gap-4">
+<div class="flex flex-col gap-2">
+<div class="text-sm font-bold text-[#182442] dark:text-white uppercase tracking-widest">CRM Intelligent</div>
+<div class="text-[0.6875rem] uppercase tracking-[0.05em] text-[#45464e] dark:text-slate-300">
+                    © 2026 CRM Intelligent. Global Smart Sync Solutions for SMEs.
+                </div>
+</div>
+<div class="flex gap-6 font-['Inter'] text-[0.6875rem] uppercase tracking-[0.05em]">
+<a class="text-[#45464e] hover:text-[#182442] dark:hover:text-white transition-all opacity-80 hover:opacity-100" href="#">Privacy Policy</a>
+<a class="text-[#45464e] hover:text-[#182442] dark:hover:text-white transition-all opacity-80 hover:opacity-100" href="#">Terms of Service</a>
+<a class="text-[#45464e] hover:text-[#182442] dark:hover:text-white transition-all opacity-80 hover:opacity-100" href="#">Cookie Settings</a>
+<a class="text-[#45464e] hover:text-[#182442] dark:hover:text-white transition-all opacity-80 hover:opacity-100" href="#">Contact</a>
+</div>
+</div>
+</footer>
+<script>
+  const navMobileToggle = document.getElementById("nav-mobile-toggle");
+  const navMobileMenu = document.getElementById("nav-mobile-menu");
+
+  const navLogin = document.getElementById("nav-login");
+  const navGetStarted = document.getElementById("nav-get-started");
+
+  const linkToRegister = document.getElementById("link-to-register");
+  const linkToLogin = document.getElementById("link-to-login");
+
+  const loginView = document.getElementById("login-view");
+  const registerView = document.getElementById("register-view");
+
+  const authTitle = document.getElementById("auth-title");
+  const authSubtitle = document.getElementById("auth-subtitle");
+  const authCard = document.getElementById("auth-card");
+  const loginForm = document.getElementById("login-form");
+  const registerForm = document.getElementById("register-form");
+
+  function goToDashboard() {
+    window.location.href = "dashboard_resumen_inbox.html";
+  
+  }
+
+  function scrollToAuthCard() {
+    if (!authCard) return;
+    const y = authCard.getBoundingClientRect().top + window.scrollY - 96; // offset for fixed navbar
+    window.scrollTo({ top: y, behavior: "smooth" });
+  }
+
+  function showLogin() {
+    loginView?.classList.remove("hidden");
+    registerView?.classList.add("hidden");
+    if (authTitle) authTitle.textContent = "Inicia sesión";
+    if (authSubtitle) authSubtitle.textContent = "Accede a tu panel unificado y gestiona tus leads.";
+    scrollToAuthCard();
+  }
+
+  function showRegister() {
+    registerView?.classList.remove("hidden");
+    loginView?.classList.add("hidden");
+    if (authTitle) authTitle.textContent = "Registra tu empresa";
+    if (authSubtitle) authSubtitle.textContent = "Crea tu cuenta y conecta WhatsApp y Email en minutos.";
+    scrollToAuthCard();
+  }
+
+  function toggleMobileMenu(forceState) {
+    const shouldOpen =
+      typeof forceState === "boolean"
+        ? forceState
+        : navMobileMenu?.classList.contains("hidden");
+
+    if (!navMobileMenu) return;
+
+    if (shouldOpen) {
+      navMobileMenu.classList.remove("hidden");
+      navMobileToggle?.setAttribute("aria-expanded", "true");
+    } else {
+      navMobileMenu.classList.add("hidden");
+      navMobileToggle?.setAttribute("aria-expanded", "false");
+    }
+  }
+
+  navMobileToggle?.addEventListener("click", (e) => {
+    e.preventDefault();
+    toggleMobileMenu();
+  });
+
+  navLogin?.addEventListener("click", (e) => {
+    e.preventDefault();
+    showLogin();
+    toggleMobileMenu(false);
+  });
+
+  navGetStarted?.addEventListener("click", (e) => {
+    e.preventDefault();
+    showRegister();
+    toggleMobileMenu(false);
+  });
+
+  linkToRegister?.addEventListener("click", (e) => {
+    e.preventDefault();
+    showRegister();
+    toggleMobileMenu(false);
+  });
+
+  linkToLogin?.addEventListener("click", (e) => {
+    e.preventDefault();
+    showLogin();
+    toggleMobileMenu(false);
+  });
+
+  // Prototype navigation (no backend yet)
+  loginForm?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    goToDashboard();
+  });
+
+  registerForm?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    goToDashboard();
+  });
+</script>
+</body></html>

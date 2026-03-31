@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>CRM Intelligent - Welcome</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#182442',      // Deep Indigo
+                        secondary: '#006c49',    // Soft Emerald
+                        surface: '#f8f9fa',      // Background Canvas
+                        accent: '#bca26c',
+                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                }
+            }
+        }
+    </script>
+    <style>
+    /* Ensamblaje Editorial: El logo aparece desde un desenfoque premium */
+    @keyframes assemble {
+        0% { opacity: 0; transform: scale(1.15); filter: blur(20px); }
+        100% { opacity: 1; transform: scale(1); filter: blur(0); }
+    }
+
+    /* Parpadeo Orgánico: Simula una pupila inteligente */
+    @keyframes blinkEye {
+        0%, 45%, 55%, 100% { transform: scaleY(0); opacity: 0; } 
+        48%, 52% { transform: scaleY(1); opacity: 1; } 
+    }
+
+    /* Iluminación de la Idea (Bombillo) */
+    @keyframes lightUp {
+        0% { filter: brightness(0.5); opacity: 0; transform: scale(0.9); }
+        100% { filter: brightness(1.5); opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes fadeInUp { 
+        to { opacity: 1; transform: translateY(0); } 
+    }
+
+    /* Aplicación de Animaciones */
+    .animate-assemble { 
+        animation: assemble 2.5s cubic-bezier(0.22, 1, 0.36, 1) forwards; 
+    }
+
+    .eye-lid-anim { 
+        /* Sincronización: 
+           1. Parpadeo doble rápido (1.5s) - "Activación"
+           2. Parpadeo lento y solemne (6s) - "Pensamiento"
+        */
+        animation: 
+            blinkEye 0.2s ease-in-out 1 forwards 3s, 
+            blinkEye 1.5s ease-in-out 4 forwards 5s; 
+        
+        transform-origin: top;
+        background: radial-gradient(ellipse at center, #ffffff 0%, #ffffff 70%, transparent 100%);
+        border-radius: 50%;
+        filter: blur(1px); /* Suaviza aún más los bordes para que no parezca un parche */
+    }
+
+    .animate-glow { 
+        animation: lightUp 2s ease-in-out forwards 4.5s; 
+    }
+
+    .fade-out-all { 
+        animation: fadeOut 1.5s forwards 10s; /* Un segundo extra para apreciar el resultado */
+    }
+
+    @keyframes fadeOut { 
+        to { opacity: 0; visibility: hidden; } 
+    }
+    /* Animación de salida suave para toda la página */
+    .page-exit {
+        animation: fadeOutPage 1.5s forwards;
+    }
+
+    @keyframes fadeOutPage {
+        from { opacity: 1; }
+        to { opacity: 0; }
+    }
+</style>
+</head>
+<body class="bg-surface font-sans overflow-hidden">
+
+    <main class="fixed inset-0 z-0 flex flex-col p-8 opacity-20 pointer-events-none">
+        <div class="flex items-center justify-between mb-8">
+            <div class="h-8 w-48 bg-gray-200 rounded"></div>
+            <div class="h-10 w-10 bg-gray-200 rounded-full"></div>
+        </div>
+        <div class="grid grid-cols-3 gap-6">
+            <div class="h-64 bg-white rounded-lg border border-gray-100 p-4"></div>
+            <div class="h-64 bg-white rounded-lg border border-gray-100 p-4"></div>
+            <div class="h-64 bg-white rounded-lg border border-gray-100 p-4"></div>
+        </div>
+    </main>
+
+    <section class="fixed inset-0 z-50 flex items-center justify-center bg-surface fade-out-all">
+        <div class="flex flex-col items-center">
+            
+            <div class="relative w-[550px] h-[550px] flex items-center justify-center animate-assemble">
+                <img src="img/logo.webp" alt="CRM Intelligent Logo" class="w-full h-auto mix-blend-multiply drop-shadow-2xl">
+
+                <div class="absolute top-[64.7%] left-[51.3%] -translate-x-1/2 -translate-y-1/2 w-[108px] h-[66.5px] z-20 overflow-hidden pointer-events-none">
+                    <div class="absolute inset-0 eye-lid-anim"></div>
+                </div>
+
+                <div class="absolute top-12 left-1/2 -translate-x-1/2 w-32 h-32 z-20 animate-glow opacity-0 pointer-events-none">
+                    <div class="w-full h-full rounded-full bg-secondary/30 blur-3xl"></div>
+                </div>
+            </div>
+
+            <div class="text-center opacity-0 translate-y-8" 
+                 style="animation: fadeInUp 1.2s forwards 4.5s;">
+                <h1 class="text-5xl font-medium tracking-[0.25em] text-primary uppercase">
+                    CRM Intelligent
+                </h1>
+                <p class="mt-4 text-secondary/60 text-lg tracking-[0.4em] font-light">
+                    OMNICHANNEL CONTROL
+                </p>
+            </div>
+        </div>
+    </section>
+
+   <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log("CRM Intelligent Interface Initialized");
+
+            // 1. Iniciamos el desvanecimiento visual a los 8.5 segundos
+            setTimeout(() => {
+                document.body.classList.add('page-exit');
+            }, 8500);
+
+            // 2. Redirección final a los 9.9 segundos
+            setTimeout(() => {
+                window.location.href = "hero_2.html"; 
+            }, 9900); 
+        });
+    </script>
+</body>
+</html>
