@@ -1,12 +1,12 @@
 import React from 'react';
-import { useDashboardStats } from '../api/getDashboardStats';
+import { useDashboardStats } from '../../../common/getDashboardStats';
 import { Users, MessageSquare, Clock, AlertCircle } from 'lucide-react';
 
 export const DashboardOverview: React.FC = () => {
   const { data, isLoading, isError } = useDashboardStats();
 
-  if (isLoading) return <div className="p-8 text-center">Cargando métricas inteligentes...</div>;
-  if (isError || !data) return <div className="p-8 text-red-500">Error al cargar el dashboard.</div>;
+  if (isLoading) return <div className="p-8 text-center font-medium text-slate-600">Cargando métricas inteligentes...</div>;
+  if (isError || !data) return <div className="p-8 text-rose-500 bg-rose-50 rounded-lg border border-rose-200 m-6">Error al conectar con el servidor de métricas.</div>;
 
   const stats = [
     { 
@@ -46,7 +46,7 @@ export const DashboardOverview: React.FC = () => {
         <p className="text-slate-500">Métricas en tiempo real de tu ecosistema CRM.</p>
       </header>
 
-      {/* Grid de Tarjetas */}
+      {/* Grid de Tarjetas de KPIs */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat) => (
           <div key={stat.label} className="p-5 bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
@@ -65,12 +65,12 @@ export const DashboardOverview: React.FC = () => {
 
       {/* Sección de Estados de Lead */}
       <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-        <h2 className="text-lg font-semibold mb-4 text-slate-800 text-center">Distribución de Leads por Etapa</h2>
-        <div className="flex flex-wrap justify-center gap-4">
+        <h2 className="text-lg font-semibold mb-6 text-slate-800 border-b pb-4">Distribución de Leads por Etapa</h2>
+        <div className="flex flex-wrap gap-4">
           {Object.entries(data.contactosPorEstado).map(([estado, count]) => (
-            <div key={estado} className="px-4 py-2 rounded-full bg-slate-100 border border-slate-200 flex items-center gap-2">
-              <span className="text-xs font-bold text-slate-600">{estado.replace('_', ' ')}</span>
-              <span className="bg-indigo-600 text-white text-[10px] px-2 py-0.5 rounded-full">{count}</span>
+            <div key={estado} className="px-4 py-3 rounded-lg bg-slate-50 border border-slate-100 flex flex-col items-center min-w-[120px]">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{estado.replace('_', ' ')}</span>
+              <span className="text-xl font-bold text-indigo-600 mt-1">{count}</span>
             </div>
           ))}
         </div>
