@@ -14,6 +14,7 @@ Frontend del proyecto S03-26-Equipo-09-Web-App-Development, basado en Vite + Rea
 - [Preparación para Despliegue](#preparación-para-despliegue)
 - [Devtools](#devtools)
 - [Paquetes Instalados](#paquetes-instalados)
+- [Scripts Disponibles](#scripts-disponibles)
 
 ## Resumen
 
@@ -329,3 +330,16 @@ Una lista simplificada está en la sección Resumen.
 - [ts-reset](https://github.com/total-typescript/ts-reset#readme)
 - [Faker](https://fakerjs.dev/)
 - [Dayjs](https://day.js.org/en/)
+
+## Scripts disponibles
+
+- `pnpm run dev` → inicia entorno de desarrollo
+- `pnpm run build` → genera build de producción
+- `pnpm run preview` → sirve el build localmente
+- `pnpm run storybook` → abre Storybook en http://localhost:6006
+- `pnpm run test` → ejecuta unitarias + e2e
+- `pnpm run test:unit` → pruebas unitarias
+- `pnpm run test:e2e` → pruebas end-to-end
+- `pnpm run lint` → revisa errores de lint
+- `pnpm run lint:fix` → corrige errores automáticamente
+- `pnpm run format` → formatea el código
