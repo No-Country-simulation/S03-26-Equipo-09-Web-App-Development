@@ -76,7 +76,7 @@ export const Register = () => {
             <h1 className="text-2xl font-bold text-slate-900 mb-2">Crea tu Cuenta</h1>
             <p className="text-sm text-slate-500 flex items-center justify-center gap-2">
               Registra tu empresa y comienza hoy
-              <Badge variant="success" className="ml-auto">Gratis</Badge>
+              <Badge className="ml-auto" variant="success">Gratis</Badge>
             </p>
           </div>
 
@@ -107,16 +107,16 @@ export const Register = () => {
           )}
 
           {/* Formulario */}
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
             {/* Company Name Input */}
             <div>
               <Input
+                error={errors.companyName?.message}
+                icon="business"
                 id="companyName"
-                type="text"
                 label="Nombre de la Empresa"
                 placeholder="Mi Empresa S.A.S."
-                icon="business"
-                error={errors.companyName?.message}
+                type="text"
                 {...register('companyName')}
                 disabled={isSubmitting}
               />
@@ -125,12 +125,12 @@ export const Register = () => {
             {/* Email Input */}
             <div>
               <Input
+                error={errors.email?.message}
+                icon="mail"
                 id="email"
-                type="email"
                 label="Correo Corporativo"
                 placeholder="contacto@empresa.com"
-                icon="mail"
-                error={errors.email?.message}
+                type="email"
                 {...register('email')}
                 disabled={isSubmitting}
               />
@@ -139,12 +139,12 @@ export const Register = () => {
             {/* Password Input */}
             <div>
               <Input
+                error={errors.password?.message}
+                icon="lock"
                 id="password"
-                type="password"
                 label="Contraseña"
                 placeholder="••••••••"
-                icon="lock"
-                error={errors.password?.message}
+                type="password"
                 {...register('password')}
                 disabled={isSubmitting}
               />
@@ -153,12 +153,12 @@ export const Register = () => {
             {/* Confirm Password Input */}
             <div>
               <Input
+                error={errors.confirmPassword?.message}
+                icon="lock_check"
                 id="confirmPassword"
-                type="password"
                 label="Confirmar Contraseña"
                 placeholder="••••••••"
-                icon="lock_check"
-                error={errors.confirmPassword?.message}
+                type="password"
                 {...register('confirmPassword')}
                 disabled={isSubmitting}
               />
@@ -181,10 +181,10 @@ export const Register = () => {
 
             {/* Submit Button */}
             <Button
-              type="submit"
-              disabled={isSubmitting}
               className="w-full h-12 mt-8"
+              disabled={isSubmitting}
               isLoading={isSubmitting}
+              type="submit"
             >
               {isSubmitting ? 'Registrando...' : 'Crear Cuenta'}
             </Button>
@@ -194,9 +194,9 @@ export const Register = () => {
               <p className="text-xs text-slate-600">
                 ¿Ya tienes cuenta?{' '}
                 <button
+                  className="font-bold text-[#008f60] hover:text-[#006c49] hover:underline underline-offset-2 transition-colors"
                   type="button"
                   onClick={() => navigate({ to: '/login' })}
-                  className="font-bold text-[#008f60] hover:text-[#006c49] hover:underline underline-offset-2 transition-colors"
                 >
                   Inicia sesión aquí
                 </button>
