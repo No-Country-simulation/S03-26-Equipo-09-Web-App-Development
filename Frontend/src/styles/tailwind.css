@@ -1,7 +1,122 @@
 @import "tailwindcss";
+
+/* ─── Design Tokens ─── */
+:root {
+  --sidebar-width: 260px;
+  --sidebar-width-collapsed: 68px;
+  --sidebar-transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --crm-primary: #182442;
+  --crm-accent: #006c49;
+  --crm-bg: #f4f6f9;
+}
+
+/* ─── Sidebar ─── */
+.sidebar {
+  width: var(--sidebar-width);
+  transition: width var(--sidebar-transition);
+  will-change: width;
+}
+.sidebar.collapsed {
+  width: var(--sidebar-width-collapsed);
+}
+.sidebar-label {
+  opacity: 1;
+  max-width: 200px;
+  transition: opacity var(--sidebar-transition), max-width var(--sidebar-transition);
+  white-space: nowrap;
+  overflow: hidden;
+}
+.sidebar.collapsed .sidebar-label {
+  opacity: 0;
+  max-width: 0;
+}
+.sidebar-section-title {
+  opacity: 1;
+  transition: opacity var(--sidebar-transition);
+}
+.sidebar.collapsed .sidebar-section-title {
+  opacity: 0;
+}
+.sidebar-item-tooltip {
+  pointer-events: none;
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.sidebar.collapsed .sidebar-nav-item:hover .sidebar-item-tooltip {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* ─── Animations ─── */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes pulse-dot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%       { transform: scale(1.4); opacity: 0.6; }
+}
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.animate-fade-in    { animation: fadeIn 0.4s ease-out both; }
+.animate-slide-up   { animation: fadeSlideUp 0.4s ease-out both; }
+.animate-slide-left { animation: slideInLeft 0.3s ease-out both; }
+.animate-pulse-dot  { animation: pulse-dot 1.8s ease-in-out infinite; }
+
+/* Staggered children delays */
+.stagger > * { animation: fadeSlideUp 0.4s ease-out both; }
+.stagger > *:nth-child(1) { animation-delay: 0.05s; }
+.stagger > *:nth-child(2) { animation-delay: 0.10s; }
+.stagger > *:nth-child(3) { animation-delay: 0.15s; }
+.stagger > *:nth-child(4) { animation-delay: 0.20s; }
+.stagger > *:nth-child(5) { animation-delay: 0.25s; }
+
+/* ─── Shimmer skeleton ─── */
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e8e4 50%, #f0f0f0 75%);
+  background-size: 400px 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: 8px;
+}
+
+/* ─── Glassmorphism card ─── */
+.glass-card {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+}
+
+/* ─── Gradient text ─── */
+.gradient-text {
+  background: linear-gradient(135deg, #182442 0%, #006c49 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── Custom scrollbar ─── */
+.crm-scroll::-webkit-scrollbar { width: 4px; }
+.crm-scroll::-webkit-scrollbar-track { background: transparent; }
+.crm-scroll::-webkit-scrollbar-thumb { background: rgba(24,36,66,0.15); border-radius: 99px; }
+.crm-scroll::-webkit-scrollbar-thumb:hover { background: rgba(24,36,66,0.3); }
+
+/* ─── Misc Legacy ─── */
 @layer components {
   .aura-gradient {
     background: radial-gradient(circle at 0% 0%, rgba(111, 251, 190, 0.08) 0%, transparent 50%),
                 radial-gradient(circle at 100% 100%, rgba(24, 36, 66, 0.05) 0%, transparent 50%);
   }
-}
+}
