@@ -18,7 +18,7 @@ export const registerSchema = z.object({
     .min(1, { message: "Confirma tu contraseña" }),
   acceptTerms: z
     .boolean()
-    .refine(val => val === true, { message: "Debes aceptar los términos y condiciones" })
+    .refine(value => value === true, { message: "Debes aceptar los términos y condiciones" })
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Las contraseñas no coinciden",
   path: ["confirmPassword"],
