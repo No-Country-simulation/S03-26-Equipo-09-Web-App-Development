@@ -9,9 +9,11 @@ import { Checkbox } from '../components/ui/Checkbox/Checkbox';
 import { Button } from '../components/ui/Button/Button';
 import { Card } from '../components/ui/Card/Card';
 import { Badge } from '../components/ui/Badge/Badge';
+import { useAuthStore } from '../store/authStore';
 
 export const Login = () => {
   const navigate = useNavigate();
+  const { login } = useAuthStore();
   const [serverError, setServerError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
@@ -21,7 +23,7 @@ export const Login = () => {
     formState: { errors, isSubmitting },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
-    mode: 'onBlur', // Mostrar errores al salir del campo
+    mode: 'onBlur',
     defaultValues: {
       rememberMe: false
     }
@@ -30,42 +32,24 @@ export const Login = () => {
   const onSubmit = async (data: LoginFormValues) => {
     setServerError(null);
     setSuccessMessage(null);
-
-    // Simulación de validación de login
     try {
-      // Esperar 500ms para simular llamada a API
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await login(data.email, data.password);
 
-      if (
-        data.email === 'admin@crm.com' &&
-        data.password === '123456'
-      ) {
-        // ✅ Login exitoso - Guardar token en localStorage
-        const mockToken = `mock-jwt-${Date.now()}`;
-        localStorage.setItem('authToken', mockToken);
-        
-        if (data.rememberMe) {
-          localStorage.setItem('rememberEmail', data.email);
-        } else {
-          localStorage.removeItem('rememberEmail');
-        }
-
-        setSuccessMessage('¡Login exitoso! Redirigiendo...');
-        
-        // Redirigir al dashboard después de 1 segundo
-        setTimeout(() => {
-          navigate({ to: '/dashboard' });
-        }, 1000);
+      if (data.rememberMe) {
+        localStorage.setItem('rememberEmail', data.email);
       } else {
-        // ❌ Credenciales inválidas
-        setServerError(
-          'El correo o la contraseña son incorrectos. Intenta con admin@crm.com / 123456'
-        );
+        localStorage.removeItem('rememberEmail');
       }
-    } catch (error) {
-      setServerError('Error al conectar con el servidor. Por favor intenta de nuevo.');
+
+      setSuccessMessage('¡Login exitoso! Redirigiendo...');
+      setTimeout(() => {
+        void navigate({ to: '/dashboard' });
+      }, 800);
+    } catch (err) {
+      setServerError(err instanceof Error ? err.message : 'Error al conectar con el servidor.');
     }
   };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 flex items-center justify-center p-4">
@@ -85,7 +69,7 @@ export const Login = () => {
             <h1 className="text-2xl font-bold text-slate-900 mb-2">Inicia Sesión</h1>
             <p className="text-sm text-slate-500 flex items-center justify-center gap-2">
               Accede a tu panel CRM
-              <Badge variant="success" className="ml-auto">Online</Badge>
+              <Badge className="ml-auto" variant="success">Online</Badge>
             </p>
           </div>
 
@@ -116,16 +100,16 @@ export const Login = () => {
           )}
 
           {/* Formulario */}
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
             {/* Email Input */}
             <div>
               <Input
+                error={errors.email?.message}
+                icon="mail"
                 id="email"
-                type="email"
                 label="Correo Corporativo"
                 placeholder="admin@crm.com"
-                icon="mail"
-                error={errors.email?.message}
+                type="email"
                 {...register('email')}
                 disabled={isSubmitting}
               />
@@ -134,12 +118,12 @@ export const Login = () => {
             {/* Password Input */}
             <div>
               <Input
+                error={errors.password?.message}
+                icon="lock"
                 id="password"
-                type="password"
                 label="Contraseña"
                 placeholder="••••••••"
-                icon="lock"
-                error={errors.password?.message}
+                type="password"
                 {...register('password')}
                 disabled={isSubmitting}
               />
@@ -156,8 +140,8 @@ export const Login = () => {
               
               {/* Link Olvidé contraseña */}
               <button
-                type="button"
                 className="text-xs font-semibold text-[#008f60] hover:text-[#006c49] hover:underline underline-offset-2 transition-colors"
+                type="button"
               >
                 ¿Olvidé contraseña?
               </button>
@@ -165,10 +149,10 @@ export const Login = () => {
 
             {/* Submit Button */}
             <Button
-              type="submit"
-              disabled={isSubmitting}
               className="w-full h-12 mt-8"
+              disabled={isSubmitting}
               isLoading={isSubmitting}
+              type="submit"
             >
               {isSubmitting ? 'Validando...' : 'Entrar al Panel'}
             </Button>
@@ -178,9 +162,9 @@ export const Login = () => {
               <p className="text-xs text-slate-600">
                 ¿No tienes cuenta?{' '}
                 <button
+                  className="font-bold text-[#008f60] hover:text-[#006c49] hover:underline underline-offset-2 transition-colors"
                   type="button"
                   onClick={() => navigate({ to: '/register' })}
-                  className="font-bold text-[#008f60] hover:text-[#006c49] hover:underline underline-offset-2 transition-colors"
                 >
                   Regístrate aquí
                 </button>
