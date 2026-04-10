@@ -1,5 +1,5 @@
 import { Outlet, useNavigate } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
+import { JSX, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../../store/authStore';
 import { useLanguage } from '../../hooks/useLanguage';
@@ -7,7 +7,7 @@ import { Sidebar } from './Sidebar';
 import { countSinLeer } from '../../services/conversacionesService';
 import { countPendientes } from '../../services/seguimientosService';
 
-export const DashboardLayout = () => {
+export const DashboardLayout = (): JSX.Element => {
   const { t } = useTranslation();
   const { language } = useLanguage();
   const { user, logout } = useAuthStore();
@@ -17,14 +17,14 @@ export const DashboardLayout = () => {
   const [pendientes, setPendientes] = useState(0);
 
   useEffect(() => {
-    void (async () => {
+    void (async (): Promise<void> => {
       const [sl, pe] = await Promise.all([countSinLeer(), countPendientes()]);
       setSinLeer(sl);
       setPendientes(pe);
     })();
   }, []);
 
-  const handleLogout = async () => {
+  const handleLogout = async (): Promise<void> => {
     await logout();
     void navigate({ to: '/' });
   };
@@ -37,8 +37,8 @@ export const DashboardLayout = () => {
     <div className="flex h-screen overflow-hidden bg-[#f7f8fa] font-sans antialiased">
 
       {/* ══ SIDEBAR desktop ══ */}
-      <div className="hidden lg:flex flex-shrink-0 h-screen">
-        <Sidebar sinLeer={sinLeer} pendientes={pendientes} />
+      <div className="hidden lg:flex shrink-0 h-screen">
+        <Sidebar pendientes={pendientes} sinLeer={sinLeer} />
       </div>
 
       {/* ══ MOBILE overlay ══ */}
@@ -53,8 +53,8 @@ export const DashboardLayout = () => {
         className={`fixed inset-y-0 left-0 z-50 lg:hidden transition-transform duration-300 ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}
       >
         {/* In mobile we always show expanded version */}
-        <div className="h-full w-[220px]" style={{ width: '220px' }} onMouseEnter={() => {}} onMouseLeave={() => {}}>
-          <Sidebar sinLeer={sinLeer} pendientes={pendientes} />
+        <div className="h-full w-55" onMouseEnter={() => {}} onMouseLeave={() => {}}>
+          <Sidebar pendientes={pendientes} sinLeer={sinLeer} />
         </div>
       </div>
 
@@ -62,7 +62,7 @@ export const DashboardLayout = () => {
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
 
         {/* ── TOP HEADER ── */}
-        <header className="flex-shrink-0 h-14 bg-white border-b border-slate-100 flex items-center gap-4 px-4 sm:px-6">
+        <header className="shrink-0 h-14 bg-white border-b border-slate-100 flex items-center gap-4 px-4 sm:px-6">
 
           {/* Mobile menu button */}
           <button
@@ -75,7 +75,7 @@ export const DashboardLayout = () => {
           {/* Search */}
           <div className="flex-1 max-w-sm hidden sm:block">
             <div className="flex items-center gap-2.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-white hover:border-slate-300 focus-within:bg-white focus-within:border-[#182442]/30 focus-within:ring-2 focus-within:ring-[#182442]/8 px-3 py-1.5 transition-all">
-              <span className="material-symbols-outlined text-slate-400 text-[16px] flex-shrink-0">search</span>
+              <span className="material-symbols-outlined text-slate-400 text-[16px] shrink-0">search</span>
               <input
                 className="flex-1 bg-transparent text-sm text-slate-700 placeholder:text-slate-400 border-none outline-none"
                 placeholder={language === 'es' ? 'Buscar...' : 'Search...'}
