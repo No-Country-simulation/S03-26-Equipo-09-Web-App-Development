@@ -103,6 +103,21 @@
 			<version>1.18.32</version> <!-- versión estable actual -->
 			<scope>provided</scope>
 		</dependency>
+
+		<!-- iText 7 para generación de PDFs -->
+		<dependency>
+			<groupId>com.itextpdf</groupId>
+			<artifactId>itext7-core</artifactId>
+			<version>7.2.5</version>
+			<type>pom</type>
+		</dependency>
+
+		<!-- Apache Commons CSV para exportación CSV -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-csv</artifactId>
+			<version>1.10.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>

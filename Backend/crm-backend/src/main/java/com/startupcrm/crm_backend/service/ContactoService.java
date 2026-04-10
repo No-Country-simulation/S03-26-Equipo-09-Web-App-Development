@@ -2,6 +2,7 @@ package com.startupcrm.crm_backend.service;
 
 import com.startupcrm.crm_backend.exception.ResourceNotFoundException;
 import com.startupcrm.crm_backend.model.Contacto;
+import com.startupcrm.crm_backend.model.EstadoLead;
 import com.startupcrm.crm_backend.repository.ContactoRepository;
 import org.springframework.stereotype.Service;
 
@@ -50,6 +51,41 @@ public class ContactoService {
             throw new ResourceNotFoundException("Contacto no encontrado");
         }
         contactoRepository.deleteById(id);
+    }
+
+    /**
+     * Segmentación: Buscar contactos por estado del funnel
+     */
+    public List<Contacto> getContactosPorEstado(EstadoLead estado) {
+        return contactoRepository.findByEstado(estado);
+    }
+
+    /**
+     * Segmentación: Obtener leads activos
+     */
+    public List<Contacto> getLeadsActivos() {
+        return contactoRepository.findByEstado(EstadoLead.LEAD_ACTIVO);
+    }
+
+    /**
+     * Segmentación: Obtener contactos en seguimiento
+     */
+    public List<Contacto> getContactosEnSeguimiento() {
+        return contactoRepository.findByEstado(EstadoLead.EN_SEGUIMIENTO);
+    }
+
+    /**
+     * Segmentación: Obtener clientes
+     */
+    public List<Contacto> getClientes() {
+        return contactoRepository.findByEstado(EstadoLead.CLIENTE);
+    }
+
+    /**
+     * Segmentación: Obtener leads calificados
+     */
+    public List<Contacto> getLeadsCalificados() {
+        return contactoRepository.findByEstado(EstadoLead.CALIFICADO);
     }
 }
 

@@ -16,4 +16,16 @@ public class ConversacionMapper {
 
         return dto;
     }
+
+    public static Conversacion toEntity(ConversacionDTO dto) {
+        if (dto == null) return null;
+
+        Conversacion conversacion = new Conversacion();
+        conversacion.setId(dto.getId());
+        conversacion.setCanal(dto.getCanal());
+        conversacion.setContenido(dto.getContenido());
+        conversacion.setFechaHora(dto.getFechaHora());
+
+        return conversacion;
+    }
 }

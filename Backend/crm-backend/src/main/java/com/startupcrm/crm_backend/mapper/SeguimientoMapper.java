@@ -16,5 +16,17 @@ public class SeguimientoMapper {
 
         return dto;
     }
+
+    public static Seguimiento toEntity(SeguimientoDTO dto) {
+        if (dto == null) return null;
+
+        Seguimiento seguimiento = new Seguimiento();
+        seguimiento.setId(dto.getId());
+        seguimiento.setTarea(dto.getTarea());
+        seguimiento.setFecha(dto.getFecha());
+        seguimiento.setCompletado(dto.isCompletado());
+
+        return seguimiento;
+    }
 }
 
