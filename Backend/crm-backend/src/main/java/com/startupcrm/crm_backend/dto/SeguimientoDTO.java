@@ -1,44 +1,17 @@
 package com.startupcrm.crm_backend.dto;
 
-import java.time.LocalDate;
+import lombok.Getter;
+import lombok.Setter;
+import java.time.LocalDateTime;
 
+@Getter
+@Setter
 public class SeguimientoDTO {
-
     private Long id;
     private String tarea;
-    private LocalDate fecha;
-    private boolean completado;
+    private LocalDateTime fecha;
+    private Boolean completado;
+    private Boolean recordatorioActivado;
 
-    public Long getId() {
-        return id;
-    }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getTarea() {
-        return tarea;
-    }
-
-    public void setTarea(String tarea) {
-        this.tarea = tarea;
-    }
-
-    public LocalDate getFecha() {
-        return fecha;
-    }
-
-    public void setFecha(LocalDate fecha) {
-        this.fecha = fecha;
-    }
-
-    public boolean isCompletado() {
-        return completado;
-    }
-
-    public void setCompletado(boolean completado) {
-        this.completado = completado;
-    }
 }
-

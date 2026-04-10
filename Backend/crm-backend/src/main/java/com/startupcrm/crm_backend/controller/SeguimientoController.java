@@ -1,5 +1,9 @@
 package com.startupcrm.crm_backend.controller;
 
+import com.startupcrm.crm_backend.dto.ApiResponse;
+import com.startupcrm.crm_backend.dto.SeguimientoDTO;
+import com.startupcrm.crm_backend.exception.ResourceNotFoundException;
+import com.startupcrm.crm_backend.mapper.SeguimientoMapper;
 import com.startupcrm.crm_backend.model.Seguimiento;
 import com.startupcrm.crm_backend.repository.SeguimientoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,19 +17,18 @@ import java.util.Optional;
 @RequestMapping("/api/seguimientos")
 public class SeguimientoController {
 
-    @Autowired
-    private SeguimientoRepository seguimientoRepository;
+    private final SeguimientoRepository seguimientoRepository;
 
-    @GetMapping
-    public List<Seguimiento> getAllSeguimientos() {
-        return seguimientoRepository.findAll();
+    public SeguimientoController(SeguimientoRepository seguimientoRepository) {
+        this.seguimientoRepository = seguimientoRepository;
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Seguimiento> getSeguimientoById(@PathVariable Long id) {
-        return seguimientoRepository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    @GetMapping
+    public ApiResponse<List<SeguimientoDTO>> getAll() {
+        List<SeguimientoDTO> data = seguimientoRepository.findAll().stream()
+                .map(SeguimientoMapper::toDTO)
+                .toList();
+        return new ApiResponse<>(true, data, null);
     }
 
     @PostMapping
@@ -45,13 +48,11 @@ public class SeguimientoController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteSeguimiento(@PathVariable Long id) {
-        Optional<Seguimiento> seguimientoOpt = seguimientoRepository.findById(id);
-        if (seguimientoOpt.isPresent()) {
-            seguimientoRepository.delete(seguimientoOpt.get());
-            return ResponseEntity.noContent().build(); // correcto tipo Void
-        } else {
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id) {
+        if (!seguimientoRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Seguimiento no encontrado");
         }
+        seguimientoRepository.deleteById(id);
+        return ResponseEntity.ok(new ApiResponse<>(true, null, null));
     }
 }

@@ -12,9 +12,20 @@ public class SeguimientoMapper {
         dto.setId(s.getId());
         dto.setTarea(s.getTarea());
         dto.setFecha(s.getFecha());
-        dto.setCompletado(s.isCompletado());
+        dto.setCompletado(s.getCompletado());
+        dto.setRecordatorioActivado(s.getRecordatorioActivado());
 
         return dto;
     }
-}
 
+    public static Seguimiento toEntity(SeguimientoDTO dto) {
+        if (dto == null) return null;
+
+        Seguimiento s = new Seguimiento();
+        s.setTarea(dto.getTarea());
+        s.setFecha(dto.getFecha());
+        s.setCompletado(dto.getCompletado());
+        s.setRecordatorioActivado(dto.getRecordatorioActivado());
+        return s;
+    }
+}

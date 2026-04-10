@@ -1,6 +1,5 @@
 package com.startupcrm.crm_backend.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,12 +17,16 @@ public class Conversacion {
     private Long id;
 
     private String canal; // WhatsApp, Email
+
+    @Column(columnDefinition = "TEXT")
     private String contenido;
-    private LocalDateTime fechaHora;
+
+    private LocalDateTime fechaHora = LocalDateTime.now();
+
+    private Boolean esEntrante; // true: Cliente -> CRM | false: CRM -> Cliente
+    private Boolean leido = false;
 
     @ManyToOne
     @JoinColumn(name = "contacto_id")
-    //@JsonBackReference
-    @JsonBackReference(value = "contacto-conversaciones")
     private Contacto contacto;
 }

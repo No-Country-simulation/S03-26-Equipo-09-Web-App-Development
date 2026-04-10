@@ -13,7 +13,19 @@ public class ConversacionMapper {
         dto.setCanal(c.getCanal());
         dto.setContenido(c.getContenido());
         dto.setFechaHora(c.getFechaHora());
+        dto.setEsEntrante(c.getEsEntrante()); // Crucial para KPIs
+        dto.setLeido(c.getLeido());
 
         return dto;
+    }
+
+    public static Conversacion toEntity(ConversacionDTO dto) {
+        if (dto == null) return null;
+
+        Conversacion c = new Conversacion();
+        c.setCanal(dto.getCanal());
+        c.setContenido(dto.getContenido());
+        c.setEsEntrante(dto.getEsEntrante());
+        return c;
     }
 }

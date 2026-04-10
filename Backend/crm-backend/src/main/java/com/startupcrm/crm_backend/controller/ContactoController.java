@@ -64,24 +64,12 @@ public class ContactoController {
         return new ApiResponse<>(true, ContactoMapper.toDTO(saved), null);
     }
 
-    /*@PutMapping("/{id}")
-    public ContactoDTO update(@PathVariable Long id, @Valid @RequestBody ContactoDTO dto) {
-        Contacto contacto = ContactoMapper.toEntity(dto);
-        return ContactoMapper.toDTO(contactoService.update(id, contacto));
-    }*/
-
     @PutMapping("/{id}")
     public ApiResponse<ContactoDTO> update(@PathVariable Long id, @Valid @RequestBody ContactoDTO dto) {
         Contacto contacto = ContactoMapper.toEntity(dto);
         Contacto updated = contactoService.update(id, contacto);
         return new ApiResponse<>(true, ContactoMapper.toDTO(updated), null);
     }
-
-    /*@DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        contactoService.delete(id);
-        return ResponseEntity.noContent().build();
-    }*/
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id) {

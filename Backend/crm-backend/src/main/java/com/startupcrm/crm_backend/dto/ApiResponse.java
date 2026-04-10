@@ -1,5 +1,11 @@
 package com.startupcrm.crm_backend.dto;
 
+
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class ApiResponse<T> {
 
     private boolean success;
@@ -12,15 +18,4 @@ public class ApiResponse<T> {
         this.error = error;
     }
 
-    public boolean isSuccess() {
-        return success;
-    }
-
-    public T getData() {
-        return data;
-    }
-
-    public String getError() {
-        return error;
-    }
 }

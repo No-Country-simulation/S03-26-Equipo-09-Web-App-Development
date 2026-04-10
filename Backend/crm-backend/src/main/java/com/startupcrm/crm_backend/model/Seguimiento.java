@@ -1,11 +1,11 @@
 package com.startupcrm.crm_backend.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
+
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -17,15 +17,12 @@ public class Seguimiento {
     private Long id;
 
     private String tarea;
-    private LocalDate fecha;
-    private Boolean completado;
+    private LocalDateTime fecha; // Con hora para el Scheduler
+    private Boolean completado = false;
+
+    private Boolean recordatorioActivado = false;
 
     @ManyToOne
     @JoinColumn(name = "contacto_id")
-    @JsonBackReference(value = "contacto-seguimientos")
     private Contacto contacto;
-
-    public boolean isCompletado() {
-        return completado;
-    }
 }
