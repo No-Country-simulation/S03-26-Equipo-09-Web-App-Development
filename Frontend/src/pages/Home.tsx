@@ -120,8 +120,8 @@ export const Home = () => {
               </p>
               
               <button 
-                onClick={() => navigate({ to: '/login' })}
                 className="w-full py-3 bg-white text-[#006c49] rounded-lg font-bold text-sm shadow-lg hover:bg-slate-50 transition-all active:scale-[0.98]"
+                onClick={() => navigate({ to: '/login' })}
               >
                 Iniciar Sesión
               </button>
