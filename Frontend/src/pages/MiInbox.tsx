@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { InboxVendedor } from '../components/InboxVendedor';
+import { UnifiedInbox } from '../components/UnifiedInbox';
 import { usuarioService } from '../common/apiClient';
 
 interface Usuario {
@@ -34,35 +34,37 @@ export default function MiInbox() {
   if (loading) return <div className="text-center py-8">Cargando...</div>;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Selector de Vendedor */}
+    <div className="min-h-screen bg-slate-50 py-6">
+      <div className="max-w-6xl mx-auto">
+        {/* Selector de Vendedor (Demo) */}
         {vendedores.length > 1 && (
-          <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Seleccionar Vendedor (Para Demo):
-            </label>
-            <div className="flex gap-2 flex-wrap">
-              {vendedores.map((v) => (
-                <button
-                  key={v.id}
-                  onClick={() => setVendedorSeleccionado(v)}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                    vendedorSeleccionado?.id === v.id
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-                  }`}
-                >
-                  👤 {v.nombre}
-                </button>
-              ))}
+          <div className="mb-6 px-4 md:px-6">
+            <div className="bg-white rounded-lg border border-slate-200 p-4">
+              <label className="block text-sm font-semibold text-[#182442] mb-3">
+                👤 Seleccionar Vendedor (Modo Demo)
+              </label>
+              <div className="flex gap-2 flex-wrap">
+                {vendedores.map((v) => (
+                  <button
+                    key={v.id}
+                    onClick={() => setVendedorSeleccionado(v)}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                      vendedorSeleccionado?.id === v.id
+                        ? 'bg-[#006c49] text-white shadow-md scale-105'
+                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                    }`}
+                  >
+                    {v.nombre}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         )}
 
-        {/* Inbox del Vendedor */}
+        {/* Inbox Unificado */}
         {vendedorSeleccionado && (
-          <InboxVendedor
+          <UnifiedInbox
             vendedorId={vendedorSeleccionado.id}
             vendedorNombre={vendedorSeleccionado.nombre}
           />
