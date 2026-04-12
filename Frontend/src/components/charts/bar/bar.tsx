@@ -11,7 +11,7 @@ export const BarChart = ({ data }: BarChartProps) => (
     axisTop={null}
     borderColor={{ from: 'color', modifiers: [['darker', 1.6]] }}
     borderRadius={8}
-    colors={['#008f60']} // Esmeralda Corporativo
+    colors={['#006c49']} // Verde corporativo
     data={data}
     indexBy="fuente"
     indexScale={{ type: 'band', round: true }}
@@ -19,29 +19,48 @@ export const BarChart = ({ data }: BarChartProps) => (
     labelSkipHeight={12}
     labelSkipWidth={12}
     labelTextColor="#ffffff"
-    margin={{ top: 20, right: 20, bottom: 50, left: 60 }}
-    padding={0.3}
+    margin={{ top: 20, right: 20, bottom: 60, left: 60 }}
+    padding={0.4}
     role="application"
     valueScale={{ type: 'linear' }}
     axisBottom={{
       tickSize: 5,
+      tickPadding: 8,
+      tickRotation: -45,
+      legend: 'Vendedor / Canal',
+      legendPosition: 'middle',
+      legendOffset: 50
+    }}
+    axisLeft={{
+      tickSize: 5,
       tickPadding: 5,
       tickRotation: 0,
-      legend: 'Canal',
+      legend: 'Tasa %',
       legendPosition: 'middle',
-      legendOffset: 32
+      legendOffset: -50
     }}
     theme={{
       axis: {
         legend: {
-          text: { fontSize: 12, fontWeight: 600, fill: '#64748b' }
+          text: { fontSize: 12, fontWeight: 600, fill: '#182442' }
         },
         ticks: {
-          text: { fontSize: 11, fill: '#94a3b8' }
+          text: { fontSize: 11, fill: '#64748b' }
         }
       },
       grid: {
-        line: { stroke: '#f1f5f9', strokeWidth: 1 }
+        line: { stroke: '#e2e8f0', strokeWidth: 1 }
+      },
+      tooltip: {
+        chip: {
+          borderRadius: '4px'
+        },
+        container: {
+          background: '#1e293b',
+          color: '#f1f5f9',
+          fontSize: '12px',
+          borderRadius: '4px'
+        }
       }
     }}
   />

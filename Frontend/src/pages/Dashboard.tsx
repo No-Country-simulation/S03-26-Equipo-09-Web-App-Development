@@ -254,10 +254,10 @@ export const DashboardPage = () => {
           </div>
           <div style={{ minHeight: '300px' }}>
             <BarChart data={[
-              { id: 'Juan García', data: [{ x: 'Conversión %', y: 34 }] },
-              { id: 'María López', data: [{ x: 'Conversión %', y: 38 }] },
-              { id: 'Carlos Ruiz', data: [{ x: 'Conversión %', y: 29 }] },
-              { id: 'Ana Chen', data: [{ x: 'Conversión %', y: 32 }] }
+              { fuente: 'Juan García', leads: 34 },
+              { fuente: 'María López', leads: 38 },
+              { fuente: 'Carlos Ruiz', leads: 29 },
+              { fuente: 'Ana Chen', leads: 32 }
             ]} />
           </div>
         </Card>
