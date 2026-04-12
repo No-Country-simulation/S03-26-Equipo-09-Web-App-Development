@@ -9,10 +9,10 @@ import java.util.List;
 public interface ContactoRepository extends JpaRepository<Contacto, Long> {
 
     // Para filtrar por estado en el Funnel
-    List<Contacto> findByEstado(EstadoLead estado);
+    List<Contacto> findByEstado(String estado);
 
     // Para métricas: ¿Cuántos leads hay en X estado?
-    long countByEstado(EstadoLead estado);
+    long countByEstado(String estado);
 
     // Para métricas: ¿Cuántos leads entraron entre estas fechas?
     long countByFechaCreacionBetween(LocalDateTime inicio, LocalDateTime fin);

@@ -32,19 +32,22 @@ public class SeguimientoController {
     }
 
     @PostMapping
-    public Seguimiento createSeguimiento(@RequestBody Seguimiento seguimiento) {
-        return seguimientoRepository.save(seguimiento);
+    public ApiResponse<SeguimientoDTO> createSeguimiento(@RequestBody SeguimientoDTO dto) {
+        Seguimiento entity = SeguimientoMapper.toEntity(dto);
+        Seguimiento saved = seguimientoRepository.save(entity);
+        return new ApiResponse<>(true, SeguimientoMapper.toDTO(saved), null);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Seguimiento> updateSeguimiento(@PathVariable Long id, @RequestBody Seguimiento seguimientoDetails) {
+    public ApiResponse<SeguimientoDTO> updateSeguimiento(@PathVariable Long id, @RequestBody SeguimientoDTO dto) {
         return seguimientoRepository.findById(id).map(seguimiento -> {
-            seguimiento.setTarea(seguimientoDetails.getTarea());
-            seguimiento.setFecha(seguimientoDetails.getFecha());
-            seguimiento.setCompletado(seguimientoDetails.getCompletado());
-            seguimiento.setContacto(seguimientoDetails.getContacto());
-            return ResponseEntity.ok(seguimientoRepository.save(seguimiento));
-        }).orElse(ResponseEntity.notFound().build());
+            seguimiento.setTarea(dto.getTarea());
+            seguimiento.setFecha(dto.getFecha());
+            seguimiento.setCompletado(dto.getCompletado());
+            // El contacto_id vendría en el DTO si fuera necesario mapearlo aquí
+            Seguimiento saved = seguimientoRepository.save(seguimiento);
+            return new ApiResponse<>(true, SeguimientoMapper.toDTO(saved), null);
+        }).orElseThrow(() -> new ResourceNotFoundException("Seguimiento no encontrado con id " + id));
     }
 
     @DeleteMapping("/{id}")

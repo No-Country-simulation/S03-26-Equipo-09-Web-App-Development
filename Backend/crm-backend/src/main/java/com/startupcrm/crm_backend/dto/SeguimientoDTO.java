@@ -12,6 +12,7 @@ public class SeguimientoDTO {
     private LocalDateTime fecha;
     private Boolean completado;
     private Boolean recordatorioActivado;
+    private ContactoDTO contacto;
 
 
 }

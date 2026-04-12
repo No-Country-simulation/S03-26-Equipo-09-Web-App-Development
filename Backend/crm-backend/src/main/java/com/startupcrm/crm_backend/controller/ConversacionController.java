@@ -51,25 +51,26 @@ public class ConversacionController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Conversacion> updateConversacion(@PathVariable Long id, @RequestBody Conversacion conversacionDetails) {
+    public ApiResponse<ConversacionDTO> updateConversacion(@PathVariable Long id, @RequestBody ConversacionDTO dto) {
         return conversacionRepository.findById(id).map(conversacion -> {
-            conversacion.setCanal(conversacionDetails.getCanal());
-            conversacion.setContenido(conversacionDetails.getContenido());
-            conversacion.setFechaHora(conversacionDetails.getFechaHora());
-            conversacion.setContacto(conversacionDetails.getContacto());
-            return ResponseEntity.ok(conversacionRepository.save(conversacion));
-        }).orElse(ResponseEntity.notFound().build());
+            conversacion.setCanal(dto.getCanal());
+            conversacion.setContenido(dto.getContenido());
+            if (dto.getLeido() != null) {
+                conversacion.setLeido(dto.getLeido());
+            }
+            Conversacion saved = conversacionRepository.save(conversacion);
+            return new ApiResponse<>(true, ConversacionMapper.toDTO(saved), null);
+        }).orElseThrow(() -> new ResourceNotFoundException("Conversación no encontrada con id " + id));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteSeguimiento(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteConversacion(@PathVariable Long id) {
         return conversacionRepository.findById(id)
-                .map(seguimiento -> {
-                    conversacionRepository.delete(seguimiento);
-                    return ResponseEntity.noContent().<Void>build(); // forzado a Void
+                .map(conversacion -> {
+                    conversacionRepository.delete(conversacion);
+                    return ResponseEntity.noContent().<Void>build();
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());
-
     }
 
 

@@ -151,7 +151,7 @@ export const SeguimientosPage = () => {
                   </button>
                   <div className="flex-1 min-w-0">
                     <p className={`font-semibold text-sm ${seg.completado ? 'line-through text-on-surface-variant' : 'text-primary'}`}>{seg.tarea}</p>
-                    <p className="text-xs text-on-surface-variant mt-0.5">{seg.contacto.nombre} · {seg.fecha}</p>
+                    <p className="text-xs text-on-surface-variant mt-0.5">{seg.contacto?.nombre || t('common.unknown')} · {seg.fecha}</p>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
                     {estado === 'vencida' && <Badge variant="error">{t('seguimientos.badge.overdue')}</Badge>}

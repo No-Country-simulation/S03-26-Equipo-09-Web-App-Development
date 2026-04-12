@@ -93,7 +93,7 @@ export const PlantillasPage = () => {
             <Card key={plantilla.id} className={`flex flex-col gap-3 cursor-pointer hover:shadow-md transition-all ${!plantilla.esActiva ? 'opacity-50' : ''}`} onClick={() => { setVistaPrevia(plantilla); }}>
               <div className="flex items-start justify-between gap-2">
                 <h3 className="font-bold text-primary text-sm truncate">{plantilla.nombre}</h3>
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border flex-shrink-0 ${CANAL_COLORS[plantilla.canal]}`}>{t(`canal.${plantilla.canal}`)}</span>
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border flex-shrink-0 ${CANAL_COLORS[plantilla.canal || 'WhatsApp']}`}>{t(`canal.${plantilla.canal || 'WhatsApp'}`)}</span>
               </div>
               <p className="text-xs text-on-surface-variant line-clamp-3 bg-surface-container-low rounded-lg p-3 font-mono leading-relaxed">{plantilla.contenido}</p>
               <div className="flex items-center justify-between pt-1">
@@ -128,7 +128,7 @@ export const PlantillasPage = () => {
               <Badge variant={vistaPrevia.esActiva ? 'success' : 'error'}>
                 {vistaPrevia.esActiva ? t('plantillas.badge.active') : t('plantillas.badge.inactive')}
               </Badge>
-              <span className={`text-xs font-bold px-2 py-1 rounded-full border ${CANAL_COLORS[vistaPrevia.canal]}`}>{t(`canal.${vistaPrevia.canal}`)}</span>
+              <span className={`text-xs font-bold px-2 py-1 rounded-full border ${CANAL_COLORS[vistaPrevia.canal || 'WhatsApp']}`}>{t(`canal.${vistaPrevia.canal || 'WhatsApp'}`)}</span>
             </div>
             <div className="bg-surface-container-low rounded-xl p-4">
               <p className="text-xs text-on-surface-variant uppercase tracking-widest font-bold mb-2">{t('plantillas.content')}</p>

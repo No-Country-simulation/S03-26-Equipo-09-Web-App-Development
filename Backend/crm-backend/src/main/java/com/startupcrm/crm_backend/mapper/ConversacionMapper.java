@@ -15,6 +15,7 @@ public class ConversacionMapper {
         dto.setFechaHora(c.getFechaHora());
         dto.setEsEntrante(c.getEsEntrante()); // Crucial para KPIs
         dto.setLeido(c.getLeido());
+        dto.setContacto(ContactoMapper.toDTOBasico(c.getContacto()));
 
         return dto;
     }

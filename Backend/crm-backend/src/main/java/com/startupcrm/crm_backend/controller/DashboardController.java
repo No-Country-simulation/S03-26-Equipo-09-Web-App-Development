@@ -50,8 +50,10 @@ public class DashboardController {
 
         // 4. Distribución por estados (para la gráfica de pastel)
         Map<String, Long> statsPorEstado = new HashMap<>();
+        // Los estados que maneja el frontend son: LEAD_ACTIVO, EN_SEGUIMIENTO, CLIENTE, PERDIDO, etc.
+        // Usamos los valores del Enum pero como String para consultar el repo
         for (EstadoLead estado : EstadoLead.values()) {
-            statsPorEstado.put(estado.name(), contactoRepo.countByEstado(estado));
+            statsPorEstado.put(estado.name(), contactoRepo.countByEstado(estado.name()));
         }
         dto.setContactosPorEstado(statsPorEstado);
 
