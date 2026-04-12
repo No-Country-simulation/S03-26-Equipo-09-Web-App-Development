@@ -74,11 +74,11 @@ public class DatabaseSeeder implements CommandLineRunner {
         return "55" + (10000000 + random.nextInt(89999999));
     }
 
-    private EstadoLead getEstado(int i) {
-        if (i < 7) return EstadoLead.LEAD_ACTIVO;
-        if (i < 14) return EstadoLead.EN_SEGUIMIENTO;
-        if (i < 17) return EstadoLead.CALIFICADO;
-        return EstadoLead.CLIENTE;
+    private String getEstado(int i) {
+        if (i < 7) return "LEAD_ACTIVO";
+        if (i < 14) return "EN_SEGUIMIENTO";
+        if (i < 17) return "CALIFICADO";
+        return "CLIENTE";
     }
 
     private List<Conversacion> generarConversaciones(Contacto contacto) {
