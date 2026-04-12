@@ -124,7 +124,7 @@ export const InboxPage = () => {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-2">
-                          <p className={`text-sm font-bold truncate ${conv.leido ? 'text-on-surface-variant' : 'text-primary'}`}>{conv.contacto.nombre}</p>
+                          <p className={`text-sm font-bold truncate ${conv.leido ? 'text-on-surface-variant' : 'text-primary'}`}>{conv.contacto?.nombre || t('common.unknown')}</p>
                           <div className="flex items-center gap-1.5 flex-shrink-0">
                             {!conv.leido && <span className="w-2 h-2 rounded-full bg-primary flex-shrink-0" />}
                             <span className="text-[10px] text-on-surface-variant">{timeAgo(conv.fechaHora)}</span>
@@ -145,11 +145,11 @@ export const InboxPage = () => {
               <Card className="flex flex-col h-full p-0 overflow-hidden">
                 <div className="flex items-center gap-4 px-6 py-4 border-b border-outline-variant/20 bg-surface-container-low/30">
                   <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
-                    {seleccionada.contacto.nombre.charAt(0)}
+                    {seleccionada.contacto?.nombre?.charAt(0) || '?'}
                   </div>
                   <div>
-                    <p className="font-bold text-primary">{seleccionada.contacto.nombre}</p>
-                    <p className="text-xs text-on-surface-variant">{seleccionada.contacto.email}</p>
+                    <p className="font-bold text-primary">{seleccionada.contacto?.nombre || t('common.unknown')}</p>
+                    <p className="text-xs text-on-surface-variant">{seleccionada.contacto?.email || '-'}</p>
                   </div>
                   <div className="ml-auto">
                     <Badge variant={seleccionada.canal === 'WhatsApp' ? 'success' : 'info'}>
