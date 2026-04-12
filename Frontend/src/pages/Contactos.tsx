@@ -1,12 +1,24 @@
 import { useState } from 'react';
+import { useAuth } from '../hooks/useAuth';
 import { ContactoTable } from '../components/ContactoTable';
 import { CalificadoPanel } from '../components/CalificadoPanel';
 import { Button } from '../components/ui/Button/Button';
 import { Modal } from '../components/ui/Modal/Modal';
 
+// Mock data de vendedores para el admin
+const VENDEDORES_MOCK = [
+  { id: 1, nombre: 'Juan García', email: 'juan@crm.com' },
+  { id: 2, nombre: 'María López', email: 'maria@crm.com' },
+  { id: 3, nombre: 'Carlos Ruiz', email: 'carlos@crm.com' },
+  { id: 4, nombre: 'Ana Chen', email: 'ana@crm.com' }
+];
+
 export const ContactosPage = () => {
+  const { isAdmin } = useAuth();
   const [activeTab, setActiveTab] = useState<'lead-activo' | 'en-seguimiento' | 'cliente' | 'inactivo' | 'calificado'>('lead-activo');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedVendedor, setSelectedVendedor] = useState<string>(''); // Filtro para Admin
+  const [newLeadVendedor, setNewLeadVendedor] = useState<string>(''); // Selector en form para Admin
 
   // Definir tabs con los 5 nuevos estados operativos
   const tabs = [
@@ -47,14 +59,17 @@ export const ContactosPage = () => {
 
   return (
     <div className="space-y-6 p-4 md:p-6 animate-fade-in">
-      {/* Header con Título y Botón */}
+      {/* Header con Título y Botón - DIFERENCIADO POR ROL */}
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-[#182442]">
-            Centro de Gestión de Leads
+            {isAdmin ? 'Centro de Gestión de Leads (Admin)' : 'Mis Leads'}
           </h1>
           <p className="text-slate-600 text-base mt-1">
-            Administra leads en 5 estados: Activo, Seguimiento, Cliente, Inactivo, Calificado
+            {isAdmin 
+              ? 'Administra todos los leads del equipo en 5 estados'
+              : 'Administra tus leads en 5 estados: Activo, Seguimiento, Cliente, Inactivo, Calificado'
+            }
           </p>
         </div>
         <Button 
@@ -67,6 +82,33 @@ export const ContactosPage = () => {
           Nuevo Lead
         </Button>
       </header>
+
+      {/* FILTRO DE VENDEDOR - SOLO PARA ADMIN */}
+      {isAdmin && (
+        <div className="bg-gradient-to-r from-[#006c49]/5 to-[#006c49]/10 rounded-lg border border-[#006c49]/20 p-4">
+          <label className="block text-sm font-semibold text-[#182442] mb-2">
+            <span className="material-symbols-outlined inline mr-2 text-[18px]">person</span>
+            Filtrar por Vendedor
+          </label>
+          <select
+            value={selectedVendedor}
+            onChange={(e) => setSelectedVendedor(e.target.value)}
+            className="w-full md:w-64 px-4 py-2 rounded-lg border border-[#006c49]/30 bg-white focus:border-[#006c49] focus:ring-2 focus:ring-[#006c49]/20 focus:outline-none transition-all font-medium"
+          >
+            <option value="">Todos los Vendedores</option>
+            {VENDEDORES_MOCK.map((vendedor) => (
+              <option key={vendedor.id} value={vendedor.id.toString()}>
+                {vendedor.nombre}
+              </option>
+            ))}
+          </select>
+          {selectedVendedor && (
+            <p className="text-sm text-[#006c49] mt-2 font-semibold">
+              ✓ Mostrando leads asignados a {VENDEDORES_MOCK.find(v => v.id.toString() === selectedVendedor)?.nombre}
+            </p>
+          )}
+        </div>
+      )}
 
       {/* Tabs como Badges Coloreados - 4 Estados */}
       <div className="flex flex-wrap gap-3 pb-4">
@@ -117,6 +159,26 @@ export const ContactosPage = () => {
       {/* Modal para Nuevo Lead */}
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Crear Nuevo Lead">
         <form className="space-y-4">
+          {/* SELECTOR DE VENDEDOR - SOLO PARA ADMIN */}
+          {isAdmin && (
+            <div>
+              <label className="block text-sm font-medium text-[#182442] mb-1">Asignar a Vendedor * <span className="text-red-500">(Campo Admin)</span></label>
+              <select
+                value={newLeadVendedor}
+                onChange={(e) => setNewLeadVendedor(e.target.value)}
+                className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-[#006c49] focus:ring-2 focus:ring-[#006c49]/20 focus:outline-none transition-all"
+                required={isAdmin}
+              >
+                <option value="">-- Selecciona un vendedor --</option>
+                {VENDEDORES_MOCK.map((vendedor) => (
+                  <option key={vendedor.id} value={vendedor.id.toString()}>
+                    {vendedor.nombre} ({vendedor.email})
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
           <div>
             <label className="block text-sm font-medium text-[#182442] mb-1">Nombre Completo *</label>
             <input 
@@ -160,7 +222,10 @@ export const ContactosPage = () => {
           <div className="flex gap-3 justify-end pt-4">
             <button
               type="button"
-              onClick={() => setIsModalOpen(false)}
+              onClick={() => {
+                setIsModalOpen(false);
+                setNewLeadVendedor('');
+              }}
               className="px-4 py-2 rounded-lg border border-slate-300 text-[#182442] hover:bg-slate-100 transition-all"
             >
               Cancelar
