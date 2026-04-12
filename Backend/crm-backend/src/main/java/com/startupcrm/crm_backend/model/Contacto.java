@@ -22,8 +22,8 @@ public class Contacto {
     private String email;
     private String telefono;
 
-    @Enumerated(EnumType.STRING)
-    private EstadoLead estado;
+@Column(name = "estado")
+    private String estado;
 
     @Column(updatable = false)
     private LocalDateTime fechaCreacion;
