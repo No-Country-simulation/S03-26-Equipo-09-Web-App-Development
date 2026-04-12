@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Card } from '../components/ui/Card/Card';
 import { Modal } from '../components/ui/Modal/Modal';
-import { BarChart } from '../components/charts/bar/bar';
 
 interface Vendedor {
   id: number;
