@@ -109,7 +109,7 @@ export const DashboardLayout = () => {
 
                 <Link 
                   activeProps={{ className: "bg-[#006c49]/10 text-[#006c49] font-bold" }}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-semibold text-[#182442] hover:bg-[#f3f4f5] transition-all"
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-semibold transition-all hover:bg-[#f3f4f5]"
                   to="/contactos"
                 >
                   <span className="material-symbols-outlined">person</span> Leads
