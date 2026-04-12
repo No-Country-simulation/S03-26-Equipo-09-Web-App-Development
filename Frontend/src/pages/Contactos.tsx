@@ -5,14 +5,15 @@ import { Button } from '../components/ui/Button/Button';
 import { Modal } from '../components/ui/Modal/Modal';
 
 export const ContactosPage = () => {
-  const [activeTab, setActiveTab] = useState<'lead-activo' | 'en-seguimiento' | 'cliente' | 'calificado'>('lead-activo');
+  const [activeTab, setActiveTab] = useState<'lead-activo' | 'en-seguimiento' | 'cliente' | 'inactivo' | 'calificado'>('lead-activo');
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Definir tabs con los 4 nuevos estados operativos
+  // Definir tabs con los 5 nuevos estados operativos
   const tabs = [
     { id: 'lead-activo' as const, label: 'Lead Activo', icon: 'new_releases', color: 'blue', description: 'Recién capturados' },
     { id: 'en-seguimiento' as const, label: 'En Seguimiento', icon: 'schedule', color: 'yellow', description: 'Con actividad reciente' },
     { id: 'cliente' as const, label: 'Cliente', icon: 'star', color: 'green', description: 'Compra finalizada' },
+    { id: 'inactivo' as const, label: 'Inactivo', icon: 'block', color: 'red', description: 'Bloqueados o sin respuesta' },
     { id: 'calificado' as const, label: 'Calificado', icon: 'check_circle', color: 'orange', description: '7+ días sin respuesta' }
   ];
 
@@ -33,6 +34,10 @@ export const ContactosPage = () => {
       orange: {
         active: 'bg-orange-500 border-orange-600',
         inactive: 'bg-orange-100 text-orange-700 border-orange-200 hover:bg-orange-200'
+      },
+      red: {
+        active: 'bg-red-500 border-red-600',
+        inactive: 'bg-red-100 text-red-700 border-red-200 hover:bg-red-200'
       }
     };
     const entry = colorMap[color];
@@ -49,7 +54,7 @@ export const ContactosPage = () => {
             Centro de Gestión de Leads
           </h1>
           <p className="text-slate-600 text-base mt-1">
-            Administra leads en 4 estados: Activo, Seguimiento, Cliente, Calificado
+            Administra leads en 5 estados: Activo, Seguimiento, Cliente, Inactivo, Calificado
           </p>
         </div>
         <Button 
@@ -96,6 +101,12 @@ export const ContactosPage = () => {
           <div className="text-center py-12">
             <p className="text-slate-500 text-base mb-2">No hay leads en estado cliente</p>
             <p className="text-slate-400 text-sm">Los leads que completaron una compra aparecerán aquí</p>
+          </div>
+        )}
+        {activeTab === 'inactivo' && (
+          <div className="text-center py-12">
+            <p className="text-slate-500 text-base mb-2">No hay leads inactivos</p>
+            <p className="text-slate-400 text-sm">Los leads bloqueados, que se retiraron o sin actividad aparecerán aquí</p>
           </div>
         )}
         {activeTab === 'calificado' && (
