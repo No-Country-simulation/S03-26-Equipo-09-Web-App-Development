@@ -26,10 +26,7 @@ export const BarChart = ({ data }: BarChartProps) => (
     axisBottom={{
       tickSize: 5,
       tickPadding: 8,
-      tickRotation: -45,
-      legend: 'Vendedor / Canal',
-      legendPosition: 'middle',
-      legendOffset: 50
+      tickRotation: -45
     }}
     axisLeft={{
       tickSize: 5,
