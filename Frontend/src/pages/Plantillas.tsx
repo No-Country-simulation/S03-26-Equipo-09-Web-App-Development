@@ -16,7 +16,7 @@ export const Plantillas = () => {
       id: 1,
       nombre: 'Seguimiento Inicial',
       tipo: 'email',
-      contenido: 'Hola {{nombre}}, queremos seguir con tu interés en nuestro producto. ¿Podemos agendar una llamada?',
+      contenido: 'Hola {{nombre}}, queremos felicitarte por tu interés en nuestro producto. ¿Podemos agendar una llamada?',
       variables: ['nombre'],
       usosTotal: 42,
       estado: 'activa'
@@ -25,7 +25,7 @@ export const Plantillas = () => {
       id: 2,
       nombre: 'Recordatorio WhatsApp',
       tipo: 'whatsapp',
-      contenido: 'Hola {{nombre}} 👋 Solo para recordarte que tienes una propuesta pendiente. ¿Qué preguntas tienes?',
+      contenido: 'Hola {{nombre}} 👋 Solo para recordarte que tienes una propuesta de descuento pendiente. ¿Qué preguntas tienes?',
       variables: ['nombre'],
       usosTotal: 128,
       estado: 'activa'
@@ -34,7 +34,7 @@ export const Plantillas = () => {
       id: 3,
       nombre: 'Cierre de Venta',
       tipo: 'email',
-      contenido: 'Genial {{nombre}}, nos encantaría trabajar contigo. Te enviaremos los detalles del contrato en breve.',
+      contenido: 'Genial {{nombre}}, nos encanta tu decisión. Te enviaremos los detalles de tu compra en breve.',
       variables: ['nombre'],
       usosTotal: 15,
       estado: 'activa'

@@ -8,7 +8,6 @@ import { BarChart } from '../components/charts/bar/bar';
 import { PieChart } from '../components/charts/pie/pie';
 import { Card } from '../components/ui/Card/Card';
 import { Badge } from '../components/ui/Badge/Badge';
-import { Button } from '../components/ui/Button/Button';
 import { Modal } from '../components/ui/Modal/Modal';
 
 export const DashboardPage = () => {
@@ -200,14 +199,9 @@ export const DashboardPage = () => {
             <p className="text-white/40 text-sm mt-1">Email + WhatsApp</p>
           </div>
           <div>
-            <p className="text-white/60 text-xs font-bold uppercase tracking-widest">Seguimientos Pendientes</p>
-            <h4 className="text-4xl font-extrabold mt-2 text-yellow-400">{metricas?.seguimientosPendientes || mockStats.mensajesSinLeer}</h4>
-            <button 
-              onClick={() => navigate({ to: '/contactos' })}
-              className="text-sm font-bold text-secondary hover:underline mt-1"
-            >
-              Gestionar →
-            </button>
+            <p className="text-white/60 text-xs font-bold uppercase tracking-widest">Productos Vendidos</p>
+            <h4 className="text-4xl font-extrabold mt-2 text-green-400">140</h4>
+            <p className="text-secondary text-sm font-bold mt-1">+8% vs mes anterior</p>
           </div>
         </div>
       </Card>
@@ -246,34 +240,48 @@ export const DashboardPage = () => {
         </Card>
       )}
 
-      {/* 4. Acciones Rápidas */}
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Button 
-          className="flex-col h-28" 
-          icon="person_add" 
-          variant="outline" 
-          onClick={() => navigate({ to: '/contactos' })}
-        >
-          <span className="text-sm font-bold text-primary">Gestionar Contactos</span>
-        </Button>
+      {/* 4. Análisis Detallado */}
+      <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Gráfico: Eficiencia de Vendedores */}
+        <Card as="article" className="p-6 flex flex-col">
+          <div className="mb-4">
+            <h2 className="text-lg font-bold text-primary">
+              Eficiencia de Vendedores
+            </h2>
+            <p className="text-sm text-on-surface-variant mt-1">
+              Top vendedores por ventas realizadas
+            </p>
+          </div>
+          <div style={{ minHeight: '300px' }}>
+            <BarChart data={[
+              { id: 'Juan García', data: [{ x: 'Ventas', y: 45 }] },
+              { id: 'María López', data: [{ x: 'Ventas', y: 38 }] },
+              { id: 'Carlos Ruiz', data: [{ x: 'Ventas', y: 32 }] },
+              { id: 'Ana Chen', data: [{ x: 'Ventas', y: 25 }] }
+            ]} />
+          </div>
+        </Card>
 
-        <Button 
-          className="flex-col h-28" 
-          icon="filter_alt" 
-          variant="outline" 
-          onClick={() => navigate({ to: '/segmentacion' })}
-        >
-          <span className="text-sm font-bold text-primary">Ver Segmentación</span>
-        </Button>
-
-        <Button 
-          className="flex-col h-28" 
-          icon="analytics" 
-          variant="outline" 
-          onClick={() => navigate({ to: '/metricas' })}
-        >
-          <span className="text-sm font-bold text-primary">Análisis Completo</span>
-        </Button>
+        {/* Gráfico: Motivos de No Compra */}
+        <Card as="article" className="p-6 flex flex-col">
+          <div className="mb-4">
+            <h2 className="text-lg font-bold text-primary">
+              Motivos de No Compra
+            </h2>
+            <p className="text-sm text-on-surface-variant mt-1">
+              Análisis de oportunidades perdidas
+            </p>
+          </div>
+          <div style={{ minHeight: '300px' }}>
+            <PieChart data={[
+              { id: 'Presupuesto insuficiente', label: 'Presupuesto insuficiente', value: 35 },
+              { id: 'Falta de necesidad', label: 'Falta de necesidad', value: 25 },
+              { id: 'Competencia', label: 'Competencia', value: 20 },
+              { id: 'Timing', label: 'Timing', value: 15 },
+              { id: 'Otro', label: 'Otro', value: 5 }
+            ]} />
+          </div>
+        </Card>
       </section>
 
       {/* 5. Espacio para Gráficos */}
