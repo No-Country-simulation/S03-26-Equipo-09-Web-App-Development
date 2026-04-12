@@ -14,6 +14,7 @@ public class SeguimientoMapper {
         dto.setFecha(s.getFecha());
         dto.setCompletado(s.getCompletado());
         dto.setRecordatorioActivado(s.getRecordatorioActivado());
+        dto.setContacto(ContactoMapper.toDTOBasico(s.getContacto()));
 
         return dto;
     }
