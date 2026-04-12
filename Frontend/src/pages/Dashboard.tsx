@@ -70,7 +70,7 @@ export const DashboardPage = () => {
               Tus leads y métricas del mes actual
             </p>
           </div>
-          <Badge variant="info" className="bg-blue-500 text-white">👔 Vendedor</Badge>
+          <Badge variant="success" className="bg-[#006c49] text-[#182442] font-semibold">Vendedor {userName?.split(' ')[0]}</Badge>
         </header>
 
         {/* KPIs Simplificados con Nueva Lógica */}
@@ -119,17 +119,6 @@ export const DashboardPage = () => {
               </div>
             </div>
           </Card>
-        </section>
-
-        {/* Acciones Rápidas - Solo Nuevo Lead */}
-        <section className="flex justify-center">
-          <Button
-            onClick={() => {/* Abrir modal de nuevo lead - próximamente */}}
-            className="h-14 px-8 bg-[#006c49] hover:bg-[#005236] text-white font-semibold text-lg"
-          >
-            <span className="material-symbols-outlined mr-2">add</span>
-            Nuevo Lead
-          </Button>
         </section>
       </div>
     );

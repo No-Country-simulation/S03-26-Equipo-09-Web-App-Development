@@ -59,7 +59,6 @@ export const DashboardLayout = () => {
                     </div>
                     <div>
                       <p className="font-semibold text-sm text-[#182442]">{userName}</p>
-                      <p className="text-xs text-slate-500">👔 Vendedor</p>
                     </div>
                   </div>
 
