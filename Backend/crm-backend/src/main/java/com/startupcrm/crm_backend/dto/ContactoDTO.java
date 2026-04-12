@@ -25,7 +25,7 @@ public class ContactoDTO {
     @NotBlank(message = "El teléfono es obligatorio")
     private String telefono;
 
-    private EstadoLead estado;
+    private String estado;
     private LocalDateTime fechaCreacion;
     private String nombreResponsable; // Para mostrar quién lo atiende
 
