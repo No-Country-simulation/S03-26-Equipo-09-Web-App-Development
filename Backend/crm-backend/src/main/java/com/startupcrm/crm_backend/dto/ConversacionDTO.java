@@ -13,6 +13,7 @@ public class ConversacionDTO {
     private LocalDateTime fechaHora;
     private Boolean esEntrante; // true: Cliente, false: Empresa
     private Boolean leido;
+    private ContactoDTO contacto;
 
 
 }
