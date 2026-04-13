@@ -4,8 +4,8 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - DB_URL=jdbc:postgresql://aws-1-us-east-1.pooler.supabase.com:6543/postgres?prepareThreshold=0
-      - DB_USERNAME=postgres.cyohgfityjrccegxuftb
-      - DB_PASSWORD=CRM-Inteligente
-      - PORT=8080
+      - DB_URL=${DB_URL}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - PORT=${PORT:-8080}
     restart: always
