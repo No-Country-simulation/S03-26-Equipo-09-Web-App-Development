@@ -598,29 +598,29 @@ export const InboxAdmin: React.FC = () => {
         {selectedConversacion ? (
           <div className="flex-1 w-full lg:w-auto bg-white rounded-lg shadow overflow-hidden flex flex-col lg:h-auto min-h-screen lg:min-h-full">
             {/* Header Chat */}
-            <div className="bg-gradient-to-r from-[#182442] to-[#006c49] text-white px-3 py-2 lg:p-4 flex flex-row lg:flex-row lg:justify-between lg:items-center gap-2 lg:gap-3 flex-shrink-0">
+            <div className="bg-gradient-to-r from-[#182442] to-[#006c49] text-white px-3 py-1.5 lg:p-4 flex flex-row lg:flex-row lg:justify-between lg:items-center gap-2 lg:gap-3 flex-shrink-0">
               <button
                 onClick={() => setSelectedConversacion(null)}
-                className="lg:hidden px-3 py-1.5 bg-white/30 hover:bg-white/50 rounded text-sm font-semibold transition-colors"
+                className="lg:hidden px-2 py-1 bg-white/30 hover:bg-white/50 rounded text-xs font-semibold transition-colors"
                 title="Volver al listado"
               >
-                ← Conversaciones
+                ← Conv
               </button>
               <div className="flex-1 min-w-0">
-                <h3 className="font-bold text-sm lg:text-base">#{selectedConversacion.id} - {selectedConversacion.contactoNombre}</h3>
-                <p className="text-xs lg:text-sm opacity-90 line-clamp-1">{selectedConversacion.canal} • {selectedConversacion.vendedorAsignadoNombre || 'Sin asignar'}</p>
+                <h3 className="font-bold text-xs lg:text-base truncate">#{selectedConversacion.id} - {selectedConversacion.contactoNombre}</h3>
+                <p className="text-xs lg:text-sm opacity-90 line-clamp-1 hidden lg:block">{selectedConversacion.canal} • {selectedConversacion.vendedorAsignadoNombre || 'Sin asignar'}</p>
               </div>
-              <div className="flex gap-1 lg:gap-2 flex-shrink-0">
+              <div className="flex gap-0.5 lg:gap-2 flex-shrink-0">
                 <button
                   onClick={() => setReasignarModal(true)}
-                  className="p-1.5 lg:p-1 bg-white/20 hover:bg-white/30 rounded text-lg lg:text-lg"
+                  className="p-0.5 lg:p-1 bg-white/20 hover:bg-white/30 rounded text-base lg:text-lg"
                   title="Reasignar"
                 >
                   👤
                 </button>
                 <button
                   onClick={() => descargarPDF(selectedConversacion)}
-                  className="p-1.5 lg:p-1 bg-white/20 hover:bg-white/30 rounded text-lg lg:text-lg"
+                  className="p-0.5 lg:p-1 bg-white/20 hover:bg-white/30 rounded text-basese lg:text-lg"
                   title="Descargar PDF"
                 >
                   📥
@@ -629,7 +629,7 @@ export const InboxAdmin: React.FC = () => {
             </div>
 
             {/* Mensajes */}
-            <div className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-4 lg:space-y-5 bg-slate-50">
+            <div className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-3 lg:space-y-4 bg-slate-50">
               {selectedConversacion.mensajes && selectedConversacion.mensajes.length > 0 ? (
                 selectedConversacion.mensajes.map((msg) => (
                   <div
@@ -643,11 +643,11 @@ export const InboxAdmin: React.FC = () => {
                           : 'bg-[#006c49] text-white'
                       }`}
                     >
-                      <p className={`text-sm font-semibold mb-1.5 lg:mb-2 ${msg.tipo === 'entrada' ? 'text-slate-600' : 'opacity-90'}`}>
+                      <p className={`text-xs lg:text-sm font-semibold mb-1 lg:mb-1 ${msg.tipo === 'entrada' ? 'text-slate-600' : 'opacity-90'}`}>
                         {msg.remitente}
                       </p>
-                      <p className="text-base lg:text-base break-words">{msg.contenido}</p>
-                      <p className={`text-xs mt-2 lg:mt-3 ${msg.tipo === 'entrada' ? 'text-slate-400' : 'opacity-75'}`}>
+                      <p className="text-sm lg:text-sm break-words">{msg.contenido}</p>
+                      <p className={`text-xs mt-2 lg:mt-2 ${msg.tipo === 'entrada' ? 'text-slate-400' : 'opacity-75'}`}>
                         {new Date(msg.fechaHora).toLocaleTimeString('es-ES')}
                       </p>
                     </div>
@@ -659,27 +659,27 @@ export const InboxAdmin: React.FC = () => {
             </div>
 
             {/* Input Respuesta */}
-            <div className="border-t border-slate-200 px-4 py-3 lg:p-6 space-y-3 lg:space-y-4 bg-white flex-shrink-0">
-              <div className="flex gap-3 lg:gap-3">
+            <div className="border-t border-slate-200 px-3 py-2 lg:p-4 space-y-2 lg:space-y-3 bg-white flex-shrink-0">
+              <div className="flex gap-2 lg:gap-3">
                 <textarea
                   value={respuesta}
                   onChange={(e) => setRespuesta(e.target.value)}
                   placeholder="Escribe tu respuesta..."
-                  className="flex-1 px-4 py-3 lg:px-4 lg:py-3 border border-slate-300 rounded lg:rounded-lg resize-none focus:border-[#006c49] focus:ring-2 lg:focus:ring-2 focus:ring-[#006c49]/20 text-base lg:text-base"
-                  rows={4}
+                  className="flex-1 px-3 py-2 lg:px-4 lg:py-2 border border-slate-300 rounded lg:rounded-lg resize-none focus:border-[#006c49] focus:ring-1 lg:focus:ring-2 focus:ring-[#006c49]/20 text-xs lg:text-sm"
+                  rows={2}
                 />
               </div>
-              <div className="flex flex-col lg:flex-row gap-3 lg:gap-4">
+              <div className="flex flex-col lg:flex-row gap-2 lg:gap-3">
                 <button
                   onClick={() => setPlantillaModal(true)}
-                  className="flex-1 px-4 py-3 lg:py-3 lg:px-5 bg-yellow-500 text-white rounded lg:rounded-lg hover:bg-yellow-600 font-semibold text-base lg:text-base transition-colors"
+                  className="flex-1 px-3 py-2 lg:py-2 lg:px-4 bg-yellow-500 text-white rounded lg:rounded-lg hover:bg-yellow-600 font-semibold text-xs lg:text-sm transition-colors"
                 >
                   📧 Plantillas
                 </button>
                 <button
                   onClick={handleEnviarRespuesta}
                   disabled={!respuesta.trim()}
-                  className="flex-1 px-4 py-3 lg:py-3 lg:px-5 bg-[#006c49] text-white rounded lg:rounded-lg hover:bg-[#005236] font-semibold disabled:bg-slate-400 disabled:cursor-not-allowed text-base lg:text-base transition-colors"
+                  className="flex-1 px-3 py-2 lg:py-2 lg:px-4 bg-[#006c49] text-white rounded lg:rounded-lg hover:bg-[#005236] font-semibold disabled:bg-slate-400 disabled:cursor-not-allowed text-xs lg:text-smnsition-colors"
                 >
                   ✉️ Enviar
                 </button>
