@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Modal } from '../components/ui/Modal/Modal';
 
 interface Plantilla {
   id: number;
@@ -50,11 +51,57 @@ export const Plantillas = () => {
     }
   ]);
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [filtroActual, setFiltroActual] = useState<'Todas' | 'Email' | 'WhatsApp'>('Todas');
+  const [formData, setFormData] = useState({
+    nombre: '',
+    tipo: 'email' as 'email' | 'whatsapp',
+    contenido: '',
+    variables: ''
+  });
+
   const handleToggleState = (id: number) => {
     setPlantillas(plantillas.map(p => 
       p.id === id ? { ...p, estado: p.estado === 'activa' ? 'inactiva' : 'activa' } : p
     ));
   };
+
+  const handleAddPlantilla = () => {
+    if (!formData.nombre.trim() || !formData.contenido.trim()) {
+      alert('Por favor completa todos los campos');
+      return;
+    }
+
+    // Extraer variables del contenido (buscar {{var}})
+    const variablesExtracted = formData.contenido.match(/\{\{(\w+)\}\}/g)?.map(v => v.replace(/\{\{|\}\}/g, '')) || [];
+    const variablesUnicas = Array.from(new Set(variablesExtracted));
+
+    const nuevaPlantilla: Plantilla = {
+      id: Math.max(...plantillas.map(p => p.id), 0) + 1,
+      nombre: formData.nombre,
+      tipo: formData.tipo,
+      contenido: formData.contenido,
+      variables: variablesUnicas.length > 0 ? variablesUnicas : formData.variables.split(',').filter(v => v.trim()),
+      usosTotal: 0,
+      estado: 'activa'
+    };
+
+    setPlantillas([...plantillas, nuevaPlantilla]);
+    
+    // Guardar en localStorage para que otros módulos accedan
+    localStorage.setItem('plantillas_crm', JSON.stringify([...plantillas, nuevaPlantilla]));
+    
+    setFormData({ nombre: '', tipo: 'email', contenido: '', variables: '' });
+    setIsModalOpen(false);
+    alert('Plantilla creada exitosamente');
+  };
+
+  const plantillasFiltradas = plantillas.filter(p => {
+    if (filtroActual === 'Todas') return true;
+    if (filtroActual === 'Email') return p.tipo === 'email';
+    if (filtroActual === 'WhatsApp') return p.tipo === 'whatsapp';
+    return true;
+  });
 
   return (
     <div className="space-y-6 p-4 md:p-6 animate-fade-in">
@@ -68,11 +115,73 @@ export const Plantillas = () => {
             Gestiona plantillas reutilizables para Email y WhatsApp
           </p>
         </div>
-        <button className="h-11 px-6 bg-[#182442] hover:bg-[#0d1420] text-white font-semibold whitespace-nowrap rounded-lg flex items-center gap-2">
+        <button 
+          onClick={() => setIsModalOpen(true)}
+          className="h-11 px-6 bg-[#182442] hover:bg-[#0d1420] text-white font-semibold whitespace-nowrap rounded-lg flex items-center gap-2 transition-all"
+        >
           <span className="material-symbols-outlined">add</span>
           Nueva Plantilla
         </button>
       </header>
+
+      {/* Modal para crear plantilla */}
+      <Modal 
+        isOpen={isModalOpen} 
+        title="Crear Nueva Plantilla"
+        onClose={() => setIsModalOpen(false)}
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">Nombre de la Plantilla</label>
+            <input
+              type="text"
+              value={formData.nombre}
+              onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
+              placeholder="ej: Seguimiento Inicial"
+              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-[#182442] text-slate-700"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">Tipo de Mensaje</label>
+            <select
+              value={formData.tipo}
+              onChange={(e) => setFormData({ ...formData, tipo: e.target.value as 'email' | 'whatsapp' })}
+              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-[#182442] text-slate-700"
+            >
+              <option value="email">Email</option>
+              <option value="whatsapp">WhatsApp</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">Contenido</label>
+            <textarea
+              value={formData.contenido}
+              onChange={(e) => setFormData({ ...formData, contenido: e.target.value })}
+              placeholder="Escribe tu plantilla. Usa {{variable}} para variables dinámicas. ej: Hola {{nombre}}"
+              rows={4}
+              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-[#182442] text-slate-700 font-mono text-sm"
+            />
+            <p className="text-xs text-slate-500 mt-1">💡 Tip: Usa {'{{nombre}}'}, {'{{empresa}}'}, {'{{fecha}}'} para variables dinámicas</p>
+          </div>
+
+          <div className="flex gap-3 justify-end">
+            <button
+              onClick={() => setIsModalOpen(false)}
+              className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-100 transition-all font-semibold"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={handleAddPlantilla}
+              className="px-4 py-2 bg-[#182442] text-white rounded-lg hover:bg-[#0d1420] transition-all font-semibold"
+            >
+              Crear Plantilla
+            </button>
+          </div>
+        </div>
+      </Modal>
 
       {/* Filtros */}
       <div className="bg-white rounded-lg border border-slate-200 p-4 flex gap-2 flex-wrap">
@@ -80,7 +189,12 @@ export const Plantillas = () => {
         {['Todas', 'Email', 'WhatsApp'].map((filtro) => (
           <button
             key={filtro}
-            className="px-4 py-2 rounded-lg bg-slate-100 text-slate-700 font-semibold hover:bg-slate-200 transition-all text-sm"
+            onClick={() => setFiltroActual(filtro as 'Todas' | 'Email' | 'WhatsApp')}
+            className={`px-4 py-2 rounded-lg font-semibold transition-all text-sm ${
+              filtroActual === filtro
+                ? 'bg-[#182442] text-white'
+                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+            }`}
           >
             {filtro}
           </button>
@@ -128,11 +242,16 @@ export const Plantillas = () => {
       <div className="bg-white rounded-lg border border-slate-200 p-6 space-y-4">
         <h3 className="font-semibold text-[#182442] flex items-center gap-2">
           <span className="material-symbols-outlined">list_alt</span>
-          Todas las Plantillas
+          {filtroActual === 'Todas' ? 'Todas las Plantillas' : `Plantillas ${filtroActual}`}
         </h3>
 
         <div className="grid gap-4">
-          {plantillas.map((plantilla) => (
+          {plantillasFiltradas.length === 0 ? (
+            <div className="text-center py-8 text-slate-500">
+              <p>No hay plantillas disponibles</p>
+            </div>
+          ) : (
+            plantillasFiltradas.map((plantilla) => (
             <div key={plantilla.id} className="border border-slate-200 rounded-lg p-4 hover:bg-slate-50 transition-colors">
               <div className="flex items-start justify-between mb-3">
                 <div>
@@ -180,7 +299,8 @@ export const Plantillas = () => {
                 </div>
               </div>
             </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
     </div>
