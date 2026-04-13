@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import jsPDF from 'jspdf';
+import { obtenerPlantillasActivas, reemplazarVariables, incrementarUsoPlantilla } from '../common/plantillasHelper';
 
 interface Mensaje {
   id: number;
@@ -23,49 +24,10 @@ interface Conversacion {
   nombreContacto?: string;
 }
 
-interface Plantilla {
-  id: number;
-  nombre: string;
-  contenido: string;
-  canal: 'Email' | 'WhatsApp' | 'Ambos';
-  variables?: string[];
-}
-
 interface InboxVendedorProps {
   vendedorId: number;
   vendedorNombre: string;
 }
-
-const PLANTILLAS_MOCK: Plantilla[] = [
-  {
-    id: 1,
-    nombre: 'Saludo Inicial',
-    contenido: 'Hola {nombre}, ¡gracias por tu interés! ¿Cómo podemos ayudarte hoy?',
-    canal: 'Ambos',
-    variables: ['nombre']
-  },
-  {
-    id: 2,
-    nombre: 'Seguimiento de Venta',
-    contenido: '¿Tienes alguna pregunta sobre nuestro producto {producto}? Estoy aquí para ayudarte.',
-    canal: 'Email',
-    variables: ['producto']
-  },
-  {
-    id: 3,
-    nombre: 'Disponibilidad',
-    contenido: 'Estoy disponible en {horario}. ¿Te viene bien para una llamada?',
-    canal: 'WhatsApp',
-    variables: ['horario']
-  },
-  {
-    id: 4,
-    nombre: 'Cierre de Venta',
-    contenido: 'Perfecto, procederemos con tu pedido. Recibirás los detalles en tu correo dentro de {tiempo} horas.',
-    canal: 'Ambos',
-    variables: ['tiempo']
-  }
-];
 
 export const InboxVendedor: React.FC<InboxVendedorProps> = ({ vendedorId, vendedorNombre }) => {
   const [conversaciones, setConversaciones] = useState<Conversacion[]>([]);
@@ -73,12 +35,13 @@ export const InboxVendedor: React.FC<InboxVendedorProps> = ({ vendedorId, vended
   const [filtroEstado, setFiltroEstado] = useState<'Todos' | 'pendiente' | 'respondido' | 'cerrado'>('Todos');
   const [filtroBusqueda, setFiltroBusqueda] = useState('');
   const [loading, setLoading] = useState(true);
+  const [plantillas, setPlantillas] = useState<any[]>([]);
   
   const [selectedConversacion, setSelectedConversacion] = useState<Conversacion | null>(null);
   const [plantillaModal, setPlantillaModal] = useState(false);
   const [respuesta, setRespuesta] = useState('');
   const [variablesModal, setVariablesModal] = useState(false);
-  const [plantillaSeleccionada, setPlantillaSeleccionada] = useState<Plantilla | null>(null);
+  const [plantillaSeleccionada, setPlantillaSeleccionada] = useState<any | null>(null);
   const [variables, setVariables] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
@@ -242,6 +205,9 @@ export const InboxVendedor: React.FC<InboxVendedorProps> = ({ vendedorId, vended
       ];
 
       setConversaciones(conversacionesMock);
+      // Cargar plantillas desde el helper
+      const plantillasActivas = obtenerPlantillasActivas();
+      setPlantillas(plantillasActivas);
     } catch (error) {
       console.error('Error cargando datos:', error);
     } finally {
@@ -262,12 +228,10 @@ export const InboxVendedor: React.FC<InboxVendedorProps> = ({ vendedorId, vended
   const handleAplicarPlantilla = () => {
     if (!plantillaSeleccionada) return;
     
-    let contenido = plantillaSeleccionada.contenido;
-    Object.entries(variables).forEach(([key, value]) => {
-      contenido = contenido.replace(`{${key}}`, value);
-    });
+    const contenido = reemplazarVariables(plantillaSeleccionada.contenido, variables);
     
     setRespuesta(contenido);
+    incrementarUsoPlantilla(plantillaSeleccionada.id);
     setVariablesModal(false);
     setPlantillaSeleccionada(null);
     setVariables({});
@@ -723,7 +687,7 @@ export const InboxVendedor: React.FC<InboxVendedorProps> = ({ vendedorId, vended
             </div>
 
             <div className="p-6 space-y-3">
-              {PLANTILLAS_MOCK.map((plantilla) => (
+              {plantillas.map((plantilla) => (
                 <div
                   key={plantilla.id}
                   className="border border-slate-200 rounded-lg p-4 hover:border-[#006c49] hover:shadow-md transition-all cursor-pointer"
@@ -734,7 +698,7 @@ export const InboxVendedor: React.FC<InboxVendedorProps> = ({ vendedorId, vended
                       <p className="text-sm text-slate-600 mt-1">{plantilla.contenido}</p>
                       <div className="flex gap-2 mt-2">
                         <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded">
-                          {plantilla.canal}
+                          {plantilla.tipo}
                         </span>
                         {plantilla.variables && plantilla.variables.length > 0 && (
                           <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
@@ -750,6 +714,7 @@ export const InboxVendedor: React.FC<InboxVendedorProps> = ({ vendedorId, vended
                           setVariablesModal(true);
                         } else {
                           setRespuesta(plantilla.contenido);
+                          incrementarUsoPlantilla(plantilla.id);
                           setPlantillaModal(false);
                         }
                       }}
@@ -774,7 +739,7 @@ export const InboxVendedor: React.FC<InboxVendedorProps> = ({ vendedorId, vended
             </h3>
 
             <div className="space-y-4 mb-6">
-              {plantillaSeleccionada.variables?.map((variable) => (
+              {plantillaSeleccionada.variables?.map((variable: string) => (
                 <div key={variable}>
                   <label className="block text-sm font-semibold text-[#182442] mb-1">
                     {variable}
