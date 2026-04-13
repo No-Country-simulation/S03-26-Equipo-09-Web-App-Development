@@ -418,34 +418,79 @@ export const InboxVendedor: React.FC<InboxVendedorProps> = ({ vendedorId, vended
         <p className="text-slate-600 mt-1">Vendedor: {vendedorNombre}</p>
       </div>
 
+      {/* Estadísticas */}
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-200 shadow">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-slate-600 text-xs font-medium">Total</p>
+              <p className="text-2xl font-bold text-blue-600">{conversaciones.length}</p>
+            </div>
+            <span className="text-blue-300 text-4xl">📬</span>
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 border border-green-200 shadow">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-slate-600 text-xs font-medium">WhatsApp</p>
+              <p className="text-2xl font-bold text-green-600">
+                {conversaciones.filter(c => c.canal === 'WhatsApp').length}
+              </p>
+            </div>
+            <span className="text-green-300 text-4xl">📱</span>
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 border border-purple-200 shadow">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-slate-600 text-xs font-medium">Email</p>
+              <p className="text-2xl font-bold text-purple-600">
+                {conversaciones.filter(c => c.canal === 'Email').length}
+              </p>
+            </div>
+            <span className="text-purple-300 text-4xl">✉️</span>
+          </div>
+        </div>
+      </div>
+
       {/* Filtros */}
-      <div className="bg-white rounded-lg shadow p-6 space-y-4">
+      <div className="bg-white rounded-lg border border-slate-200 shadow p-6 space-y-4">
+        <h3 className="font-semibold text-[#182442] flex items-center gap-2">
+          ⚙️ Filtros
+        </h3>
+
         {/* Búsqueda */}
         <div>
+          <label className="block text-sm font-medium text-slate-700 mb-2">Buscar</label>
           <input
             type="text"
-            placeholder="🔍 Buscar por mensaje, contacto..."
+            placeholder="Buscar por mensaje o contacto..."
             value={filtroBusqueda}
             onChange={(e) => setFiltroBusqueda(e.target.value)}
             className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:border-[#006c49] focus:ring-2 focus:ring-[#006c49]/20"
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Filtro Canal */}
           <div>
-            <label className="block text-xs font-semibold text-[#182442] mb-2">Canal</label>
-            <div className="flex gap-1 flex-wrap">
+            <label className="block text-sm font-medium text-slate-700 mb-3">Canal</label>
+            <div className="flex flex-wrap gap-2">
               {['Todos', 'Email', 'WhatsApp'].map((canal) => (
                 <button
                   key={canal}
                   onClick={() => setFiltroCanal(canal as 'Todos' | 'Email' | 'WhatsApp')}
-                  className={`px-2 py-1 rounded text-xs font-semibold ${
+                  className={`px-4 py-2 rounded-lg font-semibold text-sm transition-all border-2 flex items-center gap-2 ${
                     filtroCanal === canal
-                      ? 'bg-[#006c49] text-white'
-                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                      ? 'bg-[#006c49] text-white border-[#006c49]'
+                      : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200'
                   }`}
                 >
+                  {canal === 'Email' && '✉️'} 
+                  {canal === 'WhatsApp' && '📱'} 
+                  {canal === 'Todos' && '📬'} 
                   {canal}
                 </button>
               ))}
@@ -453,34 +498,43 @@ export const InboxVendedor: React.FC<InboxVendedorProps> = ({ vendedorId, vended
           </div>
 
           {/* Filtro Estado */}
-          <div className="md:col-span-2">
-            <label className="block text-xs font-semibold text-[#182442] mb-2">Estado</label>
-            <div className="flex gap-1 flex-wrap">
-              {['Todos', 'activo', 'seguimiento', 'cliente', 'inactivo'].map((estado) => (
-                <button
-                  key={estado}
-                  onClick={() => setFiltroEstado(estado as any)}
-                  className={`px-2 py-1 rounded text-xs font-semibold ${
-                    filtroEstado === estado
-                      ? 'bg-indigo-500 text-white'
-                      : 'bg-indigo-100 text-indigo-700 hover:bg-indigo-200'
-                  }`}
-                >
-                  {estado === 'activo' && '🔥'} 
-                  {estado === 'seguimiento' && '⏳'} 
-                  {estado === 'cliente' && '✅'} 
-                  {estado === 'inactivo' && '⏸️'} 
-                  {estado}
-                </button>
-              ))}
-            </div>
-          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-3">Estado</label>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { id: 'Todos', label: 'Todos', color: 'slate' },
+                { id: 'activo', label: 'Activo', color: 'green' },
+                { id: 'seguimiento', label: 'Seguimiento', color: 'yellow' },
+                { id: 'cliente', label: 'Cliente', color: 'blue' },
+                { id: 'inactivo', label: 'Inactivo', color: 'gray' }
+              ].map((opcion) => {
+                const colorClasses: Record<string, string> = {
+                  'slate': 'bg-slate-100 text-slate-700 border-slate-300',
+                  'green': 'bg-green-100 text-green-700 border-green-300',
+                  'yellow': 'bg-yellow-100 text-yellow-700 border-yellow-300',
+                  'blue': 'bg-blue-100 text-blue-700 border-blue-300',
+                  'gray': 'bg-gray-100 text-gray-700 border-gray-300'
+                };
 
-          {/* Info */}
-          <div className="flex items-end">
-            <p className="text-xs text-slate-600">
-              <span className="font-bold text-[#006c49]">{conversacionesFiltradas.length}</span> conversaciones
-            </p>
+                return (
+                  <button
+                    key={opcion.id}
+                    onClick={() => setFiltroEstado(opcion.id as any)}
+                    className={`px-4 py-2 rounded-lg font-semibold text-sm transition-all border-2 ${
+                      filtroEstado === opcion.id
+                        ? `${colorClasses[opcion.color]} border-current ring-2 ring-offset-1`
+                        : `${colorClasses[opcion.color]} hover:brightness-95`
+                    }`}
+                  >
+                    {opcion.id === 'activo' && '🔥'} 
+                    {opcion.id === 'seguimiento' && '⏳'} 
+                    {opcion.id === 'cliente' && '✅'} 
+                    {opcion.id === 'inactivo' && '⏸️'} 
+                    {opcion.label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>
