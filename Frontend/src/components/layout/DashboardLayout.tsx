@@ -174,8 +174,52 @@ export const DashboardLayout = () => {
           </div>        
 
           {/* ACCIONES Y PERFIL */}
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-[#006c49] text-white flex items-center justify-center text-xs font-bold border-2 border-white shadow-md">{getInitials(userName)}</div>
+          <div className="flex items-center gap-3 relative">
+            <button
+              onClick={() => setIsProfileOpen(!isProfileOpen)}
+              className="w-10 h-10 rounded-full bg-[#006c49] text-white flex items-center justify-center text-xs font-bold border-2 border-white shadow-md hover:bg-[#005236] transition-all"
+            >
+              {getInitials(userName)}
+            </button>
+
+            {/* Menú Desplegable */}
+            {isProfileOpen && (
+              <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-slate-200 p-3 z-50 top-full">
+                {/* Encabezado */}
+                <div className="flex items-center gap-3 mb-4 pb-3 border-b border-slate-100">
+                  <div className="w-10 h-10 rounded-full bg-[#006c49] text-white flex items-center justify-center font-bold text-sm">
+                    {getInitials(userName)}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-sm text-[#182442]">{userName}</p>
+                  </div>
+                </div>
+
+                {/* Opciones */}
+                <div className="space-y-2">
+                  <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 text-sm text-[#182442] transition-all">
+                    <span className="material-symbols-outlined text-lg">settings</span>
+                    <span>Configuración</span>
+                  </button>
+                  <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 text-sm text-[#182442] transition-all">
+                    <span className="material-symbols-outlined text-lg">image</span>
+                    <span>Cambiar foto</span>
+                  </button>
+                  <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 text-sm text-[#182442] transition-all">
+                    <span className="material-symbols-outlined text-lg">brightness_4</span>
+                    <span>Tema oscuro</span>
+                  </button>
+                  <div className="border-t border-slate-100 pt-2 mt-2">
+                    <button 
+                      onClick={logout}
+                      className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-red-50 text-sm text-red-600 font-semibold transition-all">
+                      <span className="material-symbols-outlined text-lg">logout</span>
+                      <span>Cerrar Sesión</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </header>
