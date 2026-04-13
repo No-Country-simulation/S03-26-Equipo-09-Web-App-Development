@@ -506,14 +506,14 @@ export const InboxVendedor: React.FC<InboxVendedorProps> = ({ vendedorId, vended
                 { id: 'activo', label: 'Activo', color: 'green' },
                 { id: 'seguimiento', label: 'Seguimiento', color: 'yellow' },
                 { id: 'cliente', label: 'Cliente', color: 'blue' },
-                { id: 'inactivo', label: 'Inactivo', color: 'gray' }
+                { id: 'inactivo', label: 'Inactivo', color: 'red' }
               ].map((opcion) => {
                 const colorClasses: Record<string, string> = {
                   'slate': 'bg-slate-100 text-slate-700 border-slate-300',
                   'green': 'bg-green-100 text-green-700 border-green-300',
                   'yellow': 'bg-yellow-100 text-yellow-700 border-yellow-300',
                   'blue': 'bg-blue-100 text-blue-700 border-blue-300',
-                  'gray': 'bg-gray-100 text-gray-700 border-gray-300'
+                  'red': 'bg-red-100 text-red-700 border-red-300'
                 };
 
                 return (
@@ -529,7 +529,7 @@ export const InboxVendedor: React.FC<InboxVendedorProps> = ({ vendedorId, vended
                     {opcion.id === 'activo' && '🔥'} 
                     {opcion.id === 'seguimiento' && '⏳'} 
                     {opcion.id === 'cliente' && '✅'} 
-                    {opcion.id === 'inactivo' && '⏸️'} 
+                    {opcion.id === 'inactivo' && '🔒'} 
                     {opcion.label}
                   </button>
                 );
@@ -582,7 +582,7 @@ export const InboxVendedor: React.FC<InboxVendedorProps> = ({ vendedorId, vended
 
         {/* Panel de Chat */}
         {selectedConversacion ? (
-          <div className="flex-1 w-full lg:w-auto bg-white rounded-lg shadow overflow-hidden flex flex-col max-h-[calc(100vh-240px)] lg:max-h-none lg:min-h-full">
+          <div className="flex-1 w-full lg:w-auto bg-white rounded-lg shadow overflow-hidden flex flex-col max-h-[calc(100vh-320px)] sm:max-h-[calc(100vh-280px)] lg:max-h-none lg:min-h-full">
             {/* Header Chat */}
             <div className="bg-gradient-to-r from-[#182442] to-[#006c49] text-white px-3 py-1.5 lg:p-4 flex flex-row lg:flex-row lg:justify-between lg:items-center gap-2 lg:gap-3 flex-shrink-0">
               <button
@@ -644,21 +644,21 @@ export const InboxVendedor: React.FC<InboxVendedorProps> = ({ vendedorId, vended
                   value={respuesta}
                   onChange={(e) => setRespuesta(e.target.value)}
                   placeholder="Escribe tu respuesta..."
-                  className="flex-1 px-3 py-2 lg:px-4 lg:py-2 border border-slate-300 rounded lg:rounded-lg resize-none focus:border-[#006c49] focus:ring-1 lg:focus:ring-2 focus:ring-[#006c49]/20 text-sm lg:text-sm"
-                  rows={3}
+                  className="flex-1 px-2 py-1 lg:px-4 lg:py-2 border border-slate-300 rounded lg:rounded-lg resize-none focus:border-[#006c49] focus:ring-1 lg:focus:ring-2 focus:ring-[#006c49]/20 text-xs lg:text-sm"
+                  rows={2}
                 />
               </div>
-              <div className="flex flex-col lg:flex-row gap-2 lg:gap-3">
+              <div className="flex gap-1.5 lg:gap-3 flex-shrink-0">
                 <button
                   onClick={() => setPlantillaModal(true)}
-                  className="flex-1 px-2 py-2 lg:py-2 lg:px-4 bg-yellow-500 text-white rounded lg:rounded-lg hover:bg-yellow-600 font-semibold text-xs lg:text-sm transition-colors"
+                  className="flex-1 px-1.5 py-1 lg:px-4 lg:py-2 bg-yellow-500 text-white rounded lg:rounded-lg hover:bg-yellow-600 font-semibold text-xs transition-colors"
                 >
                   📧 Plantillas
                 </button>
                 <button
                   onClick={handleEnviarRespuesta}
                   disabled={!respuesta.trim()}
-                  className="flex-1 px-2 py-2 lg:py-2 lg:px-4 bg-[#006c49] text-white rounded lg:rounded-lg hover:bg-[#005236] font-semibold disabled:bg-slate-400 disabled:cursor-not-allowed text-xs lg:text-sm transition-colors"
+                  className="flex-1 px-1.5 py-1 lg:px-4 lg:py-2 bg-[#006c49] text-white rounded lg:rounded-lg hover:bg-[#005236] font-semibold disabled:bg-slate-400 disabled:cursor-not-allowed text-xs transition-colors"
                 >
                   ✉️ Enviar
                 </button>
