@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { UnifiedInbox } from '../components/UnifiedInbox';
+import { InboxVendedor } from '../components/InboxVendedor';
 import { useAuth } from '../hooks/useAuth';
 
 export default function MiInbox() {
@@ -26,9 +26,9 @@ export default function MiInbox() {
 
   return (
     <div className="min-h-screen bg-slate-50 py-6">
-      <div className="max-w-6xl mx-auto">
-        {/* Inbox Unificado del Vendedor Logeado */}
-        <UnifiedInbox vendedorId={userId} vendedorNombre={userName} />
+      <div className="max-w-7xl mx-auto px-4">
+        {/* Inbox Mejorado del Vendedor */}
+        <InboxVendedor vendedorId={userId} vendedorNombre={userName} />
       </div>
     </div>
   );
