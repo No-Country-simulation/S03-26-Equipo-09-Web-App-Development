@@ -6,10 +6,9 @@ export const MOCK_DASHBOARD_STATS = {
   nuevosLeadsHoy: 12,
   tareasPendientes: 5,
   contactosPorEstado: {
-    "NUEVO": 45,
-    "EN_SEGUIMIENTO": 30,
+    "LEAD_ACTIVO": 75,
     "CLIENTE": 60,
-    "PERDIDO": 15
+    "INACTIVO": 15
   }
 };
 export const dashboardMockData = { 
@@ -28,9 +27,8 @@ export const dashboardMockData = {
     { fuente: 'Referidos', leads: 10 }
   ],
   leadsByStatus: [
-    { estado: 'NUEVO', cantidad: 45 },
-    { estado: 'EN_SEGUIMIENTO', cantidad: 30 },
-    { estado: 'CLIENTE', cantidad: 60 },
-    { estado: 'PERDIDO', cantidad: 15 }
+    { estado: 'Lead Activo', cantidad: 75 },
+    { estado: 'Cliente', cantidad: 60 },
+    { estado: 'Inactivo', cantidad: 15 }
   ]
 };
