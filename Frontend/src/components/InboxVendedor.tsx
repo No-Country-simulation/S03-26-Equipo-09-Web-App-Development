@@ -217,7 +217,7 @@ export const InboxVendedor: React.FC<InboxVendedorProps> = ({ vendedorId, vended
         {
           id: 5,
           canal: 'WhatsApp',
-          contenido: '¿Tienen disponibilidad para llamada de demostración?',
+          contenido: 'Ya no quiero el producto, muchas gracias',
           fechaHora: new Date(Date.now() - 2700000).toISOString(),
           contactoId: 105,
           contactoNombre: 'Laura Fernández',
@@ -226,7 +226,7 @@ export const InboxVendedor: React.FC<InboxVendedorProps> = ({ vendedorId, vended
           mensajes: [
             {
               id: 1,
-              contenido: '¿Tienen disponibilidad para llamada de demostración?',
+              contenido: 'Ya no quiero el producto, muchas gracias',
               fechaHora: new Date(Date.now() - 2700000).toISOString(),
               tipo: 'entrada',
               remitente: 'Laura Fernández'
@@ -413,76 +413,82 @@ export const InboxVendedor: React.FC<InboxVendedorProps> = ({ vendedorId, vended
   return (
     <div className="space-y-6 min-h-[calc(100vh-120px)] max-h-screen flex flex-col overflow-y-auto">
       {/* Header */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h1 className="text-3xl font-bold text-[#182442]">💬 Mi Inbox</h1>
-        <p className="text-slate-600 mt-1">Vendedor: {vendedorNombre}</p>
+      <div className="bg-white rounded-lg shadow p-3 sm:p-4 lg:p-6">
+        <h1 className="text-2xl sm:text-3xl font-bold text-[#182442]">💬 Mi Inbox</h1>
+        <p className="text-slate-600 text-xs sm:text-sm mt-1">Vendedor: {vendedorNombre}</p>
       </div>
 
       {/* Estadísticas */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-        <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-200 shadow">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3 lg:gap-4">
+        <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-2 sm:p-4 border border-blue-200 shadow">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-slate-600 text-xs font-medium">Total</p>
-              <p className="text-2xl font-bold text-blue-600">{conversaciones.length}</p>
+              <p className="text-slate-600 text-xs font-medium">
+                <span className="hidden sm:inline">Total</span>
+              </p>
+              <p className="text-xl sm:text-2xl font-bold text-blue-600">{conversaciones.length}</p>
             </div>
-            <span className="text-blue-300 text-4xl">📬</span>
+            <span className="text-blue-300 text-2xl sm:text-4xl">📬</span>
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 border border-green-200 shadow">
+        <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-2 sm:p-4 border border-green-200 shadow">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-slate-600 text-xs font-medium">WhatsApp</p>
-              <p className="text-2xl font-bold text-green-600">
+              <p className="text-slate-600 text-xs font-medium">
+                <span className="hidden sm:inline">WhatsApp</span>
+              </p>
+              <p className="text-xl sm:text-2xl font-bold text-green-600">
                 {conversaciones.filter(c => c.canal === 'WhatsApp').length}
               </p>
             </div>
-            <span className="text-green-300 text-4xl">📱</span>
+            <span className="text-green-300 text-2xl sm:text-4xl">📱</span>
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 border border-purple-200 shadow">
+        <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-2 sm:p-4 border border-purple-200 shadow">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-slate-600 text-xs font-medium">Email</p>
-              <p className="text-2xl font-bold text-purple-600">
+              <p className="text-slate-600 text-xs font-medium">
+                <span className="hidden sm:inline">Email</span>
+              </p>
+              <p className="text-xl sm:text-2xl font-bold text-purple-600">
                 {conversaciones.filter(c => c.canal === 'Email').length}
               </p>
             </div>
-            <span className="text-purple-300 text-4xl">✉️</span>
+            <span className="text-purple-300 text-2xl sm:text-4xl">✉️</span>
           </div>
         </div>
       </div>
 
       {/* Filtros */}
-      <div className="bg-white rounded-lg border border-slate-200 shadow p-6 space-y-4">
-        <h3 className="font-semibold text-[#182442] flex items-center gap-2">
-          ⚙️ Filtros
+      <div className="bg-white rounded-lg border border-slate-200 shadow p-3 sm:p-4 lg:p-6 space-y-3 sm:space-y-4">
+        <h3 className="font-semibold text-sm sm:text-base text-[#182442] flex items-center gap-2">
+          ⚙️ <span className="hidden sm:inline">Filtros</span>
         </h3>
 
         {/* Búsqueda */}
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">Buscar</label>
+          <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-1 sm:mb-2">Buscar</label>
           <input
             type="text"
             placeholder="Buscar por mensaje o contacto..."
             value={filtroBusqueda}
             onChange={(e) => setFiltroBusqueda(e.target.value)}
-            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:border-[#006c49] focus:ring-2 focus:ring-[#006c49]/20"
+            className="w-full px-2 py-1 sm:px-4 sm:py-2 border border-slate-300 rounded text-xs sm:text-sm lg:rounded-lg focus:border-[#006c49] focus:ring-2 focus:ring-[#006c49]/20"
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 lg:gap-6">
           {/* Filtro Canal */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-3">Canal</label>
-            <div className="flex flex-wrap gap-2">
+            <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-2">Canal</label>
+            <div className="flex flex-wrap gap-1 sm:gap-2">
               {['Todos', 'Email', 'WhatsApp'].map((canal) => (
                 <button
                   key={canal}
                   onClick={() => setFiltroCanal(canal as 'Todos' | 'Email' | 'WhatsApp')}
-                  className={`px-4 py-2 rounded-lg font-semibold text-sm transition-all border-2 flex items-center gap-2 ${
+                  className={`px-2 sm:px-4 py-1 sm:py-2 rounded text-xs sm:text-sm lg:rounded-lg font-semibold transition-all border-2 flex items-center gap-1 sm:gap-2 ${
                     filtroCanal === canal
                       ? 'bg-[#006c49] text-white border-[#006c49]'
                       : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200'
@@ -491,7 +497,7 @@ export const InboxVendedor: React.FC<InboxVendedorProps> = ({ vendedorId, vended
                   {canal === 'Email' && '✉️'} 
                   {canal === 'WhatsApp' && '📱'} 
                   {canal === 'Todos' && '📬'} 
-                  {canal}
+                  <span className="hidden sm:inline">{canal}</span>
                 </button>
               ))}
             </div>
@@ -499,8 +505,8 @@ export const InboxVendedor: React.FC<InboxVendedorProps> = ({ vendedorId, vended
 
           {/* Filtro Estado */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-3">Estado</label>
-            <div className="flex flex-wrap gap-2">
+            <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-2">Estado</label>
+            <div className="flex flex-wrap gap-1 sm:gap-2">
               {[
                 { id: 'Todos', label: 'Todos', color: 'slate' },
                 { id: 'activo', label: 'Activo', color: 'green' },
@@ -520,7 +526,7 @@ export const InboxVendedor: React.FC<InboxVendedorProps> = ({ vendedorId, vended
                   <button
                     key={opcion.id}
                     onClick={() => setFiltroEstado(opcion.id as any)}
-                    className={`px-4 py-2 rounded-lg font-semibold text-sm transition-all border-2 ${
+                    className={`px-2 sm:px-4 py-1 sm:py-2 rounded text-xs sm:text-sm lg:rounded-lg font-semibold transition-all border-2 ${
                       filtroEstado === opcion.id
                         ? `${colorClasses[opcion.color]} border-current ring-2 ring-offset-1`
                         : `${colorClasses[opcion.color]} hover:brightness-95`
@@ -530,7 +536,7 @@ export const InboxVendedor: React.FC<InboxVendedorProps> = ({ vendedorId, vended
                     {opcion.id === 'seguimiento' && '⏳'} 
                     {opcion.id === 'cliente' && '✅'} 
                     {opcion.id === 'inactivo' && '🔒'} 
-                    {opcion.label}
+                    <span className="hidden sm:inline">{opcion.label}</span>
                   </button>
                 );
               })}
