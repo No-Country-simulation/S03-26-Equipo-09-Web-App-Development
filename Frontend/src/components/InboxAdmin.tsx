@@ -601,10 +601,10 @@ export const InboxAdmin: React.FC = () => {
             <div className="bg-gradient-to-r from-[#182442] to-[#006c49] text-white px-3 py-1.5 lg:p-4 flex flex-row lg:flex-row lg:justify-between lg:items-center gap-2 lg:gap-3 flex-shrink-0">
               <button
                 onClick={() => setSelectedConversacion(null)}
-                className="lg:hidden px-2 py-1 bg-white/30 hover:bg-white/50 rounded text-xs font-semibold transition-colors"
+                className="lg:hidden px-3 py-2 bg-white/30 hover:bg-white/50 rounded text-sm font-semibold transition-colors"
                 title="Volver al listado"
               >
-                ← Conv
+                ← Volver
               </button>
               <div className="flex-1 min-w-0">
                 <h3 className="font-bold text-xs lg:text-base truncate">#{selectedConversacion.id} - {selectedConversacion.contactoNombre}</h3>
@@ -659,27 +659,27 @@ export const InboxAdmin: React.FC = () => {
             </div>
 
             {/* Input Respuesta */}
-            <div className="border-t border-slate-200 px-3 py-2 lg:p-4 space-y-2 lg:space-y-3 bg-white flex-shrink-0">
+            <div className="border-t border-slate-200 px-4 py-3 lg:p-4 space-y-3 lg:space-y-3 bg-white flex-shrink-0">
               <div className="flex gap-2 lg:gap-3">
                 <textarea
                   value={respuesta}
                   onChange={(e) => setRespuesta(e.target.value)}
                   placeholder="Escribe tu respuesta..."
-                  className="flex-1 px-3 py-2 lg:px-4 lg:py-2 border border-slate-300 rounded lg:rounded-lg resize-none focus:border-[#006c49] focus:ring-1 lg:focus:ring-2 focus:ring-[#006c49]/20 text-xs lg:text-sm"
-                  rows={2}
+                  className="flex-1 px-3 py-2 lg:px-4 lg:py-2 border border-slate-300 rounded lg:rounded-lg resize-none focus:border-[#006c49] focus:ring-1 lg:focus:ring-2 focus:ring-[#006c49]/20 text-sm lg:text-sm"
+                  rows={4}
                 />
               </div>
               <div className="flex flex-col lg:flex-row gap-2 lg:gap-3">
                 <button
                   onClick={() => setPlantillaModal(true)}
-                  className="flex-1 px-3 py-2 lg:py-2 lg:px-4 bg-yellow-500 text-white rounded lg:rounded-lg hover:bg-yellow-600 font-semibold text-xs lg:text-sm transition-colors"
+                  className="flex-1 px-3 py-2 lg:py-2 lg:px-4 bg-yellow-500 text-white rounded lg:rounded-lg hover:bg-yellow-600 font-semibold text-sm lg:text-sm transition-colors"
                 >
                   📧 Plantillas
                 </button>
                 <button
                   onClick={handleEnviarRespuesta}
                   disabled={!respuesta.trim()}
-                  className="flex-1 px-3 py-2 lg:py-2 lg:px-4 bg-[#006c49] text-white rounded lg:rounded-lg hover:bg-[#005236] font-semibold disabled:bg-slate-400 disabled:cursor-not-allowed text-xs lg:text-smnsition-colors"
+                  className="flex-1 px-3 py-2 lg:py-2 lg:px-4 bg-[#006c49] text-white rounded lg:rounded-lg hover:bg-[#005236] font-semibold disabled:bg-slate-400 disabled:cursor-not-allowed text-sm lg:text-sm transition-colors"
                 >
                   ✉️ Enviar
                 </button>
