@@ -462,16 +462,16 @@ export const InboxAdmin: React.FC = () => {
   if (loading) return <div className="text-center py-8 text-slate-600">Cargando conversaciones...</div>;
 
   return (
-    <div className="space-y-6 min-h-[calc(100vh-120px)] max-h-screen flex flex-col overflow-y-auto">
+    <div className="space-y-2 min-h-[calc(100vh-120px)] max-h-screen flex flex-col overflow-y-auto">
       {/* Header */}
-      <div className="bg-white rounded-lg shadow p-3 sm:p-4 lg:p-6">
-        <h1 className="text-2xl sm:text-3xl font-bold text-[#182442]">💬 Inbox Admin</h1>
-        <p className="text-slate-600 text-xs sm:text-sm mt-1">Gestiona conversaciones de todos los vendedores</p>
+      <div className="bg-white rounded-lg shadow p-2 sm:p-3 lg:p-4">
+        <h1 className="text-xl sm:text-2xl font-bold text-[#182442]">💬 Inbox Admin</h1>
+        <p className="text-slate-600 text-xs mt-0.5">Gestiona conversaciones de todos los vendedores</p>
       </div>
 
       {/* Estadísticas */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 lg:gap-4">
-        <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-2 sm:p-4 border border-blue-200 shadow">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-1 sm:gap-2 lg:gap-3">
+        <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-1.5 sm:p-3 border border-blue-200 shadow">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-slate-600 text-xs font-medium">
@@ -525,33 +525,33 @@ export const InboxAdmin: React.FC = () => {
       </div>
 
       {/* Filtros */}
-      <div className="bg-white rounded-lg border border-slate-200 shadow p-3 sm:p-4 lg:p-6 space-y-3 sm:space-y-4">
-        <h3 className="font-semibold text-sm sm:text-base text-[#182442] flex items-center gap-2">
+      <div className="bg-white rounded-lg border border-slate-200 shadow p-2 sm:p-3 lg:p-4 space-y-2 sm:space-y-2">
+        <h3 className="font-semibold text-xs sm:text-sm text-[#182442] flex items-center gap-2">
           ⚙️ <span className="hidden sm:inline">Filtros</span>
         </h3>
 
         {/* Búsqueda */}
         <div>
-          <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-1 sm:mb-2">Buscar</label>
+          <label className="block text-xs font-medium text-slate-700 mb-1">Buscar</label>
           <input
             type="text"
             placeholder="Buscar por mensaje o contacto..."
             value={filtroBusqueda}
             onChange={(e) => setFiltroBusqueda(e.target.value)}
-            className="w-full px-2 py-1 sm:px-4 sm:py-2 border border-slate-300 rounded text-xs sm:text-sm lg:rounded-lg focus:border-[#006c49] focus:ring-2 focus:ring-[#006c49]/20"
+            className="w-full px-2 py-1 sm:px-3 sm:py-1.5 border border-slate-300 rounded text-xs sm:text-sm lg:rounded-lg focus:border-[#006c49] focus:ring-2 focus:ring-[#006c49]/20"
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 lg:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3 lg:gap-4">
           {/* Filtro Canal */}
           <div>
-            <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-2">Canal</label>
-            <div className="flex flex-wrap gap-1 sm:gap-2">
+            <label className="block text-xs font-medium text-slate-700 mb-1">Canal</label>
+            <div className="flex flex-wrap gap-0.5 sm:gap-1">
               {['Todos', 'Email', 'WhatsApp'].map((canal) => (
                 <button
                   key={canal}
                   onClick={() => setFiltroCanal(canal as 'Todos' | 'Email' | 'WhatsApp')}
-                  className={`px-2 sm:px-4 py-1 sm:py-2 rounded text-xs sm:text-sm lg:rounded-lg font-semibold transition-all border-2 flex items-center gap-1 sm:gap-2 ${
+                  className={`px-1.5 sm:px-3 py-0.5 sm:py-1.5 rounded text-xs sm:text-sm lg:rounded-lg font-semibold transition-all border-2 flex items-center gap-1 sm:gap-2 ${
                     filtroCanal === canal
                       ? 'bg-[#006c49] text-white border-[#006c49]'
                       : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200'
@@ -573,8 +573,8 @@ export const InboxAdmin: React.FC = () => {
 
           {/* Filtro Estado */}
           <div>
-            <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-2">Estado</label>
-            <div className="flex flex-wrap gap-1 sm:gap-2">
+            <label className="block text-xs font-medium text-slate-700 mb-1">Estado</label>
+            <div className="flex flex-wrap gap-0.5 sm:gap-1">
               {[
                 { id: 'Todos', label: 'Todos', color: 'slate' },
                 { id: 'pendiente', label: 'Pendiente', color: 'blue' },
@@ -592,7 +592,7 @@ export const InboxAdmin: React.FC = () => {
                   <button
                     key={opcion.id}
                     onClick={() => setFiltroEstado(opcion.id as any)}
-                    className={`px-2 sm:px-4 py-1 sm:py-2 rounded text-xs sm:text-sm lg:rounded-lg font-semibold transition-all border-2 ${
+                    className={`px-1.5 sm:px-3 py-0.5 sm:py-1.5 rounded text-xs sm:text-sm lg:rounded-lg font-semibold transition-all border-2 ${
                       filtroEstado === opcion.id
                         ? `${colorClasses[opcion.color]} border-current ring-2 ring-offset-1`
                         : `${colorClasses[opcion.color]} hover:brightness-95`
@@ -610,11 +610,11 @@ export const InboxAdmin: React.FC = () => {
 
           {/* Filtro Vendedor */}
           <div>
-            <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-2">Vendedor</label>
+            <label className="block text-xs font-medium text-slate-700 mb-1">Vendedor</label>
             <select
               value={filtroVendedor || ''}
               onChange={(e) => setFiltroVendedor(e.target.value ? Number(e.target.value) : null)}
-              className="w-full px-2 sm:px-4 py-1 sm:py-2 border-2 border-slate-300 rounded text-xs sm:text-sm lg:rounded-lg focus:border-[#006c49] focus:ring-2 focus:ring-[#006c49]/20 font-medium transition-all"
+              className="w-full px-2 sm:px-3 py-1 sm:py-1.5 border-2 border-slate-300 rounded text-xs sm:text-sm lg:rounded-lg focus:border-[#006c49] focus:ring-2 focus:ring-[#006c49]/20 font-medium transition-all"
             >
               <option value="">👥 Todos</option>
               {vendedores.map(v => (
@@ -642,7 +642,7 @@ export const InboxAdmin: React.FC = () => {
                   <div
                     key={conv.id}
                     onClick={() => setSelectedConversacion(conv)}
-                    className={`p-4 lg:p-3 cursor-pointer transition-all border-l-4 ${
+                    className={`p-2 lg:p-2 cursor-pointer transition-all border-l-4 ${
                       selectedConversacion?.id === conv.id
                         ? 'bg-slate-50 border-[#006c49] shadow-md'
                         : 'bg-white border-transparent hover:bg-slate-50 border-slate-200'
