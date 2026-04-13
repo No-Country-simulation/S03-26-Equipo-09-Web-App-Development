@@ -17,5 +17,10 @@ public class ApiResponse<T> {
         this.data = data;
         this.error = error;
     }
+    //helper
+    public static <T> ApiResponse<T> success(T data) {
+        return new ApiResponse<>(true, data, null);
+    }
+
 
 }
