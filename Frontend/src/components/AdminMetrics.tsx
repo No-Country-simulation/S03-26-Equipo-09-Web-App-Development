@@ -20,7 +20,18 @@ export const MetricasAdmin = ({ leads = [], mensajes = [] }: MetricasAdminProps)
     tasaConversion: 0,
     tiempoPromedioRespuesta: 2.5,
     vendedoresActivos: 3,
-    tasaCrecimiento: 12.5
+    tasaCrecimiento: 12.5,
+    ingresosmensuales: 125430.50,
+    productosVendidos: 47,
+    leadsPorFuente: { web: 12, email: 8, referencia: 5, redes: 7 },
+    motivosNoCompra: { presupuesto: 5, tiempo: 3, competencia: 2, otros: 1 },
+    mejorVendedor: {
+      nombre: 'María García',
+      email: 'maria@crm.com',
+      tasaConversion: 31.3,
+      leadsConvertidos: 10,
+      totalLeads: 32
+    }
   });
 
   useEffect(() => {
@@ -44,6 +55,22 @@ export const MetricasAdmin = ({ leads = [], mensajes = [] }: MetricasAdminProps)
     const tasaRespuesta = leads.length > 0 ? Math.round((email / leads.length) * 100) : 0;
     const tasaConversion = leads.length > 0 ? Math.round((clientes / leads.length) * 100) : 0;
 
+    // Leads por Fuente (mock data)
+    const leadsPorFuente = {
+      web: leads.filter((l: any) => l.fuente === 'WEB').length || 12,
+      email: leads.filter((l: any) => l.fuente === 'EMAIL').length || 8,
+      referencia: leads.filter((l: any) => l.fuente === 'REFERENCIA').length || 5,
+      redes: leads.filter((l: any) => l.fuente === 'REDES').length || 7
+    };
+
+    // Motivos de No Compra (mock data)
+    const motivosNoCompra = {
+      presupuesto: 5,
+      tiempo: 3,
+      competencia: 2,
+      otros: 1
+    };
+
     setMetricas({
       leadsActivos: activos,
       leadsActivoEtiqueta: activoEtiqueta,
@@ -56,7 +83,18 @@ export const MetricasAdmin = ({ leads = [], mensajes = [] }: MetricasAdminProps)
       tasaConversion,
       tiempoPromedioRespuesta: 2.5,
       vendedoresActivos: 3,
-      tasaCrecimiento: 12.5
+      tasaCrecimiento: 12.5,
+      ingresosmensuales: 125430.50,
+      productosVendidos: 47,
+      leadsPorFuente,
+      motivosNoCompra,
+      mejorVendedor: {
+        nombre: 'María García',
+        email: 'maria@crm.com',
+        tasaConversion: 31.3,
+        leadsConvertidos: 10,
+        totalLeads: 32
+      }
     });
   };
 
@@ -372,30 +410,169 @@ export const MetricasAdmin = ({ leads = [], mensajes = [] }: MetricasAdminProps)
         </Card>
       </div>
 
-      {/* Desglose Detallado */}
+      {/* Distribución de Leads por Etiqueta */}
       <Card className="shadow-md">
         <div className="space-y-4">
-          <h3 className="font-bold text-[#182442] text-lg">Desglose Detallado por Estado</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <h3 className="font-bold text-[#182442] text-lg">📊 Distribución de Leads</h3>
+          <div className="grid grid-cols-3 gap-3">
             <div className="p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg border-2 border-blue-200">
-              <span className="text-xs text-blue-600 font-semibold">LEAD ACTIVO</span>
-              <div className="text-2xl font-bold text-blue-700 mt-2">{metricas.leadsActivoEtiqueta}</div>
-              <span className="text-xs text-blue-500 mt-1 block">Nuevos en seguimiento</span>
+              <span className="text-xs text-blue-600 font-semibold">🔵 LEAD ACTIVO</span>
+              <div className="text-3xl font-bold text-blue-700 mt-2">{metricas.leadsActivoEtiqueta}</div>
+              <p className="text-xs text-blue-600 mt-2">
+                {metricas.leadsActivos > 0 ? Math.round((metricas.leadsActivoEtiqueta / metricas.leadsActivos) * 100) : 0}%
+              </p>
             </div>
             <div className="p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-lg border-2 border-green-200">
-              <span className="text-xs text-green-600 font-semibold">CLIENTE</span>
-              <div className="text-2xl font-bold text-green-700 mt-2">{metricas.clientes}</div>
-              <span className="text-xs text-green-500 mt-1 block">Compra realizada</span>
+              <span className="text-xs text-green-600 font-semibold">🟢 CLIENTE</span>
+              <div className="text-3xl font-bold text-green-700 mt-2">{metricas.clientes}</div>
+              <p className="text-xs text-green-600 mt-2">
+                {metricas.leadsActivos > 0 ? Math.round((metricas.clientes / metricas.leadsActivos) * 100) : 0}%
+              </p>
             </div>
             <div className="p-4 bg-gradient-to-br from-red-50 to-red-100 rounded-lg border-2 border-red-200">
-              <span className="text-xs text-red-600 font-semibold">INACTIVO</span>
-              <div className="text-2xl font-bold text-red-700 mt-2">{metricas.inactivos}</div>
-              <span className="text-xs text-red-500 mt-1 block">Sin respuesta o rechazo</span>
+              <span className="text-xs text-red-600 font-semibold">🔴 INACTIVO</span>
+              <div className="text-3xl font-bold text-red-700 mt-2">{metricas.inactivos}</div>
+              <p className="text-xs text-red-600 mt-2">
+                {metricas.leadsActivos > 0 ? Math.round((metricas.inactivos / metricas.leadsActivos) * 100) : 0}%
+              </p>
             </div>
-            <div className="p-4 bg-gradient-to-br from-slate-50 to-slate-100 rounded-lg border-2 border-slate-200">
-              <span className="text-xs text-slate-600 font-semibold">CONVERSION</span>
-              <div className="text-2xl font-bold text-slate-700 mt-2">{metricas.tasaConversion}%</div>
-              <span className="text-xs text-slate-500 mt-1 block">Tasa de conversion</span>
+          </div>
+        </div>
+      </Card>
+
+      {/* Mejor Vendedor */}
+      <Card className="bg-gradient-to-br from-yellow-50 to-amber-50 border border-yellow-200 shadow-md">
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <span className="text-2xl">🏆</span>
+            <h3 className="font-bold text-[#182442] text-lg">Mejor Vendedor</h3>
+          </div>
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-slate-700">{metricas.mejorVendedor.nombre}</p>
+              <p className="text-xs text-slate-500 mb-3">{metricas.mejorVendedor.email}</p>
+              <div className="space-y-2">
+                <div>
+                  <span className="text-xs text-slate-600">Tasa de Conversión</span>
+                  <div className="text-2xl font-bold text-amber-700">{metricas.mejorVendedor.tasaConversion}%</div>
+                </div>
+                <div className="text-xs text-slate-600">
+                  {metricas.mejorVendedor.leadsConvertidos} de {metricas.mejorVendedor.totalLeads} leads convertidos
+                </div>
+              </div>
+            </div>
+            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-yellow-200 to-amber-300 flex items-center justify-center text-3xl shadow-lg">
+              👩‍💼
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      {/* Ingresos y Productos */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Ingresos Mensuales */}
+        <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 border border-emerald-200 shadow-md">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium text-slate-600">Ingresos Mensuales</span>
+              <span className="text-2xl">💰</span>
+            </div>
+            <div className="text-3xl font-bold text-emerald-700">
+              ${(metricas.ingresosmensuales / 1000).toFixed(1)}K
+            </div>
+            <p className="text-xs text-emerald-600">Ingresos totales este mes</p>
+          </div>
+        </Card>
+
+        {/* Productos Vendidos */}
+        <Card className="bg-gradient-to-br from-violet-50 to-violet-100 border border-violet-200 shadow-md">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium text-slate-600">Productos Vendidos</span>
+              <span className="text-2xl">📦</span>
+            </div>
+            <div className="text-3xl font-bold text-violet-700">{metricas.productosVendidos}</div>
+            <p className="text-xs text-violet-600">Transacciones completadas</p>
+          </div>
+        </Card>
+      </div>
+
+      {/* Leads por Fuente */}
+      <Card className="shadow-md">
+        <div className="space-y-4">
+          <h3 className="font-bold text-[#182442] text-lg">🌐 Leads por Fuente</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="p-4 bg-gradient-to-br from-sky-50 to-sky-100 rounded-lg border-2 border-sky-200">
+              <span className="text-2xl block mb-2">🌐</span>
+              <span className="text-xs text-sky-600 font-semibold">Web</span>
+              <div className="text-2xl font-bold text-sky-700 mt-2">{metricas.leadsPorFuente.web}</div>
+            </div>
+            <div className="p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg border-2 border-blue-200">
+              <span className="text-2xl block mb-2">📧</span>
+              <span className="text-xs text-blue-600 font-semibold">Email</span>
+              <div className="text-2xl font-bold text-blue-700 mt-2">{metricas.leadsPorFuente.email}</div>
+            </div>
+            <div className="p-4 bg-gradient-to-br from-amber-50 to-amber-100 rounded-lg border-2 border-amber-200">
+              <span className="text-2xl block mb-2">🤝</span>
+              <span className="text-xs text-amber-600 font-semibold">Referencia</span>
+              <div className="text-2xl font-bold text-amber-700 mt-2">{metricas.leadsPorFuente.referencia}</div>
+            </div>
+            <div className="p-4 bg-gradient-to-br from-rose-50 to-rose-100 rounded-lg border-2 border-rose-200">
+              <span className="text-2xl block mb-2">📱</span>
+              <span className="text-xs text-rose-600 font-semibold">Redes</span>
+              <div className="text-2xl font-bold text-rose-700 mt-2">{metricas.leadsPorFuente.redes}</div>
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      {/* Motivos de No Compra */}
+      <Card className="shadow-md">
+        <div className="space-y-4">
+          <h3 className="font-bold text-[#182442] text-lg">❌ Motivos de No Compra</h3>
+          <div className="space-y-3">
+            {/* Presupuesto */}
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-sm font-medium text-slate-700">Presupuesto</span>
+                <span className="text-xs font-bold">{metricas.motivosNoCompra.presupuesto}</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                <div className="bg-red-500 h-2 rounded-full" style={{ width: '50%' }}></div>
+              </div>
+            </div>
+
+            {/* Falta de Tiempo */}
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-sm font-medium text-slate-700">Falta de Tiempo</span>
+                <span className="text-xs font-bold">{metricas.motivosNoCompra.tiempo}</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                <div className="bg-orange-500 h-2 rounded-full" style={{ width: '30%' }}></div>
+              </div>
+            </div>
+
+            {/* Competencia */}
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-sm font-medium text-slate-700">Competencia</span>
+                <span className="text-xs font-bold">{metricas.motivosNoCompra.competencia}</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                <div className="bg-yellow-500 h-2 rounded-full" style={{ width: '20%' }}></div>
+              </div>
+            </div>
+
+            {/* Otros */}
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-sm font-medium text-slate-700">Otros Motivos</span>
+                <span className="text-xs font-bold">{metricas.motivosNoCompra.otros}</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                <div className="bg-gray-500 h-2 rounded-full" style={{ width: '10%' }}></div>
+              </div>
             </div>
           </div>
         </div>
