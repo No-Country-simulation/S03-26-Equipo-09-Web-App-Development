@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { InboxVendedor } from '../components/InboxVendedor';
+import { InboxVendedor } from '../features/inbox/components/InboxVendedor';
 import { useAuth } from '../hooks/useAuth';
 
 export default function MiInbox() {

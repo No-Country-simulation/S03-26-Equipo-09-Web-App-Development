@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { seguimientoService, Seguimiento, contactoService, Contacto } from '../common/apiClient';
-import { Card } from './ui/Card/Card';
-import { Button } from './ui/Button/Button';
-import { Modal } from './ui/Modal/Modal';
+import { seguimientoService, Seguimiento, contactoService, Contacto } from '../../../common/apiClient';
+import { Card } from '../../../components/ui/Card/Card';
+import { Button } from '../../../components/ui/Button/Button';
+import { Modal } from '../../../components/ui/Modal/Modal';
 
 export const SeguimientosPanel = () => {
   const [seguimientos, setSegimientos] = useState<Seguimiento[]>([]);

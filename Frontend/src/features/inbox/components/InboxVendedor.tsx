@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import jsPDF from 'jspdf';
-import { obtenerPlantillasActivas, reemplazarVariables, incrementarUsoPlantilla } from '../common/plantillasHelper';
+import { obtenerPlantillasActivas, reemplazarVariables, incrementarUsoPlantilla } from '../../../common/plantillasHelper';
 
 interface Mensaje {
   id: number;

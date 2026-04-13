@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { contactoService, Contacto, estadoLabels } from '../common/apiClient';
-import { Card } from './ui/Card/Card';
-import { Badge } from './ui/Badge/Badge';
+import { contactoService, Contacto, estadoLabels } from '../../../common/apiClient';
+import { Card } from '../../../components/ui/Card/Card';
+import { Badge } from '../../../components/ui/Badge/Badge';
 
 interface ContactoTableProps {
   filtroEstado?: string;

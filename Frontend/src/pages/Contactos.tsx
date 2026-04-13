@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { ContactoTable } from '../components/ContactoTable';
+import { ContactoTable } from '../features/contactos/components/ContactoTable';
 import { Button } from '../components/ui/Button/Button';
 import { Modal } from '../components/ui/Modal/Modal';
 

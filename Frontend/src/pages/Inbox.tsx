@@ -1,5 +1,5 @@
 // Inbox Page Component
-import { InboxAdmin } from '../components/InboxAdmin';
+import { InboxAdmin } from '../features/inbox/components/InboxAdmin';
 
 export default function Inbox() {
   return (

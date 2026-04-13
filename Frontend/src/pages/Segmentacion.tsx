@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ContactoTable } from '../components/ContactoTable';
+import { ContactoTable } from '../features/contactos/components/ContactoTable';
 
 export const SegmentacionPage = () => {
   const [selectedSegmento, setSelectedSegmento] = useState<'todos' | 'LEAD_ACTIVO' | 'EN_SEGUIMIENTO' | 'CALIFICADO' | 'CLIENTE'>('LEAD_ACTIVO');

@@ -9,7 +9,7 @@ import { MetricasPage } from './pages/Metricas';
 import InboxPage from './pages/Inbox';
 import MiInboxPage from './pages/MiInbox';
 import Vendedores from './pages/Vendedores';
-import Plantillas from './pages/Plantillas';
+import Plantillas from './features/plantillas/pages/Plantillas';
 import { DashboardLayout } from './components/layout/DashboardLayout';
 
 const rootRoute = createRootRoute({

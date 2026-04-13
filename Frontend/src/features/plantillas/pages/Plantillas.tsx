@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Modal } from '../components/ui/Modal/Modal';
+import { Modal } from '../../../components/ui/Modal/Modal';
 
 interface Plantilla {
   id: number;

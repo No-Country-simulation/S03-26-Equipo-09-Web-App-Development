@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { useAuth } from '../hooks/useAuth';
-import { MetricasAdmin } from '../components/AdminMetrics';
+import { MetricasAdmin } from '../features/metricas/components/AdminMetrics';
 import { Card } from '../components/ui/Card/Card';
 
 export const MetricasPage = () => {

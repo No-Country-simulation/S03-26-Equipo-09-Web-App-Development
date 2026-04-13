@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import jsPDF from 'jspdf';
-import { Card } from './ui/Card/Card';
+import { Card } from '../../../components/ui/Card/Card';
 
 interface MetricasAdminProps {
   leads?: any[];

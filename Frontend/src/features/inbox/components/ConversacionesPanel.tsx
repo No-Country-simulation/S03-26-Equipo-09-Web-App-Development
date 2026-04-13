@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { conversacionService, Conversacion, contactoService, Contacto, whatsappService, emailService } from '../common/apiClient';
-import { Card } from './ui/Card/Card';
-import { Button } from './ui/Button/Button';
-import { Badge } from './ui/Badge/Badge';
-import { Modal } from './ui/Modal/Modal';
+import { conversacionService, Conversacion, contactoService, Contacto, whatsappService, emailService } from '../../../common/apiClient';
+import { Card } from '../../../components/ui/Card/Card';
+import { Button } from '../../../components/ui/Button/Button';
+import { Badge } from '../../../components/ui/Badge/Badge';
+import { Modal } from '../../../components/ui/Modal/Modal';
 
 interface ConversacionesProps {
   contactoId?: number;

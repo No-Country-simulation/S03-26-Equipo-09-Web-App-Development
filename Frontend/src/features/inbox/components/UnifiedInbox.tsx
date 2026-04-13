@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { conversacionService } from '../common/apiClient';
+import { conversacionService } from '../../../common/apiClient';
 
 interface Conversacion {
   id: number;
