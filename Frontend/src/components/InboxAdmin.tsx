@@ -21,6 +21,7 @@ interface Conversacion {
   vendedorAsignadoId?: number;
   vendedorAsignadoNombre?: string;
   estado?: 'pendiente' | 'respondido' | 'cerrado';
+  etiqueta?: string;
   mensajes?: Mensaje[];
 }
 
@@ -110,6 +111,7 @@ export const InboxAdmin: React.FC = () => {
           vendedorAsignadoId: 1,
           vendedorAsignadoNombre: 'Carlos López',
           estado: 'respondido',
+          etiqueta: 'Lead Activo',
           mensajes: [
             {
               id: 1,
@@ -152,6 +154,7 @@ export const InboxAdmin: React.FC = () => {
           vendedorAsignadoId: 2,
           vendedorAsignadoNombre: 'Ana María Sánchez',
           estado: 'pendiente',
+          etiqueta: 'Cliente',
           mensajes: [
             {
               id: 1,
@@ -173,6 +176,7 @@ export const InboxAdmin: React.FC = () => {
           vendedorAsignadoId: 1,
           vendedorAsignadoNombre: 'Carlos López',
           estado: 'cerrado',
+          etiqueta: 'Cliente',
           mensajes: [
             {
               id: 1,
@@ -215,6 +219,7 @@ export const InboxAdmin: React.FC = () => {
           vendedorAsignadoId: 3,
           vendedorAsignadoNombre: 'Pedro Gómez',
           estado: 'respondido',
+          etiqueta: 'Cliente',
           mensajes: [
             {
               id: 1,
@@ -243,6 +248,7 @@ export const InboxAdmin: React.FC = () => {
           vendedorAsignadoId: 2,
           vendedorAsignadoNombre: 'Ana María Sánchez',
           estado: 'pendiente',
+          etiqueta: 'Inactivo',
           mensajes: [
             {
               id: 1,
@@ -459,6 +465,25 @@ export const InboxAdmin: React.FC = () => {
     );
   };
 
+  const getBadgeEtiqueta = (etiqueta?: string) => {
+    if (!etiqueta) return null;
+    
+    const etiquetas: Record<string, { bg: string; text: string }> = {
+      'Lead Activo': { bg: 'bg-blue-100', text: 'text-blue-700' },
+      'Cliente': { bg: 'bg-green-100', text: 'text-green-700' },
+      'Inactivo': { bg: 'bg-red-100', text: 'text-red-700' }
+    };
+    
+    const config = etiquetas[etiqueta];
+    if (!config) return <span className="inline-flex items-center rounded px-2 py-0.5 text-xs font-semibold bg-slate-100 text-slate-700">{etiqueta}</span>;
+    
+    return (
+      <span className={`inline-flex items-center rounded px-2 py-0.5 text-xs font-semibold ${config.bg} ${config.text}`}>
+        {etiqueta}
+      </span>
+    );
+  };
+
   if (loading) return <div className="text-center py-8 text-slate-600">Cargando conversaciones...</div>;
 
   return (
@@ -651,7 +676,12 @@ export const InboxAdmin: React.FC = () => {
                     <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-2 mb-2">
                       <div className="flex-1">
                         <p className="font-semibold text-slate-800 text-base lg:text-sm">#{conv.id} - {conv.contactoNombre}</p>
-                        <p className="text-xs text-slate-500">{new Date(conv.fechaHora).toLocaleString('es-ES')}</p>
+                        {conv.etiqueta && (
+                          <div className="mt-1">
+                            {getBadgeEtiqueta(conv.etiqueta)}
+                          </div>
+                        )}
+                        <p className="text-xs text-slate-500 mt-1">{new Date(conv.fechaHora).toLocaleString('es-ES')}</p>
                       </div>
                       <div className="flex gap-1 flex-wrap">
                         {getBadgeCanal(conv.canal)}

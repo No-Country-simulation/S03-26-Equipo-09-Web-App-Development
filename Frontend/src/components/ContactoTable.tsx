@@ -19,15 +19,11 @@ export const ContactoTable = ({ filtroEstado }: ContactoTableProps) => {
     setCargando(true);
     try {
       let datos: Contacto[];
-
+      
       if (filtroEstado && filtroEstado !== 'todos') {
         // Usar endpoint de segmentación
         if (filtroEstado === 'LEAD_ACTIVO') {
           datos = await contactoService.getLeadsActivos();
-        } else if (filtroEstado === 'EN_SEGUIMIENTO') {
-          datos = await contactoService.getEnSeguimiento();
-        } else if (filtroEstado === 'CALIFICADO') {
-          datos = await contactoService.getLeadsCalificados();
         } else if (filtroEstado === 'CLIENTE') {
           datos = await contactoService.getClientes();
         } else {
@@ -47,10 +43,6 @@ export const ContactoTable = ({ filtroEstado }: ContactoTableProps) => {
     switch (estado) {
       case 'LEAD_ACTIVO':
         return 'primary';
-      case 'EN_SEGUIMIENTO':
-        return 'warning';
-      case 'CALIFICADO':
-        return 'success';
       case 'CLIENTE':
         return 'success';
       default:
