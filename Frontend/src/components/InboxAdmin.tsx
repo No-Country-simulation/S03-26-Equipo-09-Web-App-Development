@@ -553,7 +553,7 @@ export const InboxAdmin: React.FC = () => {
       </div>
 
       {/* Contenido Principal - Split View Responsive */}
-      <div className="flex flex-1 gap-4 lg:gap-6 overflow-hidden lg:flex-row flex-col">
+      <div className="flex flex-1 gap-4 lg:gap-6 overflow-auto lg:overflow-hidden lg:flex-row flex-col">
         
         {/* Lista de Conversaciones */}
         <div className={`${selectedConversacion && window.innerWidth < 1024 ? 'hidden lg:flex' : 'flex'} lg:flex-1 w-full bg-white rounded-lg shadow overflow-hidden flex flex-col`}>
@@ -596,7 +596,7 @@ export const InboxAdmin: React.FC = () => {
 
         {/* Panel de Chat */}
         {selectedConversacion ? (
-          <div className="flex-1 w-full lg:w-auto bg-white rounded-lg shadow overflow-hidden flex flex-col lg:h-auto min-h-screen lg:min-h-full">
+          <div className="flex-1 w-full lg:w-auto bg-white rounded-lg shadow overflow-hidden flex flex-col max-h-[calc(100vh-240px)] lg:max-h-none lg:min-h-full">
             {/* Header Chat */}
             <div className="bg-gradient-to-r from-[#182442] to-[#006c49] text-white px-3 py-1.5 lg:p-4 flex flex-row lg:flex-row lg:justify-between lg:items-center gap-2 lg:gap-3 flex-shrink-0">
               <button
