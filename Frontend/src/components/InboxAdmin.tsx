@@ -629,7 +629,7 @@ export const InboxAdmin: React.FC = () => {
             </div>
 
             {/* Mensajes */}
-            <div className="flex-1 overflow-y-auto p-2 lg:p-4 space-y-1 lg:space-y-4 bg-slate-50">
+            <div className="flex-1 overflow-y-auto p-3 lg:p-4 space-y-3 lg:space-y-4 bg-slate-50">
               {selectedConversacion.mensajes && selectedConversacion.mensajes.length > 0 ? (
                 selectedConversacion.mensajes.map((msg) => (
                   <div
@@ -637,17 +637,17 @@ export const InboxAdmin: React.FC = () => {
                     className={`flex ${msg.tipo === 'entrada' ? 'justify-start' : 'justify-end'}`}
                   >
                     <div
-                      className={`max-w-xs lg:max-w-md px-3 py-2 lg:py-3 rounded-lg ${
+                      className={`max-w-2xl lg:max-w-md px-4 py-3 lg:py-3 rounded-lg ${
                         msg.tipo === 'entrada'
                           ? 'bg-white border border-slate-200'
                           : 'bg-[#006c49] text-white'
                       }`}
                     >
-                      <p className={`text-xs font-semibold mb-0.5 lg:mb-1 ${msg.tipo === 'entrada' ? 'text-slate-600' : 'opacity-90'}`}>
+                      <p className={`text-xs font-semibold mb-1 lg:mb-1 ${msg.tipo === 'entrada' ? 'text-slate-600' : 'opacity-90'}`}>
                         {msg.remitente}
                       </p>
-                      <p className="text-xs lg:text-xs break-words">{msg.contenido}</p>
-                      <p className={`text-xs mt-1 lg:mt-2 ${msg.tipo === 'entrada' ? 'text-slate-400' : 'opacity-75'}`}>
+                      <p className="text-sm lg:text-xs break-words">{msg.contenido}</p>
+                      <p className={`text-xs mt-2 lg:mt-2 ${msg.tipo === 'entrada' ? 'text-slate-400' : 'opacity-75'}`}>
                         {new Date(msg.fechaHora).toLocaleTimeString('es-ES')}
                       </p>
                     </div>
@@ -666,7 +666,7 @@ export const InboxAdmin: React.FC = () => {
                   onChange={(e) => setRespuesta(e.target.value)}
                   placeholder="Escribe tu respuesta..."
                   className="flex-1 px-2 py-1 lg:px-4 lg:py-2 border border-slate-300 rounded lg:rounded-lg resize-none focus:border-[#006c49] focus:ring-1 lg:focus:ring-2 focus:ring-[#006c49]/20 text-xs lg:text-sm"
-                  rows={3}
+                  rows={2}
                 />
               </div>
               <div className="flex flex-col lg:flex-row gap-1 lg:gap-3">
