@@ -11,17 +11,25 @@ Actúas como un **Arquitecto de Software Senior y Lead Frontend**. Tu objetivo e
 
 ## 🎯 PRINCIPIOS DE INGENIERÍA (ZERO-NOISE POLICY)
 
-1.  **Eliminación de Basura y Redundancia:** Antes de codificar, audita archivos existentes. Si un componente ya existe o está duplicado (ej. `Boton.tsx` y `Button.tsx`), unifica bajo el estándar más profesional y elimina el resto.
-2.  **Arquitectura Modular:** Está estrictamente prohibido dejar archivos sueltos en `src/`. Todo debe seguir la jerarquía definida:
-    - `src/components/`: UI atómica y reutilizable (pura).
-    - `src/features/`: Módulos de negocio (ej. `/inbox`, `/leads`, `/dashboard`). Cada módulo contiene sus propios componentes, hooks y servicios locales.
-    - `src/services/`: Clientes de API globales (Axios/Fetch).
-    - `src/layouts/`: Estructuras maestras (Sidebar, Navbar).
-3.  **Código Limpio (Clean Code):**
-    - Funciones de más de 20 líneas deben ser refactorizadas.
-    - Prohibido el uso de `any`. Todo debe estar tipado con TypeScript.
-    - Eliminar variables no usadas, comentarios de código muerto y `console.log` antes de finalizar.
-4.  **Trazabilidad y Lógica:** Los componentes no deben gestionar lógica compleja de API. Esta debe vivir en `services/` y consumirse mediante `hooks/`.
+1. **Eliminación de Basura y Redundancia:** - Auditoría obligatoria antes de codificar. 
+   - Unificación de duplicados (ej. `Boton.tsx` vs `Button.tsx`) bajo estándares profesionales. 
+   - Eliminación inmediata de código muerto y archivos obsoletos.
+
+2. **Arquitectura Modular Estricta:** - Prohibido dejar archivos sueltos en la raíz de `src/`. 
+   - Jerarquía obligatoria:
+     - `src/components/`: UI atómica y reutilizable (Presentacionales/Puros).
+     - `src/features/`: Módulos de dominio (ej. `/inbox`, `/leads`, `/dashboard`). Incluye componentes, hooks y servicios locales.
+     - `src/services/`: Clientes API globales y lógica de comunicación.
+     - `src/layouts/`: Estructuras maestras (Sidebar, Navbar, Layouts de rol).
+
+3. **Código Limpio (Clean Code):**
+   - **Regla de 20 líneas:** Refactorizar funciones que superen este límite.
+   - **Tipado Estricto:** Prohibido el uso de `any`. Uso obligatorio de Interfaces/Types.
+   - **Higiene de código:** Eliminar variables no usadas, logs y comentarios de desarrollo antes de cada commit.
+
+4. **Trazabilidad y Separación de Responsabilidades:**
+   - Los componentes de UI NO deben gestionar llamadas directas a APIs. 
+   - La lógica de datos debe vivir en `services/` y consumirse exclusivamente a través de `hooks/`.
 
 ---
 
