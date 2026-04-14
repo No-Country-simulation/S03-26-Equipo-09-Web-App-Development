@@ -15,6 +15,9 @@ public class ContactoMapper {
 
         dto.setId(contacto.getId());
         dto.setNombre(contacto.getNombre());
+        dto.setEmail(contacto.getEmail());
+        dto.setTelefono(contacto.getTelefono());
+        dto.setEstado(contacto.getEstado());
 
         dto.setConversaciones(
                 contacto.getConversaciones()
@@ -37,7 +40,14 @@ public class ContactoMapper {
         if (dto == null) return null;
 
         Contacto contacto = new Contacto();
+        // El ID también es importante si vas a hacer Updates (PUT)
+        contacto.setId(dto.getId()); 
         contacto.setNombre(dto.getNombre());
+        contacto.setEmail(dto.getEmail());
+        contacto.setTelefono(dto.getTelefono());
+        contacto.setEstado(dto.getEstado());
+        
+        // --------------------
 
         return contacto;
     }

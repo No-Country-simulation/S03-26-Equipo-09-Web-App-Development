@@ -1,57 +1,60 @@
 package com.startupcrm.crm_backend.controller;
 
+import com.startupcrm.crm_backend.dto.ApiResponse;
+import com.startupcrm.crm_backend.dto.SeguimientoDTO;
+import com.startupcrm.crm_backend.mapper.SeguimientoMapper;
 import com.startupcrm.crm_backend.model.Seguimiento;
-import com.startupcrm.crm_backend.repository.SeguimientoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.startupcrm.crm_backend.service.SeguimientoService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/seguimientos")
 public class SeguimientoController {
 
-    @Autowired
-    private SeguimientoRepository seguimientoRepository;
+    private final SeguimientoService seguimientoService;
+
+    public SeguimientoController(SeguimientoService seguimientoService) {
+        this.seguimientoService = seguimientoService;
+    }
 
     @GetMapping
-    public List<Seguimiento> getAllSeguimientos() {
-        return seguimientoRepository.findAll();
+    public ApiResponse<List<SeguimientoDTO>> getAllSeguimientos() {
+        List<SeguimientoDTO> data = seguimientoService.getAll().stream()
+                .map(SeguimientoMapper::toDTO)
+                .toList();
+        return new ApiResponse<>(true, data, null);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Seguimiento> getSeguimientoById(@PathVariable Long id) {
-        return seguimientoRepository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ApiResponse<SeguimientoDTO> getSeguimientoById(@PathVariable Long id) {
+        SeguimientoDTO dto = SeguimientoMapper.toDTO(seguimientoService.getById(id));
+        return new ApiResponse<>(true, dto, null);
     }
 
     @PostMapping
-    public Seguimiento createSeguimiento(@RequestBody Seguimiento seguimiento) {
-        return seguimientoRepository.save(seguimiento);
+    public ResponseEntity<ApiResponse<SeguimientoDTO>> createSeguimiento(@Valid @RequestBody SeguimientoDTO dto) {
+        Seguimiento seguimiento = SeguimientoMapper.toEntity(dto);
+        Seguimiento saved = seguimientoService.save(seguimiento);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new ApiResponse<>(true, SeguimientoMapper.toDTO(saved), null));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Seguimiento> updateSeguimiento(@PathVariable Long id, @RequestBody Seguimiento seguimientoDetails) {
-        return seguimientoRepository.findById(id).map(seguimiento -> {
-            seguimiento.setTarea(seguimientoDetails.getTarea());
-            seguimiento.setFecha(seguimientoDetails.getFecha());
-            seguimiento.setCompletado(seguimientoDetails.getCompletado());
-            seguimiento.setContacto(seguimientoDetails.getContacto());
-            return ResponseEntity.ok(seguimientoRepository.save(seguimiento));
-        }).orElse(ResponseEntity.notFound().build());
+    public ApiResponse<SeguimientoDTO> updateSeguimiento(@PathVariable Long id, @Valid @RequestBody SeguimientoDTO dto) {
+        Seguimiento seguimientoDetails = SeguimientoMapper.toEntity(dto);
+        Seguimiento updated = seguimientoService.update(id, seguimientoDetails);
+        return new ApiResponse<>(true, SeguimientoMapper.toDTO(updated), null);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteSeguimiento(@PathVariable Long id) {
-        Optional<Seguimiento> seguimientoOpt = seguimientoRepository.findById(id);
-        if (seguimientoOpt.isPresent()) {
-            seguimientoRepository.delete(seguimientoOpt.get());
-            return ResponseEntity.noContent().build(); // correcto tipo Void
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<ApiResponse<Void>> deleteSeguimiento(@PathVariable Long id) {
+        seguimientoService.delete(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .body(new ApiResponse<>(true, null, null));
     }
 }

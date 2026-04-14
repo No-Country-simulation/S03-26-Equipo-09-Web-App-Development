@@ -26,4 +26,9 @@ public class Conversacion {
     //@JsonBackReference
     @JsonBackReference(value = "contacto-conversaciones")
     private Contacto contacto;
+
+    @ManyToOne
+    @JoinColumn(name = "vendedor_asignado_id")
+    @JsonBackReference(value = "usuario-conversaciones")
+    private Usuario vendedorAsignado;
 }

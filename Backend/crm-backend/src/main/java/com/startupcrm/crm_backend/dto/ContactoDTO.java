@@ -1,5 +1,6 @@
 package com.startupcrm.crm_backend.dto;
 
+import com.startupcrm.crm_backend.model.EstadoLead;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
@@ -18,6 +19,7 @@ public class ContactoDTO {
     @NotBlank(message = "El teléfono es obligatorio")
     private String telefono;
 
+    private EstadoLead estado;
 
     private List<ConversacionDTO> conversaciones;
     private List<SeguimientoDTO> seguimientos;
@@ -52,6 +54,14 @@ public class ContactoDTO {
 
     public void setTelefono(String telefono) {
         this.telefono = telefono;
+    }
+
+    public EstadoLead getEstado() {
+        return estado;
+    }
+
+    public void setEstado(EstadoLead estado) {
+        this.estado = estado;
     }
 
     public List<ConversacionDTO> getConversaciones() {
