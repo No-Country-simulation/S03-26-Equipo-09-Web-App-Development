@@ -3,14 +3,7 @@ import { useAuth } from '../hooks/useAuth';
 import { ContactoTable } from '../features/contactos/components/ContactoTable';
 import { Button } from '../components/ui/Button/Button';
 import { Modal } from '../components/ui/Modal/Modal';
-
-// Mock data de vendedores para el admin
-const VENDEDORES_MOCK = [
-  { id: 1, nombre: 'Juan García', email: 'juan@crm.com' },
-  { id: 2, nombre: 'María López', email: 'maria@crm.com' },
-  { id: 3, nombre: 'Carlos Ruiz', email: 'carlos@crm.com' },
-  { id: 4, nombre: 'Ana Chen', email: 'ana@crm.com' }
-];
+import { getVendedoresContactosMock } from '../features/contactos/mocks/contactos.mock';
 
 export const ContactosPage = () => {
   const { isAdmin } = useAuth();
@@ -19,7 +12,8 @@ export const ContactosPage = () => {
   const [selectedVendedor, setSelectedVendedor] = useState<string>(''); // Filtro para Admin
   const [newLeadVendedor, setNewLeadVendedor] = useState<string>(''); // Selector en form para Admin
 
-  // Definir tabs con los 3 estados operativos
+  // Importar vendedores desde mocks centralizados
+  const VENDEDORES_MOCK = getVendedoresContactosMock();
   const tabs = [
     { id: 'lead-activo' as const, label: 'Lead Activo', icon: 'new_releases', color: 'blue', description: 'Recién capturados' },
     { id: 'cliente' as const, label: 'Cliente', icon: 'star', color: 'green', description: 'Compra finalizada' },

@@ -62,6 +62,17 @@ export const CONTACTOS_MOCK: Contacto[] = [
   }
 ];
 
+/**
+ * Vendedores mock para filtros en Contactos page
+ * (Centralizado para reutilización)
+ */
+export const VENDEDORES_CONTACTOS_MOCK = [
+  { id: 1, nombre: 'Juan García', email: 'juan@crm.com' },
+  { id: 2, nombre: 'María López', email: 'maria@crm.com' },
+  { id: 3, nombre: 'Carlos Ruiz', email: 'carlos@crm.com' },
+  { id: 4, nombre: 'Ana Chen', email: 'ana@crm.com' }
+];
+
 export const getContactosMock = (): Contacto[] => {
   return CONTACTOS_MOCK;
 };
@@ -69,4 +80,16 @@ export const getContactosMock = (): Contacto[] => {
 export const getContactosPorEstado = (estado: string): Contacto[] => {
   if (estado === 'Todos') return CONTACTOS_MOCK;
   return CONTACTOS_MOCK.filter(c => c.estado === estado);
+};
+
+export const getVendedoresContactosMock = () => {
+  return VENDEDORES_CONTACTOS_MOCK;
+};
+
+export const getContactosPorVendedor = (vendedorId: string, estado?: string): Contacto[] => {
+  let filtered = CONTACTOS_MOCK.filter(c => c.vendedorId === parseInt(vendedorId));
+  if (estado && estado !== 'Todos') {
+    filtered = filtered.filter(c => c.estado === estado);
+  }
+  return filtered;
 };

@@ -4,7 +4,6 @@ import { Login } from '../pages/Login';
 import { Register } from '../pages/Register';
 import { DashboardPage } from '../pages/Dashboard';
 import { ContactosPage } from '../pages/Contactos';
-import { SegmentacionPage } from '../pages/Segmentacion';
 import { MetricasPage } from '../pages/Metricas';
 import InboxPage from '../pages/Inbox';
 import MiInboxPage from '../pages/MiInbox';
@@ -52,12 +51,6 @@ const contactosRoute = createRoute({
   component: ContactosPage,
 });
 
-const segmentacionRoute = createRoute({
-  getParentRoute: () => dashboardLayoutRoute,
-  path: '/segmentacion',
-  component: SegmentacionPage,
-});
-
 const metricasRoute = createRoute({
   getParentRoute: () => dashboardLayoutRoute,
   path: '/metricas',
@@ -95,7 +88,6 @@ const routeTree = rootRoute.addChildren([
   dashboardLayoutRoute.addChildren([
     dashboardIndexRoute,
     contactosRoute,
-    segmentacionRoute,
     metricasRoute,
     inboxRoute,
     miInboxRoute,
