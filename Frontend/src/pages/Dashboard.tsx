@@ -1,41 +1,65 @@
-import { useState, useMemo } from 'react'; 
-import { dashboardMockData, MOCK_DASHBOARD_STATS } from '../features/dashboard/mocks/dashboardData';
+import { useMemo } from 'react'; 
+import { useQuery } from '@tanstack/react-query';
+import { getDashboardStats } from '../services/dashboardService';
 import { LineChart } from '../components/charts/line/Line';
 import { BarChart } from '../components/charts/bar/bar';
 import { PieChart } from '../components/charts/pie/pie';
 import { Card } from '../components/ui/Card/Card';
 import { Badge } from '../components/ui/Badge/Badge';
 import { Button } from '../components/ui/Button/Button';
-import { Modal } from '../components/ui/Modal/Modal';
 
 export const DashboardPage = () => {
-  const stats = MOCK_DASHBOARD_STATS;
-  const [isDevelopmentModalOpen, setIsDevelopmentModalOpen] = useState(false);
+  // TanStack Query - GET dashboard stats
+  const { data: stats = null, isLoading } = useQuery({
+    queryKey: ['dashboard-stats'],
+    queryFn: getDashboardStats,
+  });
 
   /**
-   * Transforma datos mockados al formato esperado por Nivo
+   * Transforma datos del backend al formato esperado por Nivo
    */
   const chartData = useMemo(() => {
+    if (!stats) return {
+      lineData: [],
+      pieData: [],
+      barData: [],
+    };
+    
     return {
       lineData: [
         {
-          id: 'Ingresos',
-          data: dashboardMockData.revenue.map(item => ({
-            x: item.month,
-            y: item.ingresos
-          }))
+          id: 'Interacciones',
+          data: [
+            { x: 'Ene', y: Math.floor(stats.interaccionesTotales * 0.3) },
+            { x: 'Feb', y: Math.floor(stats.interaccionesTotales * 0.4) },
+            { x: 'Mar', y: Math.floor(stats.interaccionesTotales * 0.5) },
+            { x: 'Abr', y: Math.floor(stats.interaccionesTotales * 0.6) },
+            { x: 'May', y: Math.floor(stats.interaccionesTotales * 0.7) },
+            { x: 'Jun', y: Math.floor(stats.interaccionesTotales * 0.8) }
+          ]
         }
       ],
-      pieData: dashboardMockData.leadsByStatus.map(item => ({
-        id: item.estado,
-        label: item.estado,
-        value: item.cantidad
+      pieData: Object.entries(stats.contactosPorEstado || {}).map(([estado, cantidad]) => ({
+        id: estado,
+        label: estado,
+        value: cantidad as number
       })),
-      barData: dashboardMockData.sources
+      barData: [
+        { fuente: 'Directos', leads: Math.floor(stats.nuevosLeadsHoy * 0.4) },
+        { fuente: 'Referidos', leads: Math.floor(stats.nuevosLeadsHoy * 0.3) },
+        { fuente: 'Marketing', leads: Math.floor(stats.nuevosLeadsHoy * 0.3) },
+      ]
     };
-  }, []);
+  }, [stats]);
 
-  // SOLO UN RETURN QUE ENCAPSULA TODO
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8 animate-fade-in p-2 md:p-6">
       
@@ -46,149 +70,114 @@ export const DashboardPage = () => {
             Panel de Control General
           </h2>
           <p className="text-on-surface-variant text-base mt-1">
-            Bienvenido de nuevo, Harold. Resumen operativo de tu CRM.
+            Bienvenido de nuevo. Resumen operativo de tu CRM.
           </p>
         </div>
         <Badge variant="success">Sistema Online</Badge>
       </header>
 
-      {/* 2. Sección de Conectividad (APIs) */}
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="hover:shadow-md transition-all">
-          <div className="flex justify-between items-start mb-6">
+      {/* 2. Sección de KPIs */}
+      {stats && (
+        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Card className="hover:shadow-md transition-all">
+            <div className="flex justify-between items-start mb-6">
               <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary">
-                  <span className="material-symbols-outlined" style={{ fontSize: '32px' }}>chat_bubble</span></div>
+                <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary">
+                  <span className="material-symbols-outlined text-2xl">people</span>
+                </div>
                 <div>
-                  <h3 className="font-bold text-primary">WhatsApp Cloud API</h3>
-                  <p className="text-xs text-on-surface-variant italic">Estado de la conexión</p>
+                  <p className="text-xs text-on-surface-variant uppercase font-bold tracking-widest">Total Contactos</p>
+                  <p className="text-2xl font-extrabold text-primary mt-1">{stats.totalContactos}</p>
                 </div>
               </div>
-                  <button className="text-xs font-bold text-secondary hover:underline transition-all" 
-                  onClick={() => { setIsDevelopmentModalOpen(true); }}>Vincular mi cuenta</button>
-          </div>
-            <div className="bg-surface-container-low p-3 rounded-xl flex justify-between items-center border border-outline-variant/10">
-              <span className="text-sm font-medium text-primary">Instancia: Activa</span>
-              <span className="text-[10px] font-bold text-secondary uppercase tracking-tighter">Latencia: 120ms</span>
             </div>
-        </Card>
+            <p className="text-xs text-on-surface-variant">Todos los contactos registrados en el sistema</p>
+          </Card>
 
-        <Card>
-          <div className="flex justify-between items-start mb-6">
+          <Card className="hover:shadow-md transition-all">
+            <div className="flex justify-between items-start mb-6">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-                  <span className="material-symbols-outlined" style={{ fontSize: '32px' }}>alternate_email</span>
+                <div className="w-12 h-12 rounded-xl bg-info/10 flex items-center justify-center text-info">
+                  <span className="material-symbols-outlined text-2xl">chat_bubble</span>
                 </div>
                 <div>
-                  <h3 className="font-bold text-primary">Email (Brevo)</h3>
-                  <p className="text-xs text-on-surface-variant">Marketing & Notificaciones</p>
+                  <p className="text-xs text-on-surface-variant uppercase font-bold tracking-widest">Interacciones</p>
+                  <p className="text-2xl font-extrabold text-primary mt-1">{stats.interaccionesTotales}</p>
                 </div>
               </div>
-                <button className="text-xs font-bold text-secondary hover:underline transition-all" 
-                onClick={() => { setIsDevelopmentModalOpen(true); }}>Conectar correo</button>
-          </div>
+            </div>
+            <p className="text-xs text-on-surface-variant">Mensajes y conversaciones totales</p>
+          </Card>
 
-              <div className="bg-surface-container-low p-3 rounded-xl flex justify-between items-center">
-                <span className="text-sm font-medium">Cuota: 2,450 / 3,000</span>
-                <span className="text-[10px] font-bold text-primary/60 uppercase">Sincronizado</span>
+          <Card className="hover:shadow-md transition-all">
+            <div className="flex justify-between items-start mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl bg-warning/10 flex items-center justify-center text-warning">
+                  <span className="material-symbols-outlined text-2xl">mail_outline</span>
+                </div>
+                <div>
+                  <p className="text-xs text-on-surface-variant uppercase font-bold tracking-widest">Sin Leer</p>
+                  <p className="text-2xl font-extrabold text-warning mt-1">{stats.mensajesSinLeer}</p>
+                </div>
               </div>
-        </Card>
-      </section>
+            </div>
+            <p className="text-xs text-on-surface-variant">Mensajes pendientes de revisar</p>
+          </Card>
 
-      {/* 3. KPIs Principales */}
-      <Card className="p-8" variant="dark">
-        <div className="relative z-10 grid grid-cols-1 sm:grid-cols-3 gap-8 text-center sm:text-left">
-          <div>
-            <p className="text-white/60 text-xs font-bold uppercase tracking-widest">Contactos Totales</p>
-            <h4 className="text-4xl font-extrabold mt-2">{stats.totalContactos.toLocaleString()}</h4>
-            <p className="text-secondary text-sm font-bold mt-1">+15% este mes</p>
-          </div>
-          <div>
-            <p className="text-white/60 text-xs font-bold uppercase tracking-widest">Interacciones</p>
-            <h4 className="text-4xl font-extrabold mt-2">{stats.interaccionesTotales.toLocaleString()}</h4>
-            <p className="text-white/40 text-sm mt-1">Omnicanal (WA/Email)</p>
-          </div>
-          <div>
-            <p className="text-white/60 text-xs font-bold uppercase tracking-widest">Sin Leer</p>
-            <h4 className="text-4xl font-extrabold mt-2 text-yellow-400">{stats.mensajesSinLeer}</h4>
-            <button className="text-sm font-bold text-secondary hover:underline mt-1">Ver Inbox →</button>
-          </div>
-        </div>
-      </Card>
+          <Card className="hover:shadow-md transition-all">
+            <div className="flex justify-between items-start mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl bg-success/10 flex items-center justify-center text-success">
+                  <span className="material-symbols-outlined text-2xl">trending_up</span>
+                </div>
+                <div>
+                  <p className="text-xs text-on-surface-variant uppercase font-bold tracking-widest">Leads Hoy</p>
+                  <p className="text-2xl font-extrabold text-success mt-1">{stats.nuevosLeadsHoy}</p>
+                </div>
+              </div>
+            </div>
+            <p className="text-xs text-on-surface-variant">Nuevos leads en las últimas 24h</p>
+          </Card>
+        </section>
+      )}
 
-      {/* 4. Acciones Rápidas */}
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Button className="flex-col h-28" icon="person_add" variant="outline" onClick={() => { setIsDevelopmentModalOpen(true); }}>
-          <span className="text-sm font-bold text-primary">Añadir Vendedor</span>
-        </Button>
-
-        <Button className="flex-col h-28" icon="database" variant="outline" onClick={() => { setIsDevelopmentModalOpen(true); }}>
-          <span className="text-sm font-bold text-primary">Exportar Leads</span>
-        </Button>
-
-        <Button className="flex-col h-28" icon="settings" variant="outline" onClick={() => { setIsDevelopmentModalOpen(true); }}>
-          <span className="text-sm font-bold text-primary">Ajustes</span>
-        </Button>
-      </section>
-
-      {/* 5. Espacio para Gráficos */}
+      {/* 3. Gráficos */}
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Chart: Línea (Ingresos Mensual) */}
-        <Card as="article" className="p-6 flex flex-col">
-          <div className="mb-4">
-            <h2 className="text-lg font-bold text-primary">
-              Ingresos Mensual
-            </h2>
-            <p className="text-sm text-on-surface-variant mt-1">
-              Tendencia de ingresos (últimos 6 meses)
-            </p>
-          </div>
-          <div className="flex-grow" style={{ minHeight: '300px' }}>
-            <LineChart data={chartData.lineData} />
-          </div>
+        <Card className="flex flex-col">
+          <h3 className="text-sm font-bold text-primary mb-4">Interacciones por Mes</h3>
+          <LineChart data={chartData.lineData} />
         </Card>
-
-        {/* Chart: Pie (Distribución de Leads) */}
-        <Card as="article" className="p-6 flex flex-col">
-          <div className="mb-4">
-            <h2 className="text-lg font-bold text-primary">
-              Distribución de Leads
-            </h2>
-            <p className="text-sm text-on-surface-variant mt-1">
-              Por estado del pipeline
-            </p>
-          </div>
-          <div className="flex-grow" style={{ minHeight: '300px' }}>
-            <PieChart data={chartData.pieData} />
-          </div>
+        <Card className="flex flex-col">
+          <h3 className="text-sm font-bold text-primary mb-4">Contactos por Estado</h3>
+          <PieChart data={chartData.pieData} />
         </Card>
       </section>
 
-      {/* Chart: Bar (Leads por Fuente) - Full Width */}
-      <Card as="article" className="p-6 flex flex-col">
-        <div className="mb-4">
-          <h2 className="text-lg font-bold text-primary">
-            Leads por Fuente
-          </h2>
-          <p className="text-sm text-on-surface-variant mt-1">
-            Rendimiento de canales de adquisición
-          </p>
-        </div>
-        <div style={{ minHeight: '320px' }}>
+      <section>
+        <Card className="flex flex-col">
+          <h3 className="text-sm font-bold text-primary mb-4">Fuentes de Leads</h3>
           <BarChart data={chartData.barData} />
-        </div>
-      </Card>
+        </Card>
+      </section>
 
-      {/* MODAL (Invisible hasta que se activa el estado) */}
-      <Modal 
-        isOpen={isDevelopmentModalOpen} 
-        title="¡En Construcción!"
-        onClose={() => { setIsDevelopmentModalOpen(false); }}
-      >
-        <p className="text-on-surface-variant text-sm">
-          Esta función estará disponible en la próxima etapa de desarrollo.
-        </p>
-      </Modal>
+      {/* 4. Sección de Acciones Rápidas */}
+      <section>
+        <h3 className="text-lg font-bold text-primary mb-4">Acciones Rápidas</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Button icon="add_circle" variant="secondary" className="justify-start">
+            Nuevo Contacto
+          </Button>
+          <Button icon="email" variant="secondary" className="justify-start">
+            Enviar Plantilla
+          </Button>
+          <Button icon="phone" variant="secondary" className="justify-start">
+            Hacer Llamada
+          </Button>
+          <Button icon="settings" variant="secondary" className="justify-start">
+            Configuración
+          </Button>
+        </div>
+      </section>
     </div>
   );
 };

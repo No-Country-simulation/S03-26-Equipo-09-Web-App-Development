@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getPlantillas, createPlantilla, togglePlantilla, deletePlantilla } from '../services/plantillasService';
 import type { Plantilla, Canal } from '../types/models';
 import { Card } from '../components/ui/Card/Card';
@@ -15,45 +16,61 @@ const CANAL_COLORS: Record<Canal, string> = {
 
 export const PlantillasPage = () => {
   const { t } = useTranslation();
-  const [plantillas, setPlantillas] = useState<Plantilla[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [filtroCanal, setFiltroCanal] = useState<Canal | 'TODOS'>('TODOS');
   const [modalOpen, setModalOpen] = useState(false);
   const [vistaPrevia, setVistaPrevia] = useState<Plantilla | null>(null);
   const [formData, setFormData] = useState({ nombre: '', contenido: '', canal: 'WhatsApp' as Canal });
-  const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    const cargar = async () => {
-      setLoading(true);
-      setPlantillas(await getPlantillas());
-      setLoading(false);
-    };
-    void cargar();
-  }, []);
+  // TanStack Query - GET
+  const { data: plantillas = [], isLoading } = useQuery({
+    queryKey: ['plantillas'],
+    queryFn: getPlantillas,
+  });
 
-  const filtradas = plantillas.filter(p => filtroCanal === 'TODOS' || p.canal === filtroCanal);
+  // TanStack Query - CREATE
+  const createMutation = useMutation({
+    mutationFn: createPlantilla,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['plantillas'] });
+      setModalOpen(false);
+      setFormData({ nombre: '', contenido: '', canal: 'WhatsApp' });
+    },
+  });
+
+  // TanStack Query - TOGGLE (activate/deactivate)
+  const toggleMutation = useMutation({
+    mutationFn: togglePlantilla,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['plantillas'] });
+    },
+  });
+
+  // TanStack Query - DELETE
+  const deleteMutation = useMutation({
+    mutationFn: deletePlantilla,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['plantillas'] });
+      if (vistaPrevia) setVistaPrevia(null);
+    },
+  });
+
+  const filtradas = useMemo(() => 
+    plantillas.filter(p => filtroCanal === 'TODOS' || p.canal === filtroCanal),
+    [plantillas, filtroCanal]
+  );
 
   const handleCrear = async () => {
     if (!formData.nombre || !formData.contenido) return;
-    setSaving(true);
-    try {
-      const nueva = await createPlantilla({ ...formData, esActiva: true });
-      setPlantillas(prev => [...prev, nueva]);
-      setModalOpen(false);
-      setFormData({ nombre: '', contenido: '', canal: 'WhatsApp' });
-    } finally { setSaving(false); }
+    await createMutation.mutateAsync({ ...formData, esActiva: true });
   };
 
   const handleToggle = async (id: number) => {
-    const actualizada = await togglePlantilla(id);
-    setPlantillas(prev => prev.map(p => (p.id === id ? actualizada : p)));
+    await toggleMutation.mutateAsync(id);
   };
 
   const handleEliminar = async (id: number) => {
-    await deletePlantilla(id);
-    setPlantillas(prev => prev.filter(p => p.id !== id));
-    if (vistaPrevia?.id === id) setVistaPrevia(null);
+    await deleteMutation.mutateAsync(id);
   };
 
   const CANAL_FILTROS = [
@@ -83,7 +100,7 @@ export const PlantillasPage = () => {
         ))}
       </div>
 
-      {loading ? (
+      {isLoading ? (
         <div className="flex items-center justify-center h-40">
           <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
         </div>
@@ -101,10 +118,10 @@ export const PlantillasPage = () => {
                   {plantilla.esActiva ? t('plantillas.badge.active') : t('plantillas.badge.inactive')}
                 </Badge>
                 <div className="flex gap-1">
-                  <button className={`p-1.5 rounded-lg transition-colors ${plantilla.esActiva ? 'hover:bg-yellow-50 text-yellow-600' : 'hover:bg-green-50 text-green-600'}`} onClick={e => { e.stopPropagation(); void handleToggle(plantilla.id); }}>
+                  <button className={`p-1.5 rounded-lg transition-colors ${plantilla.esActiva ? 'hover:bg-yellow-50 text-yellow-600' : 'hover:bg-green-50 text-green-600'}`} onClick={e => { e.stopPropagation(); void handleToggle(plantilla.id); }} disabled={toggleMutation.isPending}>
                     <span className="material-symbols-outlined text-[16px]">{plantilla.esActiva ? 'pause_circle' : 'play_circle'}</span>
                   </button>
-                  <button className="p-1.5 rounded-lg hover:bg-red-50 text-red-400 transition-colors" onClick={e => { e.stopPropagation(); void handleEliminar(plantilla.id); }}>
+                  <button className="p-1.5 rounded-lg hover:bg-red-50 text-red-400 transition-colors" onClick={e => { e.stopPropagation(); void handleEliminar(plantilla.id); }} disabled={deleteMutation.isPending}>
                     <span className="material-symbols-outlined text-[16px]">delete</span>
                   </button>
                 </div>
@@ -151,20 +168,14 @@ export const PlantillasPage = () => {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-semibold text-primary mb-2">
-              {t('plantillas.content')}{' '}
-              <span className="ml-2 text-xs text-on-surface-variant font-normal">{t('plantillas.contentHint')}</span>
-            </label>
-            <textarea
-              className="w-full rounded-xl border border-outline-variant/30 bg-surface px-4 py-2.5 text-sm text-primary focus:outline-none focus:border-primary min-h-[120px] resize-none"
-              placeholder={t('plantillas.contentPlaceholder')}
-              value={formData.contenido}
-              onChange={e => { setFormData(p => ({ ...p, contenido: e.target.value })); }}
-            />
+            <label className="block text-sm font-semibold text-primary mb-2">{t('plantillas.content')}</label>
+            <textarea className="w-full rounded-xl border border-outline-variant/30 bg-surface px-4 py-2.5 text-sm text-primary placeholder:text-on-surface-variant/50 focus:outline-none focus:border-primary transition-colors resize-none" rows={5} placeholder={t('plantillas.contentPlaceholder')} value={formData.contenido} onChange={e => { setFormData(p => ({ ...p, contenido: e.target.value })); }} />
           </div>
           <div className="flex gap-3 pt-2">
             <Button className="flex-1" variant="outline" onClick={() => { setModalOpen(false); }}>{t('common.cancel')}</Button>
-            <Button className="flex-1" isLoading={saving} onClick={() => { void handleCrear(); }}>{t('plantillas.createTemplate')}</Button>
+            <Button className="flex-1" isLoading={createMutation.isPending} onClick={() => { void handleCrear(); }}>
+              {t('plantillas.new')}
+            </Button>
           </div>
         </div>
       </Modal>

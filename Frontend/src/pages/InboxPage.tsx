@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getConversaciones, marcarLeido, createConversacion } from '../services/conversacionesService';
 import { getContactos } from '../services/contactosService';
 import type { Conversacion, Contacto, Canal } from '../types/models';
@@ -23,52 +24,68 @@ const timeAgo = (iso: string) => {
 
 export const InboxPage = () => {
   const { t } = useTranslation();
-  const [conversaciones, setConversaciones] = useState<Conversacion[]>([]);
-  const [contactos, setContactos] = useState<Contacto[]>([]);
+  const queryClient = useQueryClient();
   const [seleccionada, setSeleccionada] = useState<Conversacion | null>(null);
   const [filtroCanal, setFiltroCanal] = useState<Canal | 'TODOS'>('TODOS');
-  const [loading, setLoading] = useState(true);
   const [respuesta, setRespuesta] = useState('');
 
-  useEffect(() => {
-    const cargar = async () => {
-      setLoading(true);
-      const [convs, conts] = await Promise.all([getConversaciones(), getContactos()]);
-      setConversaciones(convs);
-      setContactos(conts);
-      if (convs.length > 0) setSeleccionada(convs[0] ?? null);
-      setLoading(false);
-    };
-    void cargar();
-  }, []);
+  // TanStack Query - GET conversaciones
+  const { data: conversaciones = [], isLoading: loadingConv } = useQuery({
+    queryKey: ['conversaciones'],
+    queryFn: getConversaciones,
+  });
 
-  // contactos is kept for future use (e.g. sidebar "sin actividad reciente")
-  void contactos;
+  // TanStack Query - GET contactos
+  const { data: contactos = [] } = useQuery({
+    queryKey: ['contactos'],
+    queryFn: getContactos,
+  });
+
+  // TanStack Query - marcar como leído
+  const marcarLeidoMutation = useMutation({
+    mutationFn: marcarLeido,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['conversaciones'] });
+    },
+  });
+
+  // TanStack Query - crear conversación
+  const crearMutation = useMutation({
+    mutationFn: createConversacion,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['conversaciones'] });
+      setRespuesta('');
+    },
+  });
 
   const seleccionar = async (conv: Conversacion) => {
     setSeleccionada(conv);
     if (!conv.leido) {
-      const actualizada = await marcarLeido(conv.id);
-      setConversaciones(prev => prev.map(c => (c.id === conv.id ? actualizada : c)));
+      await marcarLeidoMutation.mutateAsync(conv.id);
     }
   };
 
   const enviarRespuesta = async () => {
     if (!respuesta.trim() || !seleccionada) return;
-    const nueva = await createConversacion({
+    await crearMutation.mutateAsync({
       canal: seleccionada.canal,
       contenido: respuesta,
       fechaHora: new Date().toISOString(),
       contacto: seleccionada.contacto,
       leido: true,
     });
-    setConversaciones(prev => [nueva, ...prev]);
-    setSeleccionada(nueva);
-    setRespuesta('');
+    setSeleccionada(null);
   };
 
-  const filtradas = conversaciones.filter(c => filtroCanal === 'TODOS' || c.canal === filtroCanal);
-  const sinLeer = conversaciones.filter(c => !c.leido).length;
+  const filtradas = useMemo(() => 
+    conversaciones.filter(c => filtroCanal === 'TODOS' || c.canal === filtroCanal),
+    [conversaciones, filtroCanal]
+  );
+
+  const sinLeer = useMemo(() => 
+    conversaciones.filter(c => !c.leido).length,
+    [conversaciones]
+  );
 
   const CANAL_FILTROS = [
     { key: 'TODOS' as const, label: t('inbox.filters.all') },
@@ -95,7 +112,7 @@ export const InboxPage = () => {
         </div>
       </header>
 
-      {loading ? (
+      {loadingConv ? (
         <div className="flex items-center justify-center h-64">
           <div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
         </div>
@@ -176,7 +193,7 @@ export const InboxPage = () => {
                       onChange={e => { setRespuesta(e.target.value); }}
                       onKeyDown={e => { if (e.key === 'Enter') void enviarRespuesta(); }}
                     />
-                    <button className="px-4 py-2.5 rounded-xl bg-primary text-white font-bold text-sm hover:bg-primary/90 active:scale-95 transition-all disabled:opacity-50" disabled={!respuesta.trim()} onClick={() => { void enviarRespuesta(); }}>
+                    <button className="px-4 py-2.5 rounded-xl bg-primary text-white font-bold text-sm hover:bg-primary/90 active:scale-95 transition-all disabled:opacity-50" disabled={!respuesta.trim() || crearMutation.isPending} onClick={() => { void enviarRespuesta(); }}>
                       <span className="material-symbols-outlined text-[18px]">send</span>
                     </button>
                   </div>

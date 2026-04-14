@@ -1,5 +1,6 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { tx } from '../common/tx';
 import { getContactos, createContacto, updateContacto, deleteContacto } from '../services/contactosService';
 import type { Contacto, EstadoLead } from '../types/models';
@@ -29,23 +30,49 @@ const EMPTY_FORM: ContactoFormData = { nombre: '', email: '', telefono: '', esta
 
 export const ContactosPage = () => {
   const { t } = useTranslation();
-  const [contactos, setContactos] = useState<Contacto[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [busqueda, setBusqueda] = useState('');
   const [filtroEstado, setFiltroEstado] = useState<EstadoLead | 'TODOS'>('TODOS');
   const [modalOpen, setModalOpen] = useState(false);
   const [deleteModal, setDeleteModal] = useState<number | null>(null);
   const [editando, setEditando] = useState<Contacto | null>(null);
   const [formData, setFormData] = useState<ContactoFormData>(EMPTY_FORM);
-  const [saving, setSaving] = useState(false);
 
-  const cargarContactos = async () => {
-    setLoading(true);
-    try { setContactos(await getContactos()); }
-    finally { setLoading(false); }
-  };
+  // TanStack Query - GET
+  const { data: contactos = [], isLoading } = useQuery({
+    queryKey: ['contactos'],
+    queryFn: getContactos,
+  });
 
-  useEffect(() => { void cargarContactos(); }, []);
+  // TanStack Query - CREATE
+  const createMutation = useMutation({
+    mutationFn: createContacto,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['contactos'] });
+      setModalOpen(false);
+      setFormData(EMPTY_FORM);
+    },
+  });
+
+  // TanStack Query - UPDATE
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: Parameters<typeof updateContacto>[1] }) => updateContacto(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['contactos'] });
+      setModalOpen(false);
+      setEditando(null);
+      setFormData(EMPTY_FORM);
+    },
+  });
+
+  // TanStack Query - DELETE
+  const deleteMutation = useMutation({
+    mutationFn: deleteContacto,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['contactos'] });
+      setDeleteModal(null);
+    },
+  });
 
   const filtrados = useMemo(() => contactos.filter(c => {
     const matchQ = busqueda === '' || [c.nombre, c.email, c.telefono].some(v => v.toLowerCase().includes(busqueda.toLowerCase()));
@@ -57,23 +84,15 @@ export const ContactosPage = () => {
   const abrirEditar = (c: Contacto) => { setEditando(c); setFormData({ nombre: c.nombre, email: c.email, telefono: c.telefono, estado: c.estado }); setModalOpen(true); };
 
   const handleGuardar = async () => {
-    setSaving(true);
-    try {
-      if (editando) {
-        const upd = await updateContacto(editando.id, formData);
-        setContactos(prev => prev.map(c => (c.id === editando.id ? upd : c)));
-      } else {
-        const nuevo = await createContacto(formData);
-        setContactos(prev => [...prev, nuevo]);
-      }
-      setModalOpen(false);
-    } finally { setSaving(false); }
+    if (editando) {
+      await updateMutation.mutateAsync({ id: editando.id, data: formData });
+    } else {
+      await createMutation.mutateAsync(formData);
+    }
   };
 
   const handleEliminar = async (id: number) => {
-    await deleteContacto(id);
-    setContactos(prev => prev.filter(c => c.id !== id));
-    setDeleteModal(null);
+    await deleteMutation.mutateAsync(id);
   };
 
   const timeAgo = (iso?: string) => {
@@ -118,7 +137,7 @@ export const ContactosPage = () => {
 
       {/* Tabla */}
       <Card className="overflow-hidden p-0">
-        {loading ? (
+        {isLoading ? (
           <div className="flex items-center justify-center h-40">
             <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
           </div>
@@ -195,7 +214,7 @@ export const ContactosPage = () => {
           </div>
           <div className="flex gap-3 pt-2">
             <Button className="flex-1" variant="outline" onClick={() => { setModalOpen(false); }}>{t('common.cancel')}</Button>
-            <Button className="flex-1" isLoading={saving} onClick={() => { void handleGuardar(); }}>
+            <Button className="flex-1" isLoading={createMutation.isPending || updateMutation.isPending} onClick={() => { void handleGuardar(); }}>
               {editando ? t('contactos.saveChanges') : t('contactos.createTitle')}
             </Button>
           </div>
