@@ -3,12 +3,35 @@ package com.startupcrm.crm_backend.dto;
 import com.startupcrm.crm_backend.model.EstadoLead;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.util.List;
-
+/**
+ * DTO para Contacto - Alineado con apiClient.ts del Frontend.
+ * 
+ * SIMPLIFICADO para MVP:
+ * - Sin conversaciones anidadas
+ * - Sin seguimientos anidados
+ * - Incluye vendedorAsignadoId para identificar responsable
+ * 
+ * El frontend obtiene detalles en requests separados:
+ * - GET /api/conversaciones/por-contacto/{id}
+ * - GET /api/seguimientos/por-contacto/{id}
+ * 
+ * @author Backend Team
+ * @version 2.0 - Refactorización MVP
+ */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ContactoDTO {
 
     private Long id;
+
     @NotBlank(message = "El nombre es obligatorio")
     private String nombre;
 
@@ -19,66 +42,17 @@ public class ContactoDTO {
     @NotBlank(message = "El teléfono es obligatorio")
     private String telefono;
 
-    private EstadoLead estado;
+    @NotNull(message = "El estado es obligatorio")
+    private EstadoLead estado; // LEAD_ACTIVO, EN_SEGUIMIENTO, CALIFICADO, CLIENTE
 
-    private List<ConversacionDTO> conversaciones;
-    private List<SeguimientoDTO> seguimientos;
+    private Long vendedorAsignadoId; // ID del vendedor responsable
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getTelefono() {
-        return telefono;
-    }
-
-    public void setTelefono(String telefono) {
-        this.telefono = telefono;
-    }
-
-    public EstadoLead getEstado() {
-        return estado;
-    }
-
-    public void setEstado(EstadoLead estado) {
-        this.estado = estado;
-    }
-
-    public List<ConversacionDTO> getConversaciones() {
-        return conversaciones;
-    }
-
-    public void setConversaciones(List<ConversacionDTO> conversaciones) {
-        this.conversaciones = conversaciones;
-    }
-
-    public List<SeguimientoDTO> getSeguimientos() {
-        return seguimientos;
-    }
-
-    public void setSeguimientos(List<SeguimientoDTO> seguimientos) {
-        this.seguimientos = seguimientos;
-    }
-
+    /**
+     * ELIMINADAS de este DTO (MVP):
+     * - List<ConversacionDTO> conversaciones
+     * - List<SeguimientoDTO> seguimientos
+     * 
+     * RAZÓN: Evitar N+1 queries, reducir payload JSON, permitir paginación
+     */
 }
 
