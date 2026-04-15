@@ -50,6 +50,7 @@ export interface Metricas {
   tasaCompletitudSeguimientos: number;
   contactosPorEstado: Record<string, number>;
   comunicacionPorCanal: Record<string, number>;
+  productosVendidos?: number; // ← Nuevo campo
 }
 
 export interface FunnelMetricas {
@@ -249,7 +250,8 @@ export const metricasService = {
       seguimientosPendientes: 0,
       tasaCompletitudSeguimientos: 0,
       contactosPorEstado: {},
-      comunicacionPorCanal: {}
+      comunicacionPorCanal: {},
+      productosVendidos: 0
     };
   },
 

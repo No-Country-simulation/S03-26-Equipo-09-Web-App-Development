@@ -14,10 +14,10 @@ DELETE FROM usuarios WHERE id > 0;
 -- ===============================================
 INSERT INTO usuarios (id, nombre, email, password, role, telefono, activo)
 VALUES
-(1, 'Harold Admin', 'admin@crm.local', '$2a$10$Rq.Ej8E2v8zEZKOgK8Wn1eEHK.Y9H3DqPqN.C5Qx9K1L2M3N4O5P', 'ADMIN', '+34 911 234 567', true),
-(2, 'Carlos López', 'carlos.lopez@crm.local', '$2a$10$Rq.Ej8E2v8zEZKOgK8Wn1eEHK.Y9H3DqPqN.C5Qx9K1L2M3N4O5P', 'VENDEDOR', '+34 601 111 111', true),
-(3, 'Ana María Sánchez', 'ana.sanchez@crm.local', '$2a$10$Rq.Ej8E2v8zEZKOgK8Wn1eEHK.Y9H3DqPqN.C5Qx9K1L2M3N4O5P', 'VENDEDOR', '+34 602 222 222', true),
-(4, 'Pedro Gómez', 'pedro.gomez@crm.local', '$2a$10$Rq.Ej8E2v8zEZKOgK8Wn1eEHK.Y9H3DqPqN.C5Qx9K1L2M3N4O5P', 'VENDEDOR', '+34 603 333 333', true);
+(1, 'Harold Admin', 'admin@crm.local', 'admin123', 'ADMIN', '+34 911 234 567', true),
+(2, 'Carlos López', 'carlos.lopez@crm.local', 'carlos123', 'VENDEDOR', '+34 601 111 111', true),
+(3, 'Ana María Sánchez', 'ana.sanchez@crm.local', 'ana123', 'VENDEDOR', '+34 602 222 222', true),
+(4, 'Pedro Gómez', 'pedro.gomez@crm.local', 'pedro123', 'VENDEDOR', '+34 603 333 333', true);
 
 -- ===============================================
 -- CONTACTOS (5 LEADS/CONTACTOS)
@@ -27,8 +27,8 @@ VALUES
 (1, 'Roberto Martínez', 'roberto.martinez@empresa.com', '+34 650 123 456', 'LEAD_ACTIVO', 2),
 (2, 'Laura Fernández', 'laura.fernandez@startup.io', '+34 651 234 567', 'EN_SEGUIMIENTO', 3),
 (3, 'David López', 'david.lopez@empresa.es', '+34 652 345 678', 'CLIENTE', 4),
-(4, 'Patricia González', 'patricia.gonzalez@company.com', '+34 653 456 789', 'LEAD_ACTIVO', 2),
-(5, 'Francisco Ruiz', 'francisco.ruiz@negocio.es', '+34 654 567 890', 'CALIFICADO', 3);
+(4, 'Patricia González', 'patricia.gonzalez@company.com', '+34 653 456 789', 'CLIENTE', 2),
+(5, 'Francisco Ruiz', 'francisco.ruiz@negocio.es', '+34 654 567 890', 'CLIENTE', 3);
 
 -- ===============================================
 -- CONVERSACIONES (WEBHOOK SIMULATOR + MANUALES)

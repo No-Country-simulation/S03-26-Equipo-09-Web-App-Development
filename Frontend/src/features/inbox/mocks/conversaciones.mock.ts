@@ -193,7 +193,7 @@ export const CONVERSACIONES_MOCK_ADMIN: Conversacion[] = [
   }
 ];
 
-export const getConversacionesPorVendedor = (vendedorId: number) => {
-  // En producción, esto llamaría a: conversacionService.getByVendedor(vendedorId)
+export const getConversacionesPorVendedor = (_vendedorId: number) => {
+  // En producción, esto llamaría a: conversacionService.getByVendedor(_vendedorId)
   return CONVERSACIONES_MOCK_VENDEDOR;
 };

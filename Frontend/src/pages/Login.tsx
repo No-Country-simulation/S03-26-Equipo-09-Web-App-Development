@@ -10,10 +10,14 @@ import { Button } from '../components/ui/Button/Button';
 import { Card } from '../components/ui/Card/Card';
 import { Badge } from '../components/ui/Badge/Badge';
 
-// Credenciales de usuarios para prueba
-const USERS = {
-  admin: { id: 1, email: 'admin@crm.com', password: '123456', role: 'ADMIN', name: 'Harold Admin' },
-  vendedor: { id: 2, email: 'vendedor@crm.com', password: '123456', role: 'VENDEDOR', name: 'Carlos Vendedor' }
+const API_URL = import.meta.env['VITE_API_URL'] as string || 'http://localhost:8080/api';
+
+// Credenciales de desarrollo (para referencia)
+const DEV_USERS = {
+  admin: { email: 'admin@crm.local', password: 'admin123' },
+  carlos: { email: 'carlos.lopez@crm.local', password: 'carlos123' },
+  ana: { email: 'ana.sanchez@crm.local', password: 'ana123' },
+  pedro: { email: 'pedro.gomez@crm.local', password: 'pedro123' }
 };
 
 export const Login = () => {
@@ -33,15 +37,15 @@ export const Login = () => {
     resolver: zodResolver(loginSchema),
     mode: 'onBlur',
     defaultValues: {
-      email: rememberedEmail || 'admin@crm.com', // Default: Admin
+      email: rememberedEmail || 'admin@crm.local', // Default: Admin
       password: '',
       rememberMe: !!rememberedEmail
     }
   });
 
   // Botones rápidos para cargar credenciales
-  const quickLogin = (userType: keyof typeof USERS) => {
-    const user = USERS[userType];
+  const quickLogin = (userType: keyof typeof DEV_USERS) => {
+    const user = DEV_USERS[userType];
     setValue('email', user.email);
     setValue('password', user.password);
   };
@@ -51,21 +55,29 @@ export const Login = () => {
     setSuccessMessage(null);
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Llamar al endpoint de login del backend
+      const response = await fetch(`${API_URL}/usuarios/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: data.email,
+          password: data.password
+        })
+      });
 
-      // Verificar credenciales contra los usuarios definidos
-      const authenticatedUser = Object.values(USERS).find(
-        user => user.email === data.email && user.password === data.password
-      );
+      const result = (await response.json()) as { success?: boolean; data?: { token: string; userId: number; email: string; nombre: string; role: string }; error?: string };
 
-      if (authenticatedUser) {
-        // ✅ Login exitoso - Guardar token y rol en localStorage
-        const mockToken = `mock-jwt-${Date.now()}`;
-        localStorage.setItem('authToken', mockToken);
-        localStorage.setItem('userId', String(authenticatedUser.id));
-        localStorage.setItem('userRole', authenticatedUser.role);
-        localStorage.setItem('userEmail', authenticatedUser.email);
-        localStorage.setItem('userName', authenticatedUser.name);
+      if (result.success && result.data) {
+        // ✅ Login exitoso - Guardar token y datos en localStorage
+        const { token, userId, email, nombre, role } = result.data;
+        
+        localStorage.setItem('authToken', token);
+        localStorage.setItem('userId', String(userId));
+        localStorage.setItem('userRole', role);
+        localStorage.setItem('userEmail', email);
+        localStorage.setItem('userName', nombre);
         
         if (data.rememberMe) {
           localStorage.setItem('rememberEmail', data.email);
@@ -73,20 +85,19 @@ export const Login = () => {
           localStorage.removeItem('rememberEmail');
         }
 
-        setSuccessMessage(`¡Bienvenido ${authenticatedUser.name}! Redirigiendo...`);
+        setSuccessMessage(`¡Bienvenido ${nombre}! Redirigiendo...`);
         
         // Redirigir al dashboard después de 1 segundo
         setTimeout(() => {
           navigate({ to: '/dashboard' });
         }, 1000);
       } else {
-        // ❌ Credenciales inválidas
-        setServerError(
-          'El correo o la contraseña son incorrectos. Usa las credenciales mostradas abajo.'
-        );
+        // ❌ Login fallido
+        setServerError(typeof result.error === 'string' ? result.error : 'Credenciales inválidas. Por favor intenta de nuevo.');
       }
     } catch (error) {
       setServerError('Error al conectar con el servidor. Por favor intenta de nuevo.');
+      console.error('Login error:', error);
     }
   };
 
@@ -213,14 +224,14 @@ export const Login = () => {
 
           {/* Footer Info - Credenciales de Prueba */}
           <div className="mt-8 pt-6 border-t border-slate-100">
-            <p className="text-xs text-slate-500 mb-4 text-center font-semibold">Credenciales de Prueba</p>
+            <p className="text-xs text-slate-500 mb-4 text-center font-semibold">👇 Credenciales de Prueba desde Backend</p>
             
             {/* Perfil Admin */}
             <div className="mb-3 p-3 bg-blue-50 rounded-lg border border-blue-100">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-bold text-blue-900">👨‍💼 Admin</span>
-                  <Badge variant="primary" className="text-xs">Todas las funciones</Badge>
+                  <span className="text-sm font-bold text-blue-900">👨‍💼 Harold Admin</span>
+                  <Badge variant="primary" className="text-xs">ADMIN</Badge>
                 </div>
                 <button
                   type="button"
@@ -230,27 +241,65 @@ export const Login = () => {
                   Cargar
                 </button>
               </div>
-              <p className="text-xs text-blue-700 font-mono">📧 admin@crm.com</p>
-              <p className="text-xs text-blue-700 font-mono">🔐 123456</p>
+              <p className="text-xs text-blue-700 font-mono">📧 admin@crm.local</p>
+              <p className="text-xs text-blue-700 font-mono">🔐 admin123</p>
             </div>
 
-            {/* Perfil Vendedor */}
-            <div className="p-3 bg-green-50 rounded-lg border border-green-100">
+            {/* Perfil Carlos */}
+            <div className="mb-3 p-3 bg-green-50 rounded-lg border border-green-100">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-bold text-green-900">👔 Vendedor</span>
-                  <Badge variant="success" className="text-xs">Mi Inbox</Badge>
+                  <span className="text-sm font-bold text-green-900">👔 Carlos López</span>
+                  <Badge variant="success" className="text-xs">VENDEDOR</Badge>
                 </div>
                 <button
                   type="button"
-                  onClick={() => quickLogin('vendedor')}
+                  onClick={() => quickLogin('carlos')}
                   className="text-xs px-2 py-1 bg-green-500 hover:bg-green-600 text-white rounded font-semibold transition-colors"
                 >
                   Cargar
                 </button>
               </div>
-              <p className="text-xs text-green-700 font-mono">📧 vendedor@crm.com</p>
-              <p className="text-xs text-green-700 font-mono">🔐 123456</p>
+              <p className="text-xs text-green-700 font-mono">📧 carlos.lopez@crm.local</p>
+              <p className="text-xs text-green-700 font-mono">🔐 carlos123</p>
+            </div>
+
+            {/* Perfil Ana */}
+            <div className="mb-3 p-3 bg-purple-50 rounded-lg border border-purple-100">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-bold text-purple-900">👱‍♀️ Ana María</span>
+                  <Badge variant="success" className="text-xs">VENDEDOR</Badge>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => quickLogin('ana')}
+                  className="text-xs px-2 py-1 bg-purple-500 hover:bg-purple-600 text-white rounded font-semibold transition-colors"
+                >
+                  Cargar
+                </button>
+              </div>
+              <p className="text-xs text-purple-700 font-mono">📧 ana.sanchez@crm.local</p>
+              <p className="text-xs text-purple-700 font-mono">🔐 ana123</p>
+            </div>
+
+            {/* Perfil Pedro */}
+            <div className="p-3 bg-orange-50 rounded-lg border border-orange-100">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-bold text-orange-900">🧑‍💼 Pedro Gómez</span>
+                  <Badge variant="success" className="text-xs">VENDEDOR</Badge>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => quickLogin('pedro')}
+                  className="text-xs px-2 py-1 bg-orange-500 hover:bg-orange-600 text-white rounded font-semibold transition-colors"
+                >
+                  Cargar
+                </button>
+              </div>
+              <p className="text-xs text-orange-700 font-mono">📧 pedro.gomez@crm.local</p>
+              <p className="text-xs text-orange-700 font-mono">🔐 pedro123</p>
             </div>
           </div>
         </Card>

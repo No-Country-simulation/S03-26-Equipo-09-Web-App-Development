@@ -57,22 +57,26 @@ public class MetricasService {
 
             // Segmentación por estado
             Map<String, Long> contactosPorEstado = new HashMap<>();
+            long clientesCount = (long) contactoRepository.findByEstado(EstadoLead.CLIENTE).size();
+            
             contactosPorEstado.put(EstadoLead.LEAD_ACTIVO.toString(), 
                 (long) contactoRepository.findByEstado(EstadoLead.LEAD_ACTIVO).size());
             contactosPorEstado.put(EstadoLead.EN_SEGUIMIENTO.toString(), 
                 (long) contactoRepository.findByEstado(EstadoLead.EN_SEGUIMIENTO).size());
             contactosPorEstado.put(EstadoLead.CALIFICADO.toString(), 
                 (long) contactoRepository.findByEstado(EstadoLead.CALIFICADO).size());
-            contactosPorEstado.put(EstadoLead.CLIENTE.toString(), 
-                (long) contactoRepository.findByEstado(EstadoLead.CLIENTE).size());
+            contactosPorEstado.put(EstadoLead.CLIENTE.toString(), clientesCount);
 
             metricas.put("contactosPorEstado", contactosPorEstado);
+
+            // PRODUCTOS VENDIDOS = Contactos en estado CLIENTE
+            metricas.put("productosVendidos", clientesCount);
 
             // Canales de comunicación
             Map<String, Long> comunicacionPorCanal = obtenerComunicacionPorCanal();
             metricas.put("comunicacionPorCanal", comunicacionPorCanal);
 
-            logger.info("Resumen de métricas generado exitosamente");
+            logger.info("Resumen de métricas generado exitosamente. Productos Vendidos: {}", clientesCount);
 
         } catch (Exception e) {
             logger.error("Error al generar resumen de métricas: {}", e.getMessage());
