@@ -116,17 +116,6 @@ public class ContactoController {
     }
 
     /**
-     * Obtener contactos en seguimiento
-     */
-    @GetMapping("/segmentacion/en-seguimiento")
-    public ApiResponse<List<ContactoDTO>> getContactosEnSeguimiento() {
-        List<ContactoDTO> data = contactoService.getContactosEnSeguimiento().stream()
-                .map(ContactoMapper::toDTO)
-                .toList();
-        return new ApiResponse<>(true, data, null);
-    }
-
-    /**
      * Obtener clientes
      */
     @GetMapping("/segmentacion/clientes")
@@ -138,11 +127,61 @@ public class ContactoController {
     }
 
     /**
-     * Obtener leads calificados
+     * Obtener contactos inactivos
      */
-    @GetMapping("/segmentacion/leads-calificados")
-    public ApiResponse<List<ContactoDTO>> getLeadsCalificados() {
-        List<ContactoDTO> data = contactoService.getLeadsCalificados().stream()
+    @GetMapping("/segmentacion/inactivos")
+    public ApiResponse<List<ContactoDTO>> getInactivos() {
+        List<ContactoDTO> data = contactoService.getInactivos().stream()
+                .map(ContactoMapper::toDTO)
+                .toList();
+        return new ApiResponse<>(true, data, null);
+    }
+
+    // ==================== FILTRADO POR VENDEDOR ====================
+
+    /**
+     * Obtener contactos por vendedor (para admin)
+     * @param vendedorId ID del vendedor
+     */
+    @GetMapping("/por-vendedor/{vendedorId}")
+    public ApiResponse<List<ContactoDTO>> getContactosPorVendedor(@PathVariable Long vendedorId) {
+        List<ContactoDTO> data = contactoService.getContactosPorVendedor(vendedorId).stream()
+                .map(ContactoMapper::toDTO)
+                .toList();
+        return new ApiResponse<>(true, data, null);
+    }
+
+    /**
+     * Obtener leads activos de un vendedor específico
+     * @param vendedorId ID del vendedor
+     */
+    @GetMapping("/por-vendedor/{vendedorId}/segmentacion/leads-activos")
+    public ApiResponse<List<ContactoDTO>> getLeadsActivosPorVendedor(@PathVariable Long vendedorId) {
+        List<ContactoDTO> data = contactoService.getLeadsActivosPorVendedor(vendedorId).stream()
+                .map(ContactoMapper::toDTO)
+                .toList();
+        return new ApiResponse<>(true, data, null);
+    }
+
+    /**
+     * Obtener clientes de un vendedor específico
+     * @param vendedorId ID del vendedor
+     */
+    @GetMapping("/por-vendedor/{vendedorId}/segmentacion/clientes")
+    public ApiResponse<List<ContactoDTO>> getClientesPorVendedor(@PathVariable Long vendedorId) {
+        List<ContactoDTO> data = contactoService.getClientesPorVendedor(vendedorId).stream()
+                .map(ContactoMapper::toDTO)
+                .toList();
+        return new ApiResponse<>(true, data, null);
+    }
+
+    /**
+     * Obtener contactos inactivos de un vendedor específico
+     * @param vendedorId ID del vendedor
+     */
+    @GetMapping("/por-vendedor/{vendedorId}/segmentacion/inactivos")
+    public ApiResponse<List<ContactoDTO>> getInactivosPorVendedor(@PathVariable Long vendedorId) {
+        List<ContactoDTO> data = contactoService.getInactivosPorVendedor(vendedorId).stream()
                 .map(ContactoMapper::toDTO)
                 .toList();
         return new ApiResponse<>(true, data, null);

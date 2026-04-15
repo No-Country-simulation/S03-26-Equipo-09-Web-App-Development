@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { ContactoTable } from '../features/contactos/components/ContactoTable';
 import { Button } from '../components/ui/Button/Button';
 import { Modal } from '../components/ui/Modal/Modal';
-import { getVendedoresContactosMock } from '../features/contactos/mocks/contactos.mock';
+import { usuarioService, Usuario } from '../common/apiClient';
 
 export const ContactosPage = () => {
   const { isAdmin } = useAuth();
@@ -11,9 +11,29 @@ export const ContactosPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedVendedor, setSelectedVendedor] = useState<string>(''); // Filtro para Admin
   const [newLeadVendedor, setNewLeadVendedor] = useState<string>(''); // Selector en form para Admin
+  const [vendedores, setVendedores] = useState<Usuario[]>([]);
+  const [cargandoVendedores, setCargandoVendedores] = useState(false);
 
-  // Importar vendedores desde mocks centralizados
-  const VENDEDORES_MOCK = getVendedoresContactosMock();
+  // Cargar vendedores desde API
+  useEffect(() => {
+    const cargarVendedores = async () => {
+      setCargandoVendedores(true);
+      try {
+        const datos = await usuarioService.getVendedores();
+        setVendedores(datos);
+      } catch (error) {
+        console.error('Error cargando vendedores:', error);
+        setVendedores([]);
+      } finally {
+        setCargandoVendedores(false);
+      }
+    };
+    
+    if (isAdmin) {
+      cargarVendedores();
+    }
+  }, [isAdmin]);
+
   const tabs = [
     { id: 'lead-activo' as const, label: 'Lead Activo', icon: 'new_releases', color: 'blue', description: 'Recién capturados' },
     { id: 'cliente' as const, label: 'Cliente', icon: 'star', color: 'green', description: 'Compra finalizada' },
@@ -84,10 +104,11 @@ export const ContactosPage = () => {
           <select
             value={selectedVendedor}
             onChange={(e) => setSelectedVendedor(e.target.value)}
-            className="w-full md:w-64 px-4 py-2 rounded-lg border border-[#006c49]/30 bg-white focus:border-[#006c49] focus:ring-2 focus:ring-[#006c49]/20 focus:outline-none transition-all font-medium"
+            disabled={cargandoVendedores}
+            className="w-full md:w-64 px-4 py-2 rounded-lg border border-[#006c49]/30 bg-white focus:border-[#006c49] focus:ring-2 focus:ring-[#006c49]/20 focus:outline-none transition-all font-medium disabled:opacity-50"
           >
             <option value="">Todos los Vendedores</option>
-            {VENDEDORES_MOCK.map((vendedor) => (
+            {vendedores.map((vendedor) => (
               <option key={vendedor.id} value={vendedor.id.toString()}>
                 {vendedor.nombre}
               </option>
@@ -95,7 +116,7 @@ export const ContactosPage = () => {
           </select>
           {selectedVendedor && (
             <p className="text-sm text-[#006c49] mt-2 font-semibold">
-              ✓ Mostrando leads asignados a {VENDEDORES_MOCK.find(v => v.id.toString() === selectedVendedor)?.nombre}
+              ✓ Mostrando leads asignados a {vendedores.find(v => v.id.toString() === selectedVendedor)?.nombre}
             </p>
           )}
         </div>
@@ -119,24 +140,11 @@ export const ContactosPage = () => {
         ))}
       </div>
 
-      {/* Contenido Dinámico por Estado */}
-      <div className="bg-white rounded-lg border border-slate-200 p-6">
-        {activeTab === 'lead-activo' && (
-          <ContactoTable />
-        )}
-        {activeTab === 'cliente' && (
-          <div className="text-center py-12">
-            <p className="text-slate-500 text-base mb-2">No hay clientes</p>
-            <p className="text-slate-400 text-sm">Los leads que completaron una compra aparecerán aquí</p>
-          </div>
-        )}
-        {activeTab === 'inactivo' && (
-          <div className="text-center py-12">
-            <p className="text-slate-500 text-base mb-2">No hay leads inactivos</p>
-            <p className="text-slate-400 text-sm">Los leads bloqueados, que se retiraron o sin actividad aparecerán aquí</p>
-          </div>
-        )}
-      </div>
+      {/* Tabla de Contactos con Filtros Aplicados */}
+      <ContactoTable 
+        filtroEstado={activeTab}
+        filtroVendedor={selectedVendedor}
+      />
 
       {/* Modal para Nuevo Lead */}
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Crear Nuevo Lead">
@@ -192,7 +200,7 @@ export const ContactosPage = () => {
                 required
               >
                 <option value="">-- Selecciona un vendedor --</option>
-                {VENDEDORES_MOCK.map((vendedor) => (
+                {vendedores.map((vendedor) => (
                   <option key={vendedor.id} value={vendedor.id.toString()}>
                     {vendedor.nombre} ({vendedor.email})
                   </option>

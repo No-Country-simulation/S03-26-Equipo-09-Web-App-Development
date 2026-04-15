@@ -126,13 +126,6 @@ export const contactoService = {
     return data.data || [];
   },
 
-  // Segmentación: En seguimiento
-  getEnSeguimiento: async (): Promise<Contacto[]> => {
-    const response = await fetch(`${API_BASE_URL}/contactos/segmentacion/en-seguimiento`);
-    const data = (await response.json()) as ApiResponse<Contacto[]>;
-    return data.data || [];
-  },
-
   // Segmentación: Clientes
   getClientes: async (): Promise<Contacto[]> => {
     const response = await fetch(`${API_BASE_URL}/contactos/segmentacion/clientes`);
@@ -140,9 +133,39 @@ export const contactoService = {
     return data.data || [];
   },
 
-  // Segmentación: Leads calificados
-  getLeadsCalificados: async (): Promise<Contacto[]> => {
-    const response = await fetch(`${API_BASE_URL}/contactos/segmentacion/leads-calificados`);
+  // Segmentación: Inactivos
+  getInactivos: async (): Promise<Contacto[]> => {
+    const response = await fetch(`${API_BASE_URL}/contactos/segmentacion/inactivos`);
+    const data = (await response.json()) as ApiResponse<Contacto[]>;
+    return data.data || [];
+  },
+
+  // ==================== FILTRADO POR VENDEDOR ====================
+  
+  // Obtener todos los contactos de un vendedor
+  getByVendedor: async (vendedorId: number): Promise<Contacto[]> => {
+    const response = await fetch(`${API_BASE_URL}/contactos/por-vendedor/${vendedorId}`);
+    const data = (await response.json()) as ApiResponse<Contacto[]>;
+    return data.data || [];
+  },
+
+  // Obtener leads activos de un vendedor
+  getLeadsActivosByVendedor: async (vendedorId: number): Promise<Contacto[]> => {
+    const response = await fetch(`${API_BASE_URL}/contactos/por-vendedor/${vendedorId}/segmentacion/leads-activos`);
+    const data = (await response.json()) as ApiResponse<Contacto[]>;
+    return data.data || [];
+  },
+
+  // Obtener clientes de un vendedor
+  getClientesByVendedor: async (vendedorId: number): Promise<Contacto[]> => {
+    const response = await fetch(`${API_BASE_URL}/contactos/por-vendedor/${vendedorId}/segmentacion/clientes`);
+    const data = (await response.json()) as ApiResponse<Contacto[]>;
+    return data.data || [];
+  },
+
+  // Obtener inactivos de un vendedor
+  getInactivosByVendedor: async (vendedorId: number): Promise<Contacto[]> => {
+    const response = await fetch(`${API_BASE_URL}/contactos/por-vendedor/${vendedorId}/segmentacion/inactivos`);
     const data = (await response.json()) as ApiResponse<Contacto[]>;
     return data.data || [];
   }
@@ -440,7 +463,6 @@ export const estadoLead = {
 
 export const estadoLabels: Record<string, string> = {
   LEAD_ACTIVO: 'Lead Activo',
-  EN_SEGUIMIENTO: 'En Seguimiento',
-  CALIFICADO: 'Calificado',
-  CLIENTE: 'Cliente'
+  CLIENTE: 'Cliente',
+  INACTIVO: 'Inactivo'
 };

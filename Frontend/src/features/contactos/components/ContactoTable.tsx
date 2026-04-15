@@ -4,36 +4,48 @@ import { Card } from '../../../components/ui/Card/Card';
 import { Badge } from '../../../components/ui/Badge/Badge';
 
 interface ContactoTableProps {
-  filtroEstado?: string;
+  filtroEstado?: 'lead-activo' | 'cliente' | 'inactivo';
+  filtroVendedor?: string;
 }
 
-export const ContactoTable = ({ filtroEstado }: ContactoTableProps) => {
+export const ContactoTable = ({ filtroEstado = 'lead-activo', filtroVendedor }: ContactoTableProps) => {
   const [contactos, setContactos] = useState<Contacto[]>([]);
   const [cargando, setCargando] = useState(false);
 
   useEffect(() => {
     cargarContactos();
-  }, [filtroEstado]);
+  }, [filtroEstado, filtroVendedor]);
 
   const cargarContactos = async () => {
     setCargando(true);
     try {
-      let datos: Contacto[];
-      
-      if (filtroEstado && filtroEstado !== 'todos') {
-        // Usar endpoint de segmentación
-        if (filtroEstado === 'LEAD_ACTIVO') {
-          datos = await contactoService.getLeadsActivos();
-        } else if (filtroEstado === 'CLIENTE') {
-          datos = await contactoService.getClientes();
-        } else {
-          datos = await contactoService.getAll();
+      let datos: Contacto[] = [];
+      const vendedorId = filtroVendedor ? parseInt(filtroVendedor) : null;
+
+      if (vendedorId) {
+        // Filtrado por vendedor específico
+        if (filtroEstado === 'lead-activo') {
+          datos = await contactoService.getLeadsActivosByVendedor(vendedorId);
+        } else if (filtroEstado === 'cliente') {
+          datos = await contactoService.getClientesByVendedor(vendedorId);
+        } else if (filtroEstado === 'inactivo') {
+          datos = await contactoService.getInactivosByVendedor(vendedorId);
         }
       } else {
-        datos = await contactoService.getAll();
+        // Filtrado global (sin filtro de vendedor)
+        if (filtroEstado === 'lead-activo') {
+          datos = await contactoService.getLeadsActivos();
+        } else if (filtroEstado === 'cliente') {
+          datos = await contactoService.getClientes();
+        } else if (filtroEstado === 'inactivo') {
+          datos = await contactoService.getInactivos();
+        }
       }
 
       setContactos(datos);
+    } catch (error) {
+      console.error('Error cargando contactos:', error);
+      setContactos([]);
     } finally {
       setCargando(false);
     }
@@ -45,6 +57,9 @@ export const ContactoTable = ({ filtroEstado }: ContactoTableProps) => {
         return 'primary';
       case 'CLIENTE':
         return 'success';
+      case 'EN_SEGUIMIENTO':
+      case 'CALIFICADO':
+        return 'warning';
       default:
         return 'secondary';
     }
@@ -57,7 +72,7 @@ export const ContactoTable = ({ filtroEstado }: ContactoTableProps) => {
           <div className="text-center py-8 text-on-surface-variant">Cargando...</div>
         ) : contactos.length === 0 ? (
           <div className="text-center py-8 text-on-surface-variant">
-            No hay leads disponibles
+            No hay leads disponibles en esta categoría
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -73,18 +88,21 @@ export const ContactoTable = ({ filtroEstado }: ContactoTableProps) => {
               <tbody>
                 {contactos.map((contacto) => (
                   <tr key={contacto.id} className="border-b border-outline/30 hover:bg-surface-container-low transition-colors">
-                    <td className="py-3 px-4">{contacto.nombre}</td>
+                    <td className="py-3 px-4 font-medium">{contacto.nombre}</td>
                     <td className="py-3 px-4 text-on-surface-variant">{contacto.email}</td>
-                    <td className="py-3 px-4 text-on-surface-variant">{contacto.telefono}</td>
+                    <td className="py-3 px-4 text-on-surface-variant">{contacto.telefono || '-'}</td>
                     <td className="py-3 px-4">
                       <Badge variant={getEstadoBadgeColor(contacto.estado) as any}>
-                        {estadoLabels[contacto.estado]}
+                        {estadoLabels[contacto.estado] || contacto.estado}
                       </Badge>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+            <div className="mt-4 p-3 bg-surface-container-low rounded text-sm text-on-surface-variant">
+              Total: <span className="font-semibold text-primary">{contactos.length}</span> leads
+            </div>
           </div>
         )}
       </div>

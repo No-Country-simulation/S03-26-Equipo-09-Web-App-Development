@@ -57,15 +57,13 @@ public class MetricasService {
 
             // Segmentación por estado
             Map<String, Long> contactosPorEstado = new HashMap<>();
+            long leadsActivosCount = (long) contactoRepository.findByEstado(EstadoLead.LEAD_ACTIVO).size();
             long clientesCount = (long) contactoRepository.findByEstado(EstadoLead.CLIENTE).size();
+            long inactivosCount = (long) contactoRepository.findByEstado(EstadoLead.INACTIVO).size();
             
-            contactosPorEstado.put(EstadoLead.LEAD_ACTIVO.toString(), 
-                (long) contactoRepository.findByEstado(EstadoLead.LEAD_ACTIVO).size());
-            contactosPorEstado.put(EstadoLead.EN_SEGUIMIENTO.toString(), 
-                (long) contactoRepository.findByEstado(EstadoLead.EN_SEGUIMIENTO).size());
-            contactosPorEstado.put(EstadoLead.CALIFICADO.toString(), 
-                (long) contactoRepository.findByEstado(EstadoLead.CALIFICADO).size());
+            contactosPorEstado.put(EstadoLead.LEAD_ACTIVO.toString(), leadsActivosCount);
             contactosPorEstado.put(EstadoLead.CLIENTE.toString(), clientesCount);
+            contactosPorEstado.put(EstadoLead.INACTIVO.toString(), inactivosCount);
 
             metricas.put("contactosPorEstado", contactosPorEstado);
 
@@ -104,31 +102,25 @@ public class MetricasService {
     }
 
     /**
-     * Obtener métricas de embudo de ventas (funnel)
+     * Obtener métricas de embudo de ventas (funnel) - Simplificado a 3 estados
      */
     public Map<String, Object> obtenerMetricasFunnel() {
         Map<String, Object> funnel = new HashMap<>();
 
         try {
             long leadsActivos = contactoRepository.findByEstado(EstadoLead.LEAD_ACTIVO).size();
-            long enSeguimiento = contactoRepository.findByEstado(EstadoLead.EN_SEGUIMIENTO).size();
-            long calificados = contactoRepository.findByEstado(EstadoLead.CALIFICADO).size();
             long clientes = contactoRepository.findByEstado(EstadoLead.CLIENTE).size();
+            long inactivos = contactoRepository.findByEstado(EstadoLead.INACTIVO).size();
 
             funnel.put("leadsActivos", leadsActivos);
-            funnel.put("enSeguimiento", enSeguimiento);
-            funnel.put("calificados", calificados);
             funnel.put("clientes", clientes);
+            funnel.put("inactivos", inactivos);
 
             // Tasas de conversión
-            if (leadsActivos > 0) {
-                funnel.put("tasaConversion_LED_a_Seguimiento", Math.round(((double) enSeguimiento / leadsActivos * 100) * 100.0) / 100.0);
-            }
-            if (enSeguimiento > 0) {
-                funnel.put("tasaConversion_Seguimiento_a_Calificado", Math.round(((double) calificados / enSeguimiento * 100) * 100.0) / 100.0);
-            }
-            if (calificados > 0) {
-                funnel.put("tasaConversion_Calificado_a_Cliente", Math.round(((double) clientes / calificados * 100) * 100.0) / 100.0);
+            long totalLeads = leadsActivos + clientes + inactivos;
+            if (totalLeads > 0) {
+                double tasaConversion = ((double) clientes / totalLeads) * 100;
+                funnel.put("tasaConversion", Math.round(tasaConversion * 100.0) / 100.0);
             }
 
             logger.info("Métricas del funnel generadas exitosamente");

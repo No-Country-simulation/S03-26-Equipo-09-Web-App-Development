@@ -82,13 +82,6 @@ public class ContactoService {
     }
 
     /**
-     * Segmentación: Obtener contactos en seguimiento
-     */
-    public List<Contacto> getContactosEnSeguimiento() {
-        return contactoRepository.findByEstado(EstadoLead.EN_SEGUIMIENTO);
-    }
-
-    /**
      * Segmentación: Obtener clientes
      */
     public List<Contacto> getClientes() {
@@ -96,10 +89,49 @@ public class ContactoService {
     }
 
     /**
-     * Segmentación: Obtener leads calificados
+     * Segmentación: Obtener inactivos (leads que no compraron o dejaron de comunicarse)
      */
-    public List<Contacto> getLeadsCalificados() {
-        return contactoRepository.findByEstado(EstadoLead.CALIFICADO);
+    public List<Contacto> getInactivos() {
+        return contactoRepository.findByEstado(EstadoLead.INACTIVO);
+    }
+
+    // ==================== FILTRADO POR VENDEDOR ====================
+
+    /**
+     * Obtener todos los contactos de un vendedor específico
+     */
+    public List<Contacto> getContactosPorVendedor(Long vendedorId) {
+        Usuario vendedor = usuarioRepository.findById(vendedorId)
+                .orElseThrow(() -> new ResourceNotFoundException("Vendedor no encontrado"));
+        return contactoRepository.findByVendedorAsignado(vendedor);
+    }
+
+    /**
+     * Obtener leads activos de un vendedor específico
+     */
+    public List<Contacto> getLeadsActivosPorVendedor(Long vendedorId) {
+        Usuario vendedor = usuarioRepository.findById(vendedorId)
+                .orElseThrow(() -> new ResourceNotFoundException("Vendedor no encontrado"));
+        return contactoRepository.findByVendedorAsignadoAndEstado(vendedor, EstadoLead.LEAD_ACTIVO);
+    }
+
+    /**
+     * Obtener clientes de un vendedor específico
+     */
+    public List<Contacto> getClientesPorVendedor(Long vendedorId) {
+        Usuario vendedor = usuarioRepository.findById(vendedorId)
+                .orElseThrow(() -> new ResourceNotFoundException("Vendedor no encontrado"));
+        return contactoRepository.findByVendedorAsignadoAndEstado(vendedor, EstadoLead.CLIENTE);
+    }
+
+    /**
+     * Obtener contactos inactivos de un vendedor específico
+     */
+    public List<Contacto> getInactivosPorVendedor(Long vendedorId) {
+        Usuario vendedor = usuarioRepository.findById(vendedorId)
+                .orElseThrow(() -> new ResourceNotFoundException("Vendedor no encontrado"));
+        return contactoRepository.findByVendedorAsignadoAndEstado(vendedor, EstadoLead.INACTIVO);
     }
 }
+
 

@@ -25,7 +25,7 @@ VALUES
 INSERT INTO contactos (id, nombre, email, telefono, estado, vendedor_asignado_id)
 VALUES
 (1, 'Roberto Martínez', 'roberto.martinez@empresa.com', '+34 650 123 456', 'LEAD_ACTIVO', 2),
-(2, 'Laura Fernández', 'laura.fernandez@startup.io', '+34 651 234 567', 'EN_SEGUIMIENTO', 3),
+(2, 'Laura Fernández', 'laura.fernandez@startup.io', '+34 651 234 567', 'INACTIVO', 3),
 (3, 'David López', 'david.lopez@empresa.es', '+34 652 345 678', 'CLIENTE', 4),
 (4, 'Patricia González', 'patricia.gonzalez@company.com', '+34 653 456 789', 'CLIENTE', 2),
 (5, 'Francisco Ruiz', 'francisco.ruiz@negocio.es', '+34 654 567 890', 'CLIENTE', 3);
