@@ -26,6 +26,12 @@ const NAV_MAIN: Omit<NavItem, 'badge'>[] = [
   { to: '/dashboard/plantillas',   labelKey: 'nav.templates', icon: 'description' },
 ];
 
+const NAV_VENDEDOR: Omit<NavItem, 'badge'>[] = [
+  { to: '/dashboard',              labelKey: 'nav.summary',  icon: 'grid_view' },
+  { to: '/dashboard/contactos',    labelKey: 'nav.contacts', icon: 'people_alt' },
+  { to: '/dashboard/mi-inbox',     labelKey: 'nav.inbox',    icon: 'mark_unread_chat_alt' },
+];
+
 export const Sidebar = ({ sinLeer, pendientes }: SidebarProps) => {
   const { t } = useTranslation();
   const { language, toggleLanguage } = useLanguage();
@@ -52,6 +58,9 @@ export const Sidebar = ({ sinLeer, pendientes }: SidebarProps) => {
   const userInitials = user
     ? user.username.split(/[._\s]+/).map(p => p[0]?.toUpperCase() ?? '').slice(0, 2).join('')
     : 'HA';
+
+  const isVendedor = (user?.rol ?? '').toUpperCase() === 'VENDEDOR';
+  const navItems = isVendedor ? NAV_VENDEDOR : NAV_MAIN;
 
   const getBadge = (to: string) => {
     if (to === '/dashboard/inbox') return sinLeer > 0 ? sinLeer : null;
@@ -90,7 +99,7 @@ export const Sidebar = ({ sinLeer, pendientes }: SidebarProps) => {
       {/* ── Nav Items ── */}
       <nav className="flex-1 py-3 overflow-x-hidden overflow-y-auto">
         <ul className="flex flex-col gap-0.5 px-2">
-          {NAV_MAIN.map(item => {
+          {navItems.map(item => {
             const active = isActive(item.to);
             const badge = getBadge(item.to);
             return (

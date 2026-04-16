@@ -8,6 +8,7 @@ import { PipelinePage } from '../pages/PipelinePage';
 import { SeguimientosPage } from '../pages/SeguimientosPage';
 import { InboxPage } from '../pages/InboxPage';
 import { PlantillasPage } from '../pages/PlantillasPage';
+import MiInbox from '../pages/MiInbox';
 import { DashboardLayout } from '../components/layout/DashboardLayout';
 import { useAuthStore } from '../store/authStore';
 
@@ -81,6 +82,12 @@ const inboxRoute = createRoute({
   component: InboxPage,
 });
 
+const miInboxRoute = createRoute({
+  getParentRoute: () => dashboardLayoutRoute,
+  path: '/dashboard/mi-inbox',
+  component: MiInbox,
+});
+
 const plantillasRoute = createRoute({
   getParentRoute: () => dashboardLayoutRoute,
   path: '/dashboard/plantillas',
@@ -97,6 +104,7 @@ const routeTree = rootRoute.addChildren([
     pipelineRoute,
     seguimientosRoute,
     inboxRoute,
+    miInboxRoute,
     plantillasRoute,
   ]),
 ]);
