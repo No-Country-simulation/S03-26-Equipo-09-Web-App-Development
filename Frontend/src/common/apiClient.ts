@@ -36,6 +36,7 @@ export interface Usuario {
   id: number;
   nombre: string;
   email: string;
+  password?: string;
   telefono?: string;
   role: 'ADMIN' | 'VENDEDOR';
   activo: boolean;
