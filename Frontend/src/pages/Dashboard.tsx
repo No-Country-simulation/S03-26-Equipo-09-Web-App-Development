@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { useAuth } from '../hooks/useAuth';
 import { dashboardMockData, MOCK_DASHBOARD_STATS } from '../features/dashboard/mocks/dashboardData';
-import { metricasService, Metricas, FunnelMetricas } from '../common/apiClient';
+import { metricasService, Metricas } from '../common/apiClient';
 import { LineChart } from '../components/charts/line/Line';
 import { BarChart } from '../components/charts/bar/bar';
 import { PieChart } from '../components/charts/pie/pie';
@@ -10,28 +10,41 @@ import { Card } from '../components/ui/Card/Card';
 import { Badge } from '../components/ui/Badge/Badge';
 import { Modal } from '../components/ui/Modal/Modal';
 
+interface MetricasVendedor {
+  vendedorId: number;
+  vendedorNombre: string;
+  leadsAsignados: number;
+  clientesConvertidos: number;
+  leadsInactivos: number;
+  totalLeads: number;
+  tasaConversion: number;
+}
+
 export const DashboardPage = () => {
   const navigate = useNavigate();
-  const { isVendedor, userName } = useAuth();
+  const { isVendedor, userName, userId } = useAuth();
   const [isDevelopmentModalOpen, setIsDevelopmentModalOpen] = useState(false);
   const [metricas, setMetricas] = useState<Metricas | null>(null);
-  const [funnel, setFunnel] = useState<FunnelMetricas | null>(null);
+  const [metricasVendedor, setMetricasVendedor] = useState<MetricasVendedor | null>(null);
 
   useEffect(() => {
     const cargarMetricas = async () => {
       try {
-        const [metricsData, funnelData] = await Promise.all([
-          metricasService.getResumen(),
-          metricasService.getFunnel()
-        ]);
-        setMetricas(metricsData);
-        setFunnel(funnelData);
+        if (isVendedor && userId) {
+          // Cargar métricas específicas del vendedor
+          const metricsDataVendedor = await metricasService.getMetricasVendedor(userId);
+          setMetricasVendedor(metricsDataVendedor);
+        } else {
+          // Cargar resumen general (solo para admin)
+          const metricsData = await metricasService.getResumen();
+          setMetricas(metricsData);
+        }
       } catch (error) {
         console.error('Error cargando métricas:', error);
       }
     };
     cargarMetricas();
-  }, []);
+  }, [isVendedor, userId]);
 
   const mockStats = MOCK_DASHBOARD_STATS;
 
@@ -113,8 +126,14 @@ export const DashboardPage = () => {
               </div>
               <div>
                 <p className="text-sm text-slate-600 font-medium">Tasa Conversión</p>
-                <h3 className="text-3xl font-bold text-[#182442] mt-1">25%</h3>
-                <p className="text-xs text-slate-500 mt-1">Este mes (6/24 clientes ganados)</p>
+                <h3 className="text-3xl font-bold text-[#182442] mt-1">
+                  {metricasVendedor ? `${metricasVendedor.tasaConversion.toFixed(1)}%` : '0%'}
+                </h3>
+                <p className="text-xs text-slate-500 mt-1">
+                  {metricasVendedor 
+                    ? `${metricasVendedor.clientesConvertidos}/${metricasVendedor.totalLeads} clientes ganados`
+                    : 'Cargando...'}
+                </p>
               </div>
             </div>
           </Card>
@@ -200,45 +219,11 @@ export const DashboardPage = () => {
           </div>
           <div>
             <p className="text-white/60 text-xs font-bold uppercase tracking-widest">Productos Vendidos</p>
-            <h4 className="text-4xl font-extrabold mt-2 text-green-400">140</h4>
+            <h4 className="text-4xl font-extrabold mt-2 text-green-400">{metricas?.productosVendidos ?? mockStats.productosVendidos}</h4>
             <p className="text-secondary text-sm font-bold mt-1">+8% vs mes anterior</p>
           </div>
         </div>
       </Card>
-
-      {/* Embudo de conversión rápido */}
-      {funnel && (
-        <Card>
-          <h3 className="text-lg font-bold text-primary mb-4">Embudo de Conversión</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-            <div>
-              <p className="text-sm text-on-surface-variant font-medium">Leads Activos</p>
-              <p className="text-2xl font-bold text-primary mt-1">{funnel.leadsActivos}</p>
-            </div>
-            <div>
-              <p className="text-sm text-on-surface-variant font-medium">En Seguimiento</p>
-              <p className="text-2xl font-bold text-secondary mt-1">{funnel.enSeguimiento}</p>
-              <p className="text-xs text-on-surface-variant mt-1">
-                {(funnel.tasaConversion_LED_a_Seguimiento * 100).toFixed(1)}% conv.
-              </p>
-            </div>
-            <div>
-              <p className="text-sm text-on-surface-variant font-medium">Calificados</p>
-              <p className="text-2xl font-bold text-warning mt-1">{funnel.calificados}</p>
-              <p className="text-xs text-on-surface-variant mt-1">
-                {(funnel.tasaConversion_Seguimiento_a_Calificado * 100).toFixed(1)}% conv.
-              </p>
-            </div>
-            <div>
-              <p className="text-sm text-on-surface-variant font-medium">Clientes</p>
-              <p className="text-2xl font-bold text-success mt-1">{funnel.clientes}</p>
-              <p className="text-xs text-on-surface-variant mt-1">
-                {(funnel.tasaConversion_Calificado_a_Cliente * 100).toFixed(1)}% conv.
-              </p>
-            </div>
-          </div>
-        </Card>
-      )}
 
       {/* 4. Análisis Detallado */}
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">

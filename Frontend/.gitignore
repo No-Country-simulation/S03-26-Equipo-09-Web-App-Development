@@ -7,28 +7,46 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
+# Dependencies
+node_modules/
+dist/
+dist-ssr/
 *.local
+
+# Environment Variables - SENSITIVE
+.env
+.env.local
+.env.*.local
+.env.production
 
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
 !.vscode/launch.json
-.idea
+.idea/
+.idea_modules/
 .DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+*.iml
+*.iws
+
+# Test & Coverage
 /test-results/
 /playwright-report/
 /playwright/.cache/
+/coverage/
+.vitest/
+.nyc_output/
 
-# storybook
+# Storybook
 storybook-static
 
-# tests
-/coverage/
+# Cache & Temp
+.cache/
+.turbo/
+tmp/
+temp/

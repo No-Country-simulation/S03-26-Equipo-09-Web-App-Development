@@ -5,6 +5,7 @@ export const MOCK_DASHBOARD_STATS = {
   mensajesSinLeer: 8,
   nuevosLeadsHoy: 12,
   tareasPendientes: 5,
+  productosVendidos: 87, // ← Nuevo campo
   contactosPorEstado: {
     "LEAD_ACTIVO": 75,
     "CLIENTE": 60,

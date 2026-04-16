@@ -2,6 +2,7 @@ package com.startupcrm.crm_backend.controller;
 
 import com.startupcrm.crm_backend.dto.ApiResponse;
 import com.startupcrm.crm_backend.service.MetricasService;
+import com.startupcrm.crm_backend.service.MetricasVendedorService;
 import com.startupcrm.crm_backend.service.PdfExportService;
 import com.startupcrm.crm_backend.service.CsvExportService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,12 +10,14 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.List;
 
 /**
  * Controlador para endpoints de métricas y analítica del CRM
@@ -27,6 +30,9 @@ public class MetricasController {
 
     @Autowired
     private MetricasService metricasService;
+
+    @Autowired
+    private MetricasVendedorService metricasVendedorService;
 
     @Autowired
     private PdfExportService pdfExportService;
@@ -87,6 +93,34 @@ public class MetricasController {
         logger.info("Solicitando comunicación por canal");
         Map<String, Long> canales = metricasService.obtenerComunicacionPorCanal();
         return new ApiResponse<>(true, canales, null);
+    }
+
+    // ==================== ENDPOINTS DE MÉTRICAS POR VENDEDOR ====================
+
+    /**
+     * Obtener métricas de conversión para un vendedor específico
+     * GET /api/metricas/vendedor/{vendedorId}
+     * 
+     * Retorna: tasaConversion, leadsAsignados, clientesConvertidos, totalLeads, etc.
+     */
+    @GetMapping("/vendedor/{vendedorId}")
+    public ApiResponse<Map<String, Object>> obtenerMetricasVendedor(@PathVariable Long vendedorId) {
+        logger.info("Solicitando métricas del vendedor: {}", vendedorId);
+        Map<String, Object> metricas = metricasVendedorService.obtenerMetricasVendedor(vendedorId);
+        return new ApiResponse<>(true, metricas, null);
+    }
+
+    /**
+     * Obtener métricas de todos los vendedores activos
+     * GET /api/metricas/vendedores
+     * 
+     * Retorna: Lista de vendedores con sus respectivas tasas de conversión
+     */
+    @GetMapping("/vendedores")
+    public ApiResponse<List<Map<String, Object>>> obtenerMetricasTodosVendedores() {
+        logger.info("Solicitando métricas de todos los vendedores");
+        List<Map<String, Object>> metricas = metricasVendedorService.obtenerMetricasTodosVendedores();
+        return new ApiResponse<>(true, metricas, null);
     }
 
     // ==================== ENDPOINTS DE EXPORTACIÓN ====================

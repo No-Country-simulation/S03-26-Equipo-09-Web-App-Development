@@ -228,8 +228,9 @@ public class WhatsAppService {
 
             logger.info("Mensaje recibido de WhatsApp - Número: {}, Contenido: {}", fromNumber, contenido);
 
-            // Buscar o crear contacto
-            Contacto contacto = contactoRepository.findByEmail(fromNumber);
+            // Buscar contacto por teléfono
+            Contacto contacto = contactoRepository.findByTelefono(fromNumber)
+                    .orElse(null);
             if (contacto == null) {
                 // Crear nuevo contacto si no existe
                 contacto = new Contacto();

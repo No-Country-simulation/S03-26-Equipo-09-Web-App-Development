@@ -84,7 +84,7 @@ export const Home = () => {
           
           {/* Columna Texto */}
           <div className="flex flex-col gap-8 text-center lg:text-left">
-            <img alt="Logo" className="h-48 w-fit mx-auto lg:mx-0 drop-shadow-md" src="/img/logo.webp" />
+            <img alt="Logo" className="h-44 w-fit mx-auto lg:mx-4 drop-shadow-md" src="/img/imagen_crm.webp" />
             
             <h1 className="text-4xl lg:text-[3.8rem] leading-[1.05] font-medium tracking-tight text-[#182442]">
               Centraliza tus ventas de <span className="text-[#006c49]">WhatsApp</span> y Email en un solo lugar

@@ -1,20 +1,129 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { ContactoTable } from '../features/contactos/components/ContactoTable';
 import { Button } from '../components/ui/Button/Button';
 import { Modal } from '../components/ui/Modal/Modal';
-import { getVendedoresContactosMock } from '../features/contactos/mocks/contactos.mock';
+import { usuarioService, Usuario, contactoService } from '../common/apiClient';
 
 export const ContactosPage = () => {
-  const { isAdmin } = useAuth();
-  const [activeTab, setActiveTab] = useState<'lead-activo' | 'cliente' | 'inactivo'>('lead-activo');
+  const { isAdmin, userId } = useAuth();
+  const [activeTab, setActiveTab] = useState<'todos' | 'lead-activo' | 'cliente' | 'inactivo'>('todos');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedVendedor, setSelectedVendedor] = useState<string>(''); // Filtro para Admin
   const [newLeadVendedor, setNewLeadVendedor] = useState<string>(''); // Selector en form para Admin
+  const [vendedores, setVendedores] = useState<Usuario[]>([]);
+  const [cargandoVendedores, setCargandoVendedores] = useState(false);
+  
+  // Estados para el formulario de nuevo lead
+  const [formData, setFormData] = useState({
+    nombre: '',
+    email: '',
+    telefono: '',
+    estado: 'LEAD_ACTIVO'
+  });
+  const [cargandoCrear, setCargandoCrear] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0); // Para refrescar tabla
 
-  // Importar vendedores desde mocks centralizados
-  const VENDEDORES_MOCK = getVendedoresContactosMock();
+  // Cargar vendedores desde API
+  useEffect(() => {
+    const cargarVendedores = async () => {
+      setCargandoVendedores(true);
+      try {
+        const datos = await usuarioService.getVendedores();
+        setVendedores(datos);
+      } catch (error) {
+        console.error('Error cargando vendedores:', error);
+        setVendedores([]);
+      } finally {
+        setCargandoVendedores(false);
+      }
+    };
+    
+    if (isAdmin) {
+      cargarVendedores();
+    }
+  }, [isAdmin]);
+
+  const handleCreateLead = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    console.log('🔍 handleCreateLead iniciado - isAdmin:', isAdmin, 'userId:', userId);
+    
+    // Validar datos
+    if (!formData.nombre || !formData.email || !formData.telefono) {
+      alert('Por favor completa todos los campos');
+      return;
+    }
+
+    // Validar que admin haya seleccionado vendedor
+    if (isAdmin && !newLeadVendedor) {
+      alert('Debes asignar un vendedor al lead');
+      return;
+    }
+
+    // Validar vendedorAsignadoId
+    const vendedorAsignadoId = isAdmin ? parseInt(newLeadVendedor) : userId;
+    console.log('🔍 vendedorAsignadoId calculado:', vendedorAsignadoId);
+    
+    if (!vendedorAsignadoId) {
+      alert('Error: No se puede obtener el ID del vendedor. Por favor, inicia sesión nuevamente.');
+      console.error('❌ vendedorAsignadoId es null/undefined');
+      return;
+    }
+
+    setCargandoCrear(true);
+    try {
+      // Crear objeto para enviar al API
+      const nuevoLead = {
+        ...formData,
+        vendedorAsignadoId
+      };
+
+      console.log('📤 Enviando nuevo lead:', nuevoLead);
+
+      const response = await contactoService.create(nuevoLead);
+      console.log('✅ Lead creado:', response);
+
+      // Cerrar modal y limpiar formulario
+      setIsModalOpen(false);
+      setFormData({ nombre: '', email: '', telefono: '', estado: 'LEAD_ACTIVO' });
+      setNewLeadVendedor('');
+
+      // Mostrar éxito
+      alert('✓ Lead creado exitosamente');
+
+      // Refrescar tabla sin recargar página
+      setActiveTab('todos'); // Mostrar todos los leads
+      setRefreshKey(prev => prev + 1); // Disparar recarga de datos
+    } catch (error: any) {
+      console.error('❌ Error creando lead:', error);
+      console.error('   📊 Error details:', {
+        message: error?.message,
+        status: error?.status,
+        responseData: error?.response?.data,
+        responseStatus: error?.response?.status
+      });
+      
+      // Mostrar error detallado
+      let errorMsg = 'Error desconocido al crear el lead';
+      
+      if (error?.response?.data?.message) {
+        errorMsg = error.response.data.message;
+      } else if (error?.response?.data?.error) {
+        errorMsg = error.response.data.error;
+      } else if (error?.message) {
+        errorMsg = error.message;
+      }
+      
+      console.error('   📤 Mensaje final:', errorMsg);
+      alert(`✗ Error al crear el lead:\n${errorMsg}`);
+    } finally {
+      setCargandoCrear(false);
+    }
+  };
+
   const tabs = [
+    { id: 'todos' as const, label: 'Todos', icon: 'list', color: 'slate', description: 'Todos los leads sin filtrar' },
     { id: 'lead-activo' as const, label: 'Lead Activo', icon: 'new_releases', color: 'blue', description: 'Recién capturados' },
     { id: 'cliente' as const, label: 'Cliente', icon: 'star', color: 'green', description: 'Compra finalizada' },
     { id: 'inactivo' as const, label: 'Inactivo', icon: 'block', color: 'red', description: 'Bloqueados o sin respuesta' }
@@ -22,6 +131,10 @@ export const ContactosPage = () => {
 
   const getColorClasses = (color: string, isActive: boolean): string => {
     const colorMap: Record<string, { active: string; inactive: string }> = {
+      slate: {
+        active: 'bg-slate-600 border-slate-700',
+        inactive: 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200'
+      },
       blue: {
         active: 'bg-blue-500 border-blue-600',
         inactive: 'bg-blue-100 text-blue-700 border-blue-200 hover:bg-blue-200'
@@ -84,10 +197,11 @@ export const ContactosPage = () => {
           <select
             value={selectedVendedor}
             onChange={(e) => setSelectedVendedor(e.target.value)}
-            className="w-full md:w-64 px-4 py-2 rounded-lg border border-[#006c49]/30 bg-white focus:border-[#006c49] focus:ring-2 focus:ring-[#006c49]/20 focus:outline-none transition-all font-medium"
+            disabled={cargandoVendedores}
+            className="w-full md:w-64 px-4 py-2 rounded-lg border border-[#006c49]/30 bg-white focus:border-[#006c49] focus:ring-2 focus:ring-[#006c49]/20 focus:outline-none transition-all font-medium disabled:opacity-50"
           >
             <option value="">Todos los Vendedores</option>
-            {VENDEDORES_MOCK.map((vendedor) => (
+            {vendedores.map((vendedor) => (
               <option key={vendedor.id} value={vendedor.id.toString()}>
                 {vendedor.nombre}
               </option>
@@ -95,7 +209,7 @@ export const ContactosPage = () => {
           </select>
           {selectedVendedor && (
             <p className="text-sm text-[#006c49] mt-2 font-semibold">
-              ✓ Mostrando leads asignados a {VENDEDORES_MOCK.find(v => v.id.toString() === selectedVendedor)?.nombre}
+              ✓ Mostrando leads asignados a {vendedores.find(v => v.id.toString() === selectedVendedor)?.nombre}
             </p>
           )}
         </div>
@@ -119,33 +233,23 @@ export const ContactosPage = () => {
         ))}
       </div>
 
-      {/* Contenido Dinámico por Estado */}
-      <div className="bg-white rounded-lg border border-slate-200 p-6">
-        {activeTab === 'lead-activo' && (
-          <ContactoTable />
-        )}
-        {activeTab === 'cliente' && (
-          <div className="text-center py-12">
-            <p className="text-slate-500 text-base mb-2">No hay clientes</p>
-            <p className="text-slate-400 text-sm">Los leads que completaron una compra aparecerán aquí</p>
-          </div>
-        )}
-        {activeTab === 'inactivo' && (
-          <div className="text-center py-12">
-            <p className="text-slate-500 text-base mb-2">No hay leads inactivos</p>
-            <p className="text-slate-400 text-sm">Los leads bloqueados, que se retiraron o sin actividad aparecerán aquí</p>
-          </div>
-        )}
-      </div>
+      {/* Tabla de Contactos con Filtros Aplicados */}
+      <ContactoTable 
+        filtroEstado={activeTab}
+        filtroVendedor={selectedVendedor}
+        refreshTrigger={refreshKey}
+      />
 
       {/* Modal para Nuevo Lead */}
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Crear Nuevo Lead">
-        <form className="space-y-4">
+        <form onSubmit={handleCreateLead} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-[#182442] mb-1">Nombre Completo *</label>
             <input 
               type="text" 
               placeholder="Ingresa el nombre del potencial cliente"
+              value={formData.nombre}
+              onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
               className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-[#006c49] focus:ring-2 focus:ring-[#006c49]/20 focus:outline-none transition-all"
               required
             />
@@ -156,6 +260,8 @@ export const ContactosPage = () => {
             <input 
               type="email" 
               placeholder="correo@ejemplo.com"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-[#006c49] focus:ring-2 focus:ring-[#006c49]/20 focus:outline-none transition-all"
               required
             />
@@ -166,6 +272,8 @@ export const ContactosPage = () => {
             <input 
               type="tel" 
               placeholder="+591 1234 5678"
+              value={formData.telefono}
+              onChange={(e) => setFormData({ ...formData, telefono: e.target.value })}
               className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-[#006c49] focus:ring-2 focus:ring-[#006c49]/20 focus:outline-none transition-all"
               required
             />
@@ -173,8 +281,12 @@ export const ContactosPage = () => {
 
           <div>
             <label className="block text-sm font-medium text-[#182442] mb-1">Etiqueta *</label>
-            <select className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-[#006c49] focus:ring-2 focus:ring-[#006c49]/20 focus:outline-none transition-all" required>
-              <option value="">-- Selecciona una etiqueta --</option>
+            <select 
+              value={formData.estado}
+              onChange={(e) => setFormData({ ...formData, estado: e.target.value })}
+              className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-[#006c49] focus:ring-2 focus:ring-[#006c49]/20 focus:outline-none transition-all" 
+              required
+            >
               <option value="LEAD_ACTIVO">Lead Activo</option>
               <option value="CLIENTE">Cliente</option>
               <option value="INACTIVO">Inactivo</option>
@@ -192,7 +304,7 @@ export const ContactosPage = () => {
                 required
               >
                 <option value="">-- Selecciona un vendedor --</option>
-                {VENDEDORES_MOCK.map((vendedor) => (
+                {vendedores.map((vendedor) => (
                   <option key={vendedor.id} value={vendedor.id.toString()}>
                     {vendedor.nombre} ({vendedor.email})
                   </option>
@@ -207,16 +319,19 @@ export const ContactosPage = () => {
               onClick={() => {
                 setIsModalOpen(false);
                 setNewLeadVendedor('');
+                setFormData({ nombre: '', email: '', telefono: '', estado: 'LEAD_ACTIVO' });
               }}
               className="px-4 py-2 rounded-lg border border-slate-300 text-[#182442] hover:bg-slate-100 transition-all"
+              disabled={cargandoCrear}
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="px-4 py-2 rounded-lg bg-[#006c49] text-white font-semibold hover:bg-[#005236] transition-all"
+              className="px-4 py-2 rounded-lg bg-[#006c49] text-white font-semibold hover:bg-[#005236] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={cargandoCrear}
             >
-              Crear Lead
+              {cargandoCrear ? 'Creando...' : 'Crear Lead'}
             </button>
           </div>
         </form>

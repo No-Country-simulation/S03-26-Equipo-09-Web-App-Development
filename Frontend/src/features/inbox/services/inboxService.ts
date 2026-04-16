@@ -9,13 +9,12 @@ import { CONVERSACIONES_MOCK_VENDEDOR, CONVERSACIONES_MOCK_ADMIN } from '../mock
 import { USUARIOS_MOCK } from '../mocks/usuarios.mock';
 
 export class InboxService {
-  private apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
 
   /**
    * Obtener conversaciones del vendedor
    * TODO: Reemplazar con: GET /api/conversaciones/vendedor/:vendedorId
    */
-  async getConversacionesPorVendedor(vendedorId: number): Promise<Conversacion[]> {
+  async getConversacionesPorVendedor(_vendedorId: number): Promise<Conversacion[]> {
     try {
       // En producción:
       // const response = await fetch(`${this.apiBaseUrl}/conversaciones/vendedor/${vendedorId}`);
@@ -54,7 +53,7 @@ export class InboxService {
    * Enviar mensaje en una conversación
    * TODO: Reemplazar con: POST /api/conversaciones/:conversacionId/mensajes
    */
-  async enviarMensaje(conversacionId: number, contenido: string): Promise<void> {
+  async enviarMensaje(_conversacionId: number, _contenido: string): Promise<void> {
     try {
       // En producción:
       // const response = await fetch(`${this.apiBaseUrl}/conversaciones/${conversacionId}/mensajes`, {
@@ -95,7 +94,7 @@ export class InboxService {
    * Obtener estadísticas de inbox
    * TODO: Reemplazar con: GET /api/inbox/stats
    */
-  async getEstadisticas(vendedorId?: number) {
+  async getEstadisticas(_vendedorId?: number) {
     try {
       // En producción:
       // const endpoint = vendedorId

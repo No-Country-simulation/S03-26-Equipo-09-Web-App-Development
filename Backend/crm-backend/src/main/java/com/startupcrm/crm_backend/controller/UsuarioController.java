@@ -1,6 +1,8 @@
 package com.startupcrm.crm_backend.controller;
 
 import com.startupcrm.crm_backend.dto.ApiResponse;
+import com.startupcrm.crm_backend.dto.LoginRequestDTO;
+import com.startupcrm.crm_backend.dto.LoginResponseDTO;
 import com.startupcrm.crm_backend.dto.UsuarioDTO;
 import com.startupcrm.crm_backend.model.Usuario;
 import com.startupcrm.crm_backend.service.UsuarioService;
@@ -19,6 +21,30 @@ public class UsuarioController {
 
     public UsuarioController(UsuarioService usuarioService) {
         this.usuarioService = usuarioService;
+    }
+
+    /**
+     * POST /api/usuarios/login - Autenticar usuario
+     * Request: { "email": "...", "password": "..." }
+     * Response: { "token": "...", "userId": "...", "email": "...", "nombre": "...", "role": "..." }
+     */
+    @PostMapping("/login")
+    public ResponseEntity<ApiResponse<LoginResponseDTO>> login(@Valid @RequestBody LoginRequestDTO loginRequest) {
+        try {
+            // Autenticar usuario
+            Usuario usuario = usuarioService.authenticate(loginRequest.getEmail(), loginRequest.getPassword());
+            
+            // Generar token
+            String token = usuarioService.generateToken(usuario);
+            
+            // Crear respuesta
+            LoginResponseDTO response = new LoginResponseDTO(token, usuario);
+            
+            return ResponseEntity.ok(new ApiResponse<>(true, response, null));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ApiResponse<>(false, null, e.getMessage()));
+        }
     }
 
     @GetMapping

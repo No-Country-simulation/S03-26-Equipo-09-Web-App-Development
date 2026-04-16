@@ -1,71 +1,45 @@
 package com.startupcrm.crm_backend.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
 
+/**
+ * DTO para Conversacion (Interacción omnicanal).
+ * 
+ * Perfectamente alineado con la interface Conversacion del frontend (apiClient.ts).
+ * Soporta WhatsApp Cloud API y Brevo Email webhooks en una estructura unificada.
+ * 
+ * @author Backend Team
+ * @version 2.0 - Refactorización MVP
+ */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ConversacionDTO {
 
     private Long id;
-    private String canal;
+
+    @NotBlank(message = "El canal es obligatorio")
+    private String canal; // 'Email' | 'WhatsApp' - Valores literales para el frontend
+
+    @NotBlank(message = "El contenido es obligatorio")
     private String contenido;
+
+    @NotNull(message = "La fecha/hora es obligatoria")
     private LocalDateTime fechaHora;
+
+    @NotNull(message = "El contactoId es obligatorio")
     private Long contactoId;
-    private Long vendedorAsignadoId;
-    private String vendedorAsignadoNombre;
 
-    public Long getId() {
-        return id;
-    }
+    private Long vendedorAsignadoId; // Opcional: puede ser null si mensaje sin asignar
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getCanal() {
-        return canal;
-    }
-
-    public void setCanal(String canal) {
-        this.canal = canal;
-    }
-
-    public String getContenido() {
-        return contenido;
-    }
-
-    public void setContenido(String contenido) {
-        this.contenido = contenido;
-    }
-
-    public LocalDateTime getFechaHora() {
-        return fechaHora;
-    }
-
-    public void setFechaHora(LocalDateTime fechaHora) {
-        this.fechaHora = fechaHora;
-    }
-
-    public Long getContactoId() {
-        return contactoId;
-    }
-
-    public void setContactoId(Long contactoId) {
-        this.contactoId = contactoId;
-    }
-
-    public Long getVendedorAsignadoId() {
-        return vendedorAsignadoId;
-    }
-
-    public void setVendedorAsignadoId(Long vendedorAsignadoId) {
-        this.vendedorAsignadoId = vendedorAsignadoId;
-    }
-
-    public String getVendedorAsignadoNombre() {
-        return vendedorAsignadoNombre;
-    }
-
-    public void setVendedorAsignadoNombre(String vendedorAsignadoNombre) {
-        this.vendedorAsignadoNombre = vendedorAsignadoNombre;
-    }
+    private String vendedorAsignadoNombre; // Necesario para UnifiedInbox del frontend
 }
 

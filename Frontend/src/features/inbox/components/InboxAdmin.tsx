@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../hooks/useAuth';
 import jsPDF from 'jspdf';
 import { obtenerPlantillasActivas, reemplazarVariables, incrementarUsoPlantilla } from '../../../common/plantillasHelper';
+import { conversacionService, usuarioService } from '../../../common/apiClient';
 
 interface Mensaje {
   id: number;
@@ -68,7 +69,39 @@ export const InboxAdmin: React.FC = () => {
   const cargarDatos = async () => {
     setLoading(true);
     try {
-      // Mock data realista con múltiples conversaciones y mensajes
+      // Cargar conversaciones desde API
+      const conversacionesData = await conversacionService.getAll();
+      
+      // Cargar vendedores desde API
+      const usuariosData = await usuarioService.getVendedores();
+
+      // Mapear datos de API al formato del componente
+      const conversacionesMapeadas: Conversacion[] = (conversacionesData || []).map((conv: any) => ({
+        id: conv.id,
+        canal: conv.canal,
+        contenido: conv.contenido,
+        fechaHora: conv.fechaHora,
+        contactoId: conv.contactoId,
+        contactoNombre: conv.contactoNombre,
+        contactoEmail: conv.contactoEmail,
+        vendedorAsignadoId: conv.vendedorAsignadoId,
+        vendedorAsignadoNombre: conv.vendedorAsignadoNombre, // ← Viene del webhook ahora
+        estado: conv.estado || 'pendiente',
+        etiqueta: conv.estado === 'respondido' ? 'Cliente' : 'Lead Activo',
+      }));
+
+      setConversaciones(conversacionesMapeadas);
+      setVendedores(usuariosData || []);
+      
+      // Cargar plantillas desde el helper
+      const plantillasActivas = obtenerPlantillasActivas();
+      setPlantillas(plantillasActivas);
+      
+      console.log(`✅ Cargadas ${conversacionesMapeadas.length} conversaciones desde API`);
+    } catch (error) {
+      console.error('Error cargando datos:', error);
+      // Fallback: si la API falla, cargar mocks
+      console.warn('⚠️ Usando datos mock como fallback...');
       const conversacionesMock: Conversacion[] = [
         {
           id: 1,
@@ -82,168 +115,9 @@ export const InboxAdmin: React.FC = () => {
           vendedorAsignadoNombre: 'Carlos López',
           estado: 'respondido',
           etiqueta: 'Lead Activo',
-          mensajes: [
-            {
-              id: 1,
-              contenido: '¿Cuál es el precio de vuestro producto premium?',
-              fechaHora: new Date(Date.now() - 3600000).toISOString(),
-              tipo: 'entrada',
-              remitente: 'Juan García'
-            },
-            {
-              id: 2,
-              contenido: 'Hola Juan, el producto premium tiene un costo de $299.99 al mes. Incluye soporte 24/7 💪',
-              fechaHora: new Date(Date.now() - 3500000).toISOString(),
-              tipo: 'salida',
-              remitente: 'Carlos López'
-            },
-            {
-              id: 3,
-              contenido: '¿Hay descuento por pago anual?',
-              fechaHora: new Date(Date.now() - 3400000).toISOString(),
-              tipo: 'entrada',
-              remitente: 'Juan García'
-            },
-            {
-              id: 4,
-              contenido: 'Sí, si pagas anual te damos 20% de descuento. ¿Te interesa iniciar una prueba gratuita?',
-              fechaHora: new Date(Date.now() - 3300000).toISOString(),
-              tipo: 'salida',
-              remitente: 'Carlos López'
-            }
-          ]
-        },
-        {
-          id: 2,
-          canal: 'Email',
-          contenido: 'Solicitud de información sobre plan empresarial',
-          fechaHora: new Date(Date.now() - 7200000).toISOString(),
-          contactoId: 102,
-          contactoNombre: 'María Rodríguez',
-          contactoEmail: 'maria.r@company.com',
-          vendedorAsignadoId: 2,
-          vendedorAsignadoNombre: 'Ana María Sánchez',
-          estado: 'pendiente',
-          etiqueta: 'Cliente',
-          mensajes: [
-            {
-              id: 1,
-              contenido: 'Solicitud de información sobre plan empresarial',
-              fechaHora: new Date(Date.now() - 7200000).toISOString(),
-              tipo: 'entrada',
-              remitente: 'María Rodríguez'
-            }
-          ]
-        },
-        {
-          id: 3,
-          canal: 'WhatsApp',
-          contenido: 'Demanda de soporte técnico para integración',
-          fechaHora: new Date(Date.now() - 1800000).toISOString(),
-          contactoId: 103,
-          contactoNombre: 'Roberto Martínez',
-          contactoEmail: 'rob.martinez@startup.io',
-          vendedorAsignadoId: 1,
-          vendedorAsignadoNombre: 'Carlos López',
-          estado: 'cerrado',
-          etiqueta: 'Cliente',
-          mensajes: [
-            {
-              id: 1,
-              contenido: 'Tengo un problema con la integración de API',
-              fechaHora: new Date(Date.now() - 1800000).toISOString(),
-              tipo: 'entrada',
-              remitente: 'Roberto Martínez'
-            },
-            {
-              id: 2,
-              contenido: 'Hola Roberto, te envío la documentación y un video tutorial. ¿Qué error específico recibes?',
-              fechaHora: new Date(Date.now() - 1700000).toISOString(),
-              tipo: 'salida',
-              remitente: 'Carlos López'
-            },
-            {
-              id: 3,
-              contenido: 'Perfecto, ya funcionó! Muchas gracias',
-              fechaHora: new Date(Date.now() - 1600000).toISOString(),
-              tipo: 'entrada',
-              remitente: 'Roberto Martínez'
-            },
-            {
-              id: 4,
-              contenido: 'De nada! Cualquier otra duda contactame. ¡Que disfrutes! 🚀',
-              fechaHora: new Date(Date.now() - 1500000).toISOString(),
-              tipo: 'salida',
-              remitente: 'Carlos López'
-            }
-          ]
-        },
-        {
-          id: 4,
-          canal: 'Email',
-          contenido: 'Renovación de suscripción - Facturación',
-          fechaHora: new Date(Date.now() - 5400000).toISOString(),
-          contactoId: 104,
-          contactoNombre: 'David López',
-          contactoEmail: 'david.lopez@enterprise.com',
-          vendedorAsignadoId: 3,
-          vendedorAsignadoNombre: 'Pedro Gómez',
-          estado: 'respondido',
-          etiqueta: 'Cliente',
-          mensajes: [
-            {
-              id: 1,
-              contenido: 'Hola, necesito renovar mi suscripción. ¿Cómo procedo?',
-              fechaHora: new Date(Date.now() - 5400000).toISOString(),
-              tipo: 'entrada',
-              remitente: 'David López'
-            },
-            {
-              id: 2,
-              contenido: 'Hola David, tu suscripción se renueva automáticamente el próximo mes. Te enviaré el detalle por correo.',
-              fechaHora: new Date(Date.now() - 5300000).toISOString(),
-              tipo: 'salida',
-              remitente: 'Pedro Gómez'
-            }
-          ]
-        },
-        {
-          id: 5,
-          canal: 'WhatsApp',
-          contenido: '¿Tienen disponibilidad para llamada de demostración?',
-          fechaHora: new Date(Date.now() - 2700000).toISOString(),
-          contactoId: 105,
-          contactoNombre: 'Laura Fernández',
-          contactoEmail: 'laura.f@techstartup.co',
-          vendedorAsignadoId: 2,
-          vendedorAsignadoNombre: 'Ana María Sánchez',
-          estado: 'pendiente',
-          etiqueta: 'Inactivo',
-          mensajes: [
-            {
-              id: 1,
-              contenido: '¿Tienen disponibilidad para llamada de demostración?',
-              fechaHora: new Date(Date.now() - 2700000).toISOString(),
-              tipo: 'entrada',
-              remitente: 'Laura Fernández'
-            }
-          ]
         }
       ];
-
-      const vendedoresMock: Usuario[] = [
-        { id: 1, nombre: 'Carlos López', email: 'carlos@crm.com', role: 'vendedor' },
-        { id: 2, nombre: 'Ana María Sánchez', email: 'ana@crm.com', role: 'vendedor' },
-        { id: 3, nombre: 'Pedro Gómez', email: 'pedro@crm.com', role: 'vendedor' }
-      ];
-
       setConversaciones(conversacionesMock);
-      setVendedores(vendedoresMock);
-      // Cargar plantillas desde el helper
-      const plantillasActivas = obtenerPlantillasActivas();
-      setPlantillas(plantillasActivas);
-    } catch (error) {
-      console.error('Error cargando datos:', error);
     } finally {
       setLoading(false);
     }

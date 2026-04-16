@@ -11,7 +11,15 @@ export interface Contacto {
   nombre: string;
   email: string;
   telefono: string;
-  estado: 'LEAD_ACTIVO' | 'EN_SEGUIMIENTO' | 'CALIFICADO' | 'CLIENTE';
+  estado: 'LEAD_ACTIVO' | 'EN_SEGUIMIENTO' | 'CALIFICADO' | 'CLIENTE' | 'INACTIVO';
+  vendedorAsignado?: {
+    id: number;
+    nombre: string;
+    email: string;
+  };
+  vendedorAsignadoId?: number;
+  vendedorNombre?: string;
+  vendedorEmail?: string;
 }
 
 export interface Conversacion {
@@ -50,6 +58,7 @@ export interface Metricas {
   tasaCompletitudSeguimientos: number;
   contactosPorEstado: Record<string, number>;
   comunicacionPorCanal: Record<string, number>;
+  productosVendidos?: number; // ← Nuevo campo
 }
 
 export interface FunnelMetricas {
@@ -85,13 +94,26 @@ export const contactoService = {
   },
 
   // Crear contacto
-  create: async (contacto: Omit<Contacto, 'id'>): Promise<Contacto> => {
+  create: async (contacto: { nombre: string; email: string; telefono: string; estado: string; vendedorAsignadoId?: number }): Promise<Contacto> => {
     const response = await fetch(`${API_BASE_URL}/contactos`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(contacto)
     });
+    
     const data = (await response.json()) as ApiResponse<Contacto>;
+    
+    if (!response.ok) {
+      // Si hay error en validación de campos
+      if (data.data && typeof data.data === 'object' && !Array.isArray(data.data) && 'id' !in data.data) {
+        const validationErrors = Object.entries(data.data as Record<string, string>)
+          .map(([field, msg]) => `${field}: ${msg}`)
+          .join('\n');
+        throw new Error(validationErrors || 'Error de validación en la creación');
+      }
+      throw new Error(data.error || 'Error al crear el contacto');
+    }
+    
     return data.data || { id: 0, nombre: '', email: '', telefono: '', estado: 'LEAD_ACTIVO' };
   },
 
@@ -125,13 +147,6 @@ export const contactoService = {
     return data.data || [];
   },
 
-  // Segmentación: En seguimiento
-  getEnSeguimiento: async (): Promise<Contacto[]> => {
-    const response = await fetch(`${API_BASE_URL}/contactos/segmentacion/en-seguimiento`);
-    const data = (await response.json()) as ApiResponse<Contacto[]>;
-    return data.data || [];
-  },
-
   // Segmentación: Clientes
   getClientes: async (): Promise<Contacto[]> => {
     const response = await fetch(`${API_BASE_URL}/contactos/segmentacion/clientes`);
@@ -139,9 +154,39 @@ export const contactoService = {
     return data.data || [];
   },
 
-  // Segmentación: Leads calificados
-  getLeadsCalificados: async (): Promise<Contacto[]> => {
-    const response = await fetch(`${API_BASE_URL}/contactos/segmentacion/leads-calificados`);
+  // Segmentación: Inactivos
+  getInactivos: async (): Promise<Contacto[]> => {
+    const response = await fetch(`${API_BASE_URL}/contactos/segmentacion/inactivos`);
+    const data = (await response.json()) as ApiResponse<Contacto[]>;
+    return data.data || [];
+  },
+
+  // ==================== FILTRADO POR VENDEDOR ====================
+  
+  // Obtener todos los contactos de un vendedor
+  getByVendedor: async (vendedorId: number): Promise<Contacto[]> => {
+    const response = await fetch(`${API_BASE_URL}/contactos/por-vendedor/${vendedorId}`);
+    const data = (await response.json()) as ApiResponse<Contacto[]>;
+    return data.data || [];
+  },
+
+  // Obtener leads activos de un vendedor
+  getLeadsActivosByVendedor: async (vendedorId: number): Promise<Contacto[]> => {
+    const response = await fetch(`${API_BASE_URL}/contactos/por-vendedor/${vendedorId}/segmentacion/leads-activos`);
+    const data = (await response.json()) as ApiResponse<Contacto[]>;
+    return data.data || [];
+  },
+
+  // Obtener clientes de un vendedor
+  getClientesByVendedor: async (vendedorId: number): Promise<Contacto[]> => {
+    const response = await fetch(`${API_BASE_URL}/contactos/por-vendedor/${vendedorId}/segmentacion/clientes`);
+    const data = (await response.json()) as ApiResponse<Contacto[]>;
+    return data.data || [];
+  },
+
+  // Obtener inactivos de un vendedor
+  getInactivosByVendedor: async (vendedorId: number): Promise<Contacto[]> => {
+    const response = await fetch(`${API_BASE_URL}/contactos/por-vendedor/${vendedorId}/segmentacion/inactivos`);
     const data = (await response.json()) as ApiResponse<Contacto[]>;
     return data.data || [];
   }
@@ -249,7 +294,8 @@ export const metricasService = {
       seguimientosPendientes: 0,
       tasaCompletitudSeguimientos: 0,
       contactosPorEstado: {},
-      comunicacionPorCanal: {}
+      comunicacionPorCanal: {},
+      productosVendidos: 0
     };
   },
 
@@ -283,6 +329,44 @@ export const metricasService = {
     const response = await fetch(`${API_BASE_URL}/metricas/canales`);
     const data = (await response.json()) as ApiResponse<unknown>;
     return data.data;
+  },
+
+  /**
+   * Obtener métricas de conversión para un vendedor específico
+   * Retorna: tasaConversion, leadsAsignados, clientesConvertidos, totalLeads
+   */
+  getMetricasVendedor: async (vendedorId: number) => {
+    const response = await fetch(`${API_BASE_URL}/metricas/vendedor/${vendedorId}`);
+    const data = (await response.json()) as ApiResponse<{
+      vendedorId: number;
+      vendedorNombre: string;
+      leadsAsignados: number;
+      clientesConvertidos: number;
+      leadsInactivos: number;
+      totalLeads: number;
+      tasaConversion: number;
+    }>;
+    return data.data;
+  },
+
+  /**
+   * Obtener métricas de todos los vendedores activos
+   * Retorna: Array de vendedores con sus tasas de conversión
+   */
+  getMetricasTodosVendedores: async () => {
+    const response = await fetch(`${API_BASE_URL}/metricas/vendedores`);
+    const data = (await response.json()) as ApiResponse<
+      Array<{
+        vendedorId: number;
+        vendedorNombre: string;
+        leadsAsignados: number;
+        clientesConvertidos: number;
+        leadsInactivos: number;
+        totalLeads: number;
+        tasaConversion: number;
+      }>
+    >;
+    return data.data || [];
   }
 };
 
@@ -438,7 +522,6 @@ export const estadoLead = {
 
 export const estadoLabels: Record<string, string> = {
   LEAD_ACTIVO: 'Lead Activo',
-  EN_SEGUIMIENTO: 'En Seguimiento',
-  CALIFICADO: 'Calificado',
-  CLIENTE: 'Cliente'
+  CLIENTE: 'Cliente',
+  INACTIVO: 'Inactivo'
 };

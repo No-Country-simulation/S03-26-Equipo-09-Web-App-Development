@@ -1,17 +1,48 @@
 package com.startupcrm.crm_backend.dto;
 
 import com.startupcrm.crm_backend.model.Usuario;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+/**
+ * DTO para Usuario (Vendedor/Admin).
+ * 
+ * Alineado con la interface Usuario del frontend (apiClient.ts).
+ * NO expone password en ningún escenario (nunca se serializa en DTO).
+ * 
+ * @author Backend Team
+ * @version 2.0 - Refactorización MVP
+ */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class UsuarioDTO {
+    
     private Long id;
+
+    @NotBlank(message = "El nombre es obligatorio")
     private String nombre;
+
+    @NotBlank(message = "El email es obligatorio")
+    @Email(message = "Formato de email inválido")
     private String email;
+
     private String telefono;
-    private String role;
+
+    @NotBlank(message = "El rol es obligatorio")
+    private String role; // 'ADMIN' | 'VENDEDOR'
+
     private Boolean activo;
 
-    public UsuarioDTO() {}
-
+    /**
+     * Constructor de conversión desde Entity.
+     * Nunca expone el password.
+     */
     public UsuarioDTO(Usuario usuario) {
         this.id = usuario.getId();
         this.nombre = usuario.getNombre();
@@ -19,53 +50,5 @@ public class UsuarioDTO {
         this.telefono = usuario.getTelefono();
         this.role = usuario.getRole().toString();
         this.activo = usuario.getActivo();
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getTelefono() {
-        return telefono;
-    }
-
-    public void setTelefono(String telefono) {
-        this.telefono = telefono;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
-
-    public Boolean getActivo() {
-        return activo;
-    }
-
-    public void setActivo(Boolean activo) {
-        this.activo = activo;
     }
 }

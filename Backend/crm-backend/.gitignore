@@ -14,7 +14,8 @@ target/
 .sts4-cache
 
 ### IntelliJ IDEA ###
-.idea
+.idea/
+.idea_modules/
 *.iws
 *.iml
 *.ipr
@@ -31,4 +32,45 @@ build/
 
 ### VS Code ###
 .vscode/
+.vscode-test/
+*.code-workspace
+.history/
 
+### JetBrains ###
+.DS_Store
+
+### OS & SYSTEM FILES (Linux/macOS) ###
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+### SENSITIVE CONFIGURATION FILES ###
+application.properties
+application-*.properties
+!application-template.properties
+!application.properties.example
+.env
+.env.local
+.env.*.local
+.env.production
+secrets.yaml
+secrets.yml
+
+### LOGS & TEMP FILES ###
+*.log
+*.log.*
+logs/
+tmp/
+temp/
+*.tmp
+
+### DATABASE & LOCAL DEVELOPMENT ###
+*.db
+*.sqlite
+database/
+data/
