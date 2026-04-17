@@ -1,7 +1,7 @@
 # DEVELOPMENT LOG - CRM Backend MVP Refactorización
 
-**Fecha:** 14 de abril de 2026  
-**Versión:** 2.0 - Refactorización MVP  
+**Fecha:** 14 de abril de 2026 (Actualizado: 16 de abril de 2026)  
+**Versión:** 2.1 - RBAC Implementation + Inbox Admin  
 **Rol:** Arquitecto de Software Senior
 
 ---
@@ -12,9 +12,191 @@ Refactorización estratégica del backend CRM para alinearlo con:
 - ✅ Interfaces del frontend (apiClient.ts)
 - ✅ Simplificación para MVP (No features complejas innecesarias)
 - ✅ Optimización de rendimiento (N+1 queries eliminadas)
+- ✅ **NUEVO (16/04):** RBAC Granular con JWT + Admin Inbox Unificado
 - ✅ Escalabilidad sin sacrificar velocidad de entrega
 
-**Resultado:** Reducción de 15-20% de boilerplate, -30% de tráfico JSON innecesario, alineación 100% con frontend.
+**Resultado:** 
+- Reducción de 15-20% de boilerplate, -30% de tráfico JSON innecesario, alineación 100% con frontend.
+- **NUEVO:** Control de acceso por rol (Admin ↔ Vendedor), autenticación JWT, endpoints protegidos.
+
+---
+
+## 🔐 NUEVA IMPLEMENTACIÓN: RBAC Granular + Inbox Admin (16 de abril 2026)
+
+### 📦 Componentes Creados
+
+#### 1. **JwtProvider.java** (security/)
+- **Responsabilidad:** Generar y validar JWT con claims personalizados
+- **Métodos principales:**
+  - `generateToken(Usuario)` → JWT firmado HMAC-SHA512
+  - `validateToken(String)` → Valida firma y expiración
+  - `getUserIdFromToken()`, `getRoleFromToken()`, etc. → Extrae claims
+- **Configuración:** `jwt.secret` y `jwt.expiration` (application.properties)
+
+#### 2. **CustomUserDetailsService.java** (security/)
+- **Responsabilidad:** UserDetailsService de Spring Security
+- **Características:**
+  - Carga Usuario + Roles desde BD (PostgreSQL)
+  - Clase interna `CustomUserDetails extends UserDetails`
+  - Convierte `Usuario.Role` → `ROLE_ADMIN` o `ROLE_VENDEDOR`
+  - Getter para acceso a campos del Usuario
+
+#### 3. **JwtAuthenticationFilter.java** (security/)
+- **Responsabilidad:** Filtro que valida JWT en cada request
+- **Flujo:**
+  1. Extrae token del header: `Authorization: Bearer <token>`
+  2. Valida con `JwtProvider`
+  3. Carga UserDetails
+  4. Establece contexto de seguridad (`SecurityContextHolder`)
+- **Anotación:** `@Slf4j` para logging
+
+#### 4. **ForbiddenAccessException.java** (exception/)
+- **Nueva excepción:** Para denegar acceso por permisos insuficientes
+- **Handler:** Agregado a `GlobalExceptionHandler.java` → HTTP 403
+
+#### 5. **AdminInboxController.java** (controller/)
+- **Propósito:** Endpoint unificado para Admin + Inbox Omnicanal
+- **Endpoints:**
+  - `GET /api/admin/conversaciones/todas` → Page<Conversacion> (ADMIN only)
+  - `GET /api/admin/conversaciones/{id}/detalles` → Detalles de conversación
+  - `GET /api/admin/inbox/resumen` → Dashboard stats (ADMIN only)
+  - `PUT /api/admin/conversaciones/{id}/reasignar` → Reasignar a vendedor
+- **Decorador:** `@PreAuthorize("hasRole('ADMIN')")`
+
+### 🔧 Actualizaciones a Componentes Existentes
+
+#### ✅ **SecurityConfig.java** (config/)
+**ANTES:** `.requestMatchers("/**").permitAll()` → Sin seguridad
+**DESPUÉS:**
+```java
+// Públicos
+.requestMatchers("/api/usuarios/login").permitAll()
+.requestMatchers("/api/whatsapp/webhook").permitAll()
+.requestMatchers("/api/email/webhook").permitAll()
+
+// ADMIN only
+.requestMatchers("/api/admin/**").hasRole("ADMIN")
+.requestMatchers("/api/metricas/**").hasRole("ADMIN")
+
+// Resto: autenticado
+.anyRequest().authenticated()
+```
+- **Cambios:** Agregado `JwtAuthenticationFilter`
+- **Política:** Stateless (JWT) - `SessionCreationPolicy.STATELESS`
+- **Anotación:** `@EnableMethodSecurity(prePostEnabled = true)` para `@PreAuthorize`
+
+#### ✅ **UsuarioService.java** (service/)
+- **Inyectado:** `JwtProvider`
+- **Actualización:** `generateToken()` ahora retorna JWT real en lugar de UUID simple
+- **JWT incluye:** `userId` (subject), `email`, `nombre`, `role`, `expiration`
+
+#### ✅ **pom.xml** (dependencies)
+**Agregadas:**
+```xml
+<dependency>
+    <groupId>io.jsonwebtoken</groupId>
+    <artifactId>jjwt-api</artifactId>
+    <version>0.12.3</version>
+</dependency>
+<dependency>
+    <groupId>io.jsonwebtoken</groupId>
+    <artifactId>jjwt-impl</artifactId>
+    <version>0.12.3</version>
+    <scope>runtime</scope>
+</dependency>
+<!-- ... jackson adapter ... -->
+```
+- **Versión:** JJWT 0.12.3 (API moderna)
+
+### 🛡️ RBAC Strategy
+
+#### Reglas de Control de Acceso
+
+| Endpoint | ADMIN | VENDEDOR | Público |
+|----------|:-----:|:--------:|:-------:|
+| `GET /api/admin/conversaciones/todas` | ✅ | ❌ | ❌ |
+| `GET /api/admin/inbox/resumen` | ✅ | ❌ | ❌ |
+| `GET /api/admin/conversaciones/{id}/reasignar` | ✅ | ❌ | ❌ |
+| `GET /api/conversaciones/por-vendedor/{vendedorId}` | ✅ | 🔒* | ❌ |
+| `POST /api/usuarios/login` | ✅ | ✅ | ✅ |
+| `POST /api/whatsapp/webhook` | ✅ | ✅ | ✅ |
+
+*🔒 = Solo si vendedorId coincide con usuario autenticado (validar en futuro)
+
+#### Flujo de Autenticación
+
+```
+Cliente (Frontend)
+    ↓
+POST /api/usuarios/login { email, password }
+    ↓ UsuarioService.authenticate() + generateToken()
+    ↓
+Response { token: "eyJ...", userId, role, nombre }
+    ↓
+Cliente guarda token en localStorage
+    ↓
+Siguientes requests:
+  Header: Authorization: Bearer eyJ...
+    ↓
+JwtAuthenticationFilter
+    ├─ Extrae token
+    ├─ Valida con JwtProvider
+    ├─ Carga UserDetails
+    └─ Establece SecurityContext
+    ↓
+Controller verifica @PreAuthorize("hasRole('ADMIN')")
+    ├─ Si ✅ → Procesa request
+    └─ Si ❌ → Retorna HTTP 403 Forbidden
+```
+
+---
+
+## ✅ VALIDACIÓN TÉCNICA
+
+### Compilación
+```
+[INFO] BUILD SUCCESS - 60 archivos compilados sin errores
+[INFO] Warnings: Solo deprecate API warnings (aceptables)
+```
+
+### Test Setup (Requerido)
+```bash
+# Antes de testear, iniciar backend
+./mvnw spring-boot:run
+
+# En terminal separada, probar endpoints:
+curl -X POST http://localhost:8080/api/usuarios/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@crm.com","password":"admin123"}'
+
+# Debe retornar: { "token": "eyJ...", "userId": 1, "role": "ADMIN" }
+```
+
+### Postman Collection (Adjunta en este commit)
+- ✅ Login (genera token)
+- ✅ GET /api/admin/conversaciones/todas (con token ADMIN)
+- ❌ GET /api/admin/conversaciones/todas (sin token)
+- ❌ GET /api/admin/conversaciones/todas (con token VENDEDOR)
+
+---
+
+## 🚀 PRÓXIMAS ACCIONES (POST MVP)
+
+1. **RBAC Granular Nivel 2:**
+   - Validar que VENDEDOR solo pueda acceder a `conversaciones/por-vendedor/{suId}`
+   - Endpoint `/api/vendedor/conversaciones/mis` para Inbox personal
+
+2. **Refresh Tokens:**
+   - Implementar token rotation (JWT expira cada 24h, refresh token 7 días)
+   - Endpoint `POST /api/usuarios/refresh-token`
+
+3. **Rate Limiting:**
+   - Agregar rate limiter en endpoints críticos (/login, webhooks)
+   - Usar Spring Cloud Gateway o Resilience4j
+
+4. **MongoDB Integración (Post-MVP):**
+   - Guardar historial completo de mensajes en MongoDB
+   - JwtAuthenticationFilter puede verificar permisos allá también
 
 ---
 

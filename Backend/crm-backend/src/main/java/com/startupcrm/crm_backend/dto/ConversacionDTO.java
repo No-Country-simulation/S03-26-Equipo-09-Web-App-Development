@@ -41,5 +41,7 @@ public class ConversacionDTO {
     private Long vendedorAsignadoId; // Opcional: puede ser null si mensaje sin asignar
 
     private String vendedorAsignadoNombre; // Necesario para UnifiedInbox del frontend
+
+    private String estado; // 'NO_LEIDO' | 'LEIDO' | 'RESPONDIDO' | 'CERRADO' | 'FALLIDO'
 }
 

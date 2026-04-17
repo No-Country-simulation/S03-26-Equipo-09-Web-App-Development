@@ -33,15 +33,15 @@ VALUES
 -- ===============================================
 -- CONVERSACIONES (WEBHOOK SIMULATOR + MANUALES)
 -- ===============================================
-INSERT INTO conversaciones (id, canal, contenido, fecha_hora, contacto_id, vendedor_asignado_id)
+INSERT INTO conversaciones (id, canal, contenido, fecha_hora, contacto_id, vendedor_asignado_id, estado)
 VALUES
 -- Conversaciones WhatsApp
-(1, 'WhatsApp', '¿Cuál es el precio de vuestro producto premium?', '2026-04-14 10:30:00', 1, 2),
-(2, 'WhatsApp', 'Tengo un problema con la integración de API', '2026-04-14 12:15:00', 2, 3),
-(3, 'WhatsApp', '¿Tienen disponibilidad para llamada de demostración?', '2026-04-14 14:45:00', 4, 2),
+(1, 'WhatsApp', '¿Cuál es el precio de vuestro producto premium?', '2026-04-14 10:30:00', 1, 2, 'NO_LEIDO'),
+(2, 'WhatsApp', 'Tengo un problema con la integración de API', '2026-04-14 12:15:00', 2, 3, 'NO_LEIDO'),
+(3, 'WhatsApp', '¿Tienen disponibilidad para llamada de demostración?', '2026-04-14 14:45:00', 4, 2, 'NO_LEIDO'),
 -- Conversaciones Email
-(4, 'Email', 'Solicitud de información sobre plan empresarial', '2026-04-14 09:00:00', 3, 4),
-(5, 'Email', 'Renovación de suscripción - Facturación', '2026-04-14 11:30:00', 5, 3);
+(4, 'Email', 'Solicitud de información sobre plan empresarial', '2026-04-14 09:00:00', 3, 4, 'NO_LEIDO'),
+(5, 'Email', 'Renovación de suscripción - Facturación', '2026-04-14 11:30:00', 5, 3, 'NO_LEIDO');
 
 -- ===============================================
 -- PLANTILLAS EMAIL
@@ -155,3 +155,13 @@ VALUES
 (3, true, '2026-04-14', 'Confirmación de compra con David López', 3),
 (4, false, '2026-04-18', 'Demostración de API a Patricia González', 4),
 (5, false, '2026-04-19', 'Negociación de términos con Francisco Ruiz', 5);
+
+-- ===============================================
+-- RESETEAR SECUENCIAS AL SIGUIENTE ID DISPONIBLE
+-- (Crucial para evitar conflictos de "duplicate key" al crear nuevos registros)
+-- ===============================================
+ALTER SEQUENCE usuarios_id_seq RESTART WITH 5;
+ALTER SEQUENCE contactos_id_seq RESTART WITH 6;
+ALTER SEQUENCE conversaciones_id_seq RESTART WITH 6;
+ALTER SEQUENCE plantillas_id_seq RESTART WITH 9;
+ALTER SEQUENCE seguimientos_id_seq RESTART WITH 6;

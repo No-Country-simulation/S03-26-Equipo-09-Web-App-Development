@@ -3,18 +3,20 @@ package com.startupcrm.crm_backend.service;
 import com.startupcrm.crm_backend.exception.ResourceNotFoundException;
 import com.startupcrm.crm_backend.model.Usuario;
 import com.startupcrm.crm_backend.repository.UsuarioRepository;
+import com.startupcrm.crm_backend.security.JwtProvider;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
+    private final JwtProvider jwtProvider;
 
-    public UsuarioService(UsuarioRepository usuarioRepository) {
+    public UsuarioService(UsuarioRepository usuarioRepository, JwtProvider jwtProvider) {
         this.usuarioRepository = usuarioRepository;
+        this.jwtProvider = jwtProvider;
     }
 
     public List<Usuario> getAll() {
@@ -36,6 +38,13 @@ public class UsuarioService {
     }
 
     public Usuario save(Usuario usuario) {
+        // Establecer defaults si no están presentes
+        if (usuario.getActivo() == null) {
+            usuario.setActivo(true);
+        }
+        if (usuario.getRole() == null) {
+            usuario.setRole(Usuario.Role.VENDEDOR);
+        }
         return usuarioRepository.save(usuario);
     }
 
@@ -43,10 +52,20 @@ public class UsuarioService {
         Usuario existente = usuarioRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 
-        existente.setNombre(usuarioDetails.getNombre());
-        existente.setEmail(usuarioDetails.getEmail());
-        existente.setTelefono(usuarioDetails.getTelefono());
-        existente.setActivo(usuarioDetails.getActivo());
+        // Hacer updates parciales - solo actualizar campos que NO sean null
+        if (usuarioDetails.getNombre() != null && !usuarioDetails.getNombre().isBlank()) {
+            existente.setNombre(usuarioDetails.getNombre());
+        }
+        if (usuarioDetails.getEmail() != null && !usuarioDetails.getEmail().isBlank()) {
+            existente.setEmail(usuarioDetails.getEmail());
+        }
+        if (usuarioDetails.getTelefono() != null) {
+            existente.setTelefono(usuarioDetails.getTelefono());
+        }
+        // El campo activo se actualiza siempre si viene en la solicitud
+        if (usuarioDetails.getActivo() != null) {
+            existente.setActivo(usuarioDetails.getActivo());
+        }
 
         return usuarioRepository.save(existente);
     }
@@ -82,12 +101,12 @@ public class UsuarioService {
     }
 
     /**
-     * Generar token JWT simple (para desarrollo)
-     * En producción: usar Spring Security + JWT Provider
+     * Generar token JWT con información del usuario y sus roles
+     * 
+     * @param usuario Usuario para el cual generar el token
+     * @return Token JWT firmado
      */
     public String generateToken(Usuario usuario) {
-        // Generar un token simple UUID para desarrollo
-        // En producción usarías JWT con HMAC256 o RSA
-        return "Bearer-" + UUID.randomUUID().toString() + "-" + usuario.getId();
+        return jwtProvider.generateToken(usuario);
     }
 }

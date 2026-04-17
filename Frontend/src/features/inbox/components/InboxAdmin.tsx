@@ -69,11 +69,15 @@ export const InboxAdmin: React.FC = () => {
   const cargarDatos = async () => {
     setLoading(true);
     try {
-      // Cargar conversaciones desde API
-      const conversacionesData = await conversacionService.getAll();
+      console.log('📝 Iniciando cargarDatos... Token:', localStorage.getItem('authToken')?.substring(0, 30));
+      
+      // Cargar conversaciones desde API - usar endpoint admin para ver todas
+      const conversacionesData = await conversacionService.getAllAdmin();
+      console.log('📊 conversacionesData recibida:', conversacionesData);
       
       // Cargar vendedores desde API
       const usuariosData = await usuarioService.getVendedores();
+      console.log('👥 usuariosData recibida:', usuariosData);
 
       // Mapear datos de API al formato del componente
       const conversacionesMapeadas: Conversacion[] = (conversacionesData || []).map((conv: any) => ({
@@ -85,7 +89,7 @@ export const InboxAdmin: React.FC = () => {
         contactoNombre: conv.contactoNombre,
         contactoEmail: conv.contactoEmail,
         vendedorAsignadoId: conv.vendedorAsignadoId,
-        vendedorAsignadoNombre: conv.vendedorAsignadoNombre, // ← Viene del webhook ahora
+        vendedorAsignadoNombre: conv.vendedorAsignadoNombre,
         estado: conv.estado || 'pendiente',
         etiqueta: conv.estado === 'respondido' ? 'Cliente' : 'Lead Activo',
       }));
@@ -97,9 +101,10 @@ export const InboxAdmin: React.FC = () => {
       const plantillasActivas = obtenerPlantillasActivas();
       setPlantillas(plantillasActivas);
       
-      console.log(`✅ Cargadas ${conversacionesMapeadas.length} conversaciones desde API`);
+      console.log(`✅ Cargadas ${conversacionesMapeadas.length} conversaciones desde API admin`);
     } catch (error) {
-      console.error('Error cargando datos:', error);
+      console.error('❌ Error REAL cargando datos:', error);
+      console.error('❌ Error stack:', (error as any).stack);
       // Fallback: si la API falla, cargar mocks
       console.warn('⚠️ Usando datos mock como fallback...');
       const conversacionesMock: Conversacion[] = [
@@ -149,28 +154,67 @@ export const InboxAdmin: React.FC = () => {
   const handleEnviarRespuesta = async () => {
     if (!selectedConversacion || !respuesta.trim()) return;
 
-    // Agregar mensaje a la conversación
-    const nuevoMensaje: Mensaje = {
-      id: (selectedConversacion.mensajes?.length || 0) + 1,
-      contenido: respuesta,
-      fechaHora: new Date().toISOString(),
-      tipo: 'salida',
-      remitente: 'Vendedor'
-    };
+    try {
+      // Agregar mensaje a la conversación
+      const nuevoMensaje: Mensaje = {
+        id: (selectedConversacion.mensajes?.length || 0) + 1,
+        contenido: respuesta,
+        fechaHora: new Date().toISOString(),
+        tipo: 'salida',
+        remitente: 'Vendedor'
+      };
 
-    const conversacionActualizada: Conversacion = {
-      ...selectedConversacion,
-      mensajes: [...(selectedConversacion.mensajes || []), nuevoMensaje],
-      estado: 'respondido'
-    };
+      const conversacionActualizada: Conversacion = {
+        ...selectedConversacion,
+        mensajes: [...(selectedConversacion.mensajes || []), nuevoMensaje],
+        estado: 'respondido'
+      };
 
-    setSelectedConversacion(conversacionActualizada);
-    setRespuesta('');
+      // Actualizar en backend: marcar como respondido automáticamente
+      await conversacionService.marcarRespondido(selectedConversacion.id);
+      console.log('✅ Conversación marcada como RESPONDIDO en backend');
 
-    // Actualizar en lista
-    setConversaciones(conversaciones.map(c => 
-      c.id === selectedConversacion.id ? conversacionActualizada : c
-    ));
+      setSelectedConversacion(conversacionActualizada);
+      setRespuesta('');
+
+      // Actualizar en lista
+      setConversaciones(conversaciones.map(c => 
+        c.id === selectedConversacion.id ? conversacionActualizada : c
+      ));
+    } catch (error) {
+      console.error('❌ Error al enviar respuesta:', error);
+    }
+  };
+
+  const handleCerrarConversacion = async () => {
+    if (!selectedConversacion) return;
+
+    // Confirmar antes de cerrar
+    if (!window.confirm('¿Estás seguro de que deseas cerrar esta conversación?')) {
+      return;
+    }
+
+    try {
+      // Llamar a backend para cerrar
+      await conversacionService.cerrar(selectedConversacion.id);
+      console.log('🔒 Conversación cerrada en backend');
+
+      // Actualizar estado localmente
+      const conversacionActualizada: Conversacion = {
+        ...selectedConversacion,
+        estado: 'cerrado'
+      };
+
+      setSelectedConversacion(conversacionActualizada);
+
+      // Actualizar en lista
+      setConversaciones(conversaciones.map(c => 
+        c.id === selectedConversacion.id ? conversacionActualizada : c
+      ));
+    } catch (error) {
+      console.error('❌ Error al cerrar conversación:', error);
+      alert('Error al cerrar la conversación. Intenta nuevamente.');
+    }
   };
 
   const handleReasignar = async () => {
@@ -630,6 +674,17 @@ export const InboxAdmin: React.FC = () => {
                   className="flex-1 px-2 py-2 lg:py-2 lg:px-4 bg-[#006c49] text-white rounded lg:rounded-lg hover:bg-[#005236] font-semibold disabled:bg-slate-400 disabled:cursor-not-allowed text-xs lg:text-sm transition-colors"
                 >
                   ✉️ Enviar
+                </button>
+              </div>
+
+              {/* Botón Cerrar Conversación - Centrado */}
+              <div className="flex justify-center">
+                <button
+                  onClick={handleCerrarConversacion}
+                  disabled={selectedConversacion?.estado === 'cerrado'}
+                  className="px-6 py-2 lg:py-2.5 lg:px-8 bg-red-500 text-white rounded lg:rounded-lg hover:bg-red-600 font-semibold disabled:bg-slate-400 disabled:cursor-not-allowed text-xs lg:text-sm transition-colors"
+                >
+                  🔒 Cerrar Conversación
                 </button>
               </div>
             </div>

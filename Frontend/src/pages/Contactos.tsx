@@ -61,15 +61,27 @@ export const ContactosPage = () => {
       return;
     }
 
-    // Validar vendedorAsignadoId
-    const vendedorAsignadoId = isAdmin ? parseInt(newLeadVendedor) : userId;
-    console.log('🔍 vendedorAsignadoId calculado:', vendedorAsignadoId);
-    
-    if (!vendedorAsignadoId) {
-      alert('Error: No se puede obtener el ID del vendedor. Por favor, inicia sesión nuevamente.');
-      console.error('❌ vendedorAsignadoId es null/undefined');
+    // Validar que vendedor tenga su userId configurado
+    if (!isAdmin && (!userId || userId <= 0)) {
+      alert('❌ Error: Tu ID de usuario no está configurado. Por favor, inicia sesión nuevamente.');
+      console.error('❌ userId inválido para vendedor:', userId);
       return;
     }
+
+    // Validar vendedorAsignadoId
+    let vendedorAsignadoId: number;
+    if (isAdmin) {
+      vendedorAsignadoId = parseInt(newLeadVendedor);
+      if (isNaN(vendedorAsignadoId) || vendedorAsignadoId <= 0) {
+        alert('Por favor selecciona un vendedor válido');
+        console.error('❌ vendedorAsignadoId inválido:', vendedorAsignadoId);
+        return;
+      }
+    } else {
+      vendedorAsignadoId = userId || 0;
+    }
+    
+    console.log('🔍 vendedorAsignadoId final:', vendedorAsignadoId);
 
     setCargandoCrear(true);
     try {

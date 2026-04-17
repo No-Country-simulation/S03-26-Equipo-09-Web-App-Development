@@ -3,6 +3,9 @@
  * Centralizados para evitar duplicación y facilitar mantenimiento
  */
 
+export type EstadoConversacion = 'NO_LEIDO' | 'LEIDO' | 'RESPONDIDO' | 'CERRADO' | 'FALLIDO';
+export type CanalConversacion = 'Email' | 'WhatsApp';
+
 export interface Mensaje {
   id: number;
   contenido: string;
@@ -13,13 +16,15 @@ export interface Mensaje {
 
 export interface Conversacion {
   id: number;
-  canal: 'Email' | 'WhatsApp';
+  canal: CanalConversacion;
   contenido: string;
   fechaHora: string;
   contactoId: number;
   contactoNombre?: string;
   contactoEmail?: string;
-  estado?: 'pendiente' | 'respondido' | 'cerrado';
+  estado?: EstadoConversacion;
+  vendedorAsignadoId?: number;
+  vendedorAsignadoNombre?: string;
   etiqueta?: string;
   mensajes?: Mensaje[];
   nombreContacto?: string;
@@ -33,7 +38,7 @@ export interface Usuario {
 }
 
 export interface InboxFilter {
-  canal: 'Todos' | 'Email' | 'WhatsApp';
-  estado: 'Todos' | 'pendiente' | 'respondido' | 'cerrado';
+  canal: 'Todos' | CanalConversacion;
+  estado: 'Todos' | EstadoConversacion;
   busqueda: string;
 }

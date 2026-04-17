@@ -11,7 +11,9 @@ export default defineConfig({
 	plugins: [
 		react(),
 		tailwindcss(),
-		TanStackRouterVite(),
+		TanStackRouterVite({
+			routeFileIgnorePattern: '^.*\\/router\\.tsx$',
+		}),
 		viteStaticCopy({
 			targets: [
 				{

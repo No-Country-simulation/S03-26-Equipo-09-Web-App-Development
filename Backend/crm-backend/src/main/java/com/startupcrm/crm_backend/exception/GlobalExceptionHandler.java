@@ -42,6 +42,13 @@ public class GlobalExceptionHandler {
                 .body(new ApiResponse<>(false, errores, "Errores de validación"));
     }
 
+    @ExceptionHandler(ForbiddenAccessException.class)
+    public ResponseEntity<ApiResponse<Void>> handleForbiddenAccess(ForbiddenAccessException ex) {
+        logger.error("❌ ForbiddenAccessException: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(new ApiResponse<>(false, null, ex.getMessage()));
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleAll(Exception ex) {
         logger.error("❌ Exception: {}", ex.getMessage(), ex);

@@ -1,0 +1,120 @@
+a" | grep "crm" | grep -v grep | awk '{print $2}'module.exports = { 
+extends: ["@commitlint/config-conventional"] };
+ kill -9 192973 2>/dev/null || echo "Proceso no encontrado"; sleep 2; cd /home/harold/Escritorio/proyectos/S03-26-Equipo-09-Web-App-Development/Backend/crm-backend && ./mvnw spring-boot:run -DskipTests > /tmp/backend.log 2>&1 &
+ echo "Reiniciando backend..."
+ cd /home/harold/Escritorio/proyectos/S03-26-Equipo-09-Web-App-Development/Backend/crm-backend && ./mvnw clean compile 2>&1 | head -100
+ cd /home/harold/Escritorio/proyectos/S03-26-Equipo-09-Web-App-Development/Backend/crm-backend && ./mvnw compile -q 2>&1 | tail -200
+ cd /home/harold/Escritorio/proyectos/S03-26-Equipo-09-Web-App-Development/Backend/crm-backend && timeout 60 ./mvnw clean compile -q 2>&1 | grep -i "BUILD\|ERROR" | head -20
+ cd /home/harold/Escritorio/proyectos/S03-26-Equipo-09-Web-App-Development/Backend/crm-backend && ./mvnw clean compile 2>&1 | grep -A 5 "\[ERROR\]"
+ cd /home/harold/Escritorio/proyectos/S03-26-Equipo-09-Web-App-Development/Backend/crm-backend && ./mvnw -X clean compile 2>&1 | tail -300 | head -100
+ lsof -i :8080 2>/dev/null | grep LISTEN
+ sleep 10 && lsof -i :8080 2>/dev/null || echo "Backend aún no está listo"
+ lsof -i :8080 2>/dev/null | grep LISTEN
+ ps aux | grep "spring-boot:run" | grep -v grep
+ for i in {1..45}; do curl -s http://localhost:8080/api/conversaciones -H "Authorization: Bearer test" >/dev/null 2>&1 && echo "✅ Backend ready on port 8080!" && break || echo "Intento $i/45..."; sleep 1; done
+ tail -f /tmp/backend.log 2>/dev/null || ps aux | head -20
+ cd /home/harold/Escritorio/proyectos/S03-26-Equipo-09-Web-App-Development/Backend/crm-backend && timeout 60 ./mvnw spring-boot:run -DskipTests 2>&1 | tee /tmp/backend_startup.log &
+ cd /home/harold/Escritorio/proyectos/S03-26-Equipo-09-Web-App-Development/Backend/crm-backend
+ q
+ echo "done"
+ chmod +x /tmp/start_backend.sh && nohup /tmp/start_backend.sh > /tmp/backend.log 2>&1 &
+ tail -20 /tmp/backend.log 2>/dev/null || echo "Aún compilando..."
+ rm /home/harold/Escritorio/proyectos/S03-26-Equipo-09-Web-App-Development/Frontend/src/routes/router.tsx && echo "✅ router.tsx eliminado"
+ ls -la /home/harold/Escritorio/proyectos/S03-26-Equipo-09-Web-App-Development/Frontend/src/routes/router.tsx 2>&1
+ cd /home/harold/Escritorio/proyectos/S03-26-Equipo-09-Web-App-Development/Frontend/src/routes && mv router.tsx router.old.tsx && ls -1
+ ps aux | grep -E "java|postgres|mvn" | grep -v grep
+ lsof -i :8080 2>/dev/null || echo "Puerto 8080 no en uso"
+ echo "test"
+ PGPASSWORD=crm123456 psql -U postgres -h localhost -d crm_backend -c "\dt" 2>&1 | head -30
+ ls -la | grep "ql -h" && rm -f "ql -h"* && echo "✅ Archivos extraños eliminados"
+ python3 << 'EOF'
+import os
+import glob
+
+# Cambiar al directorio Frontend
+os.chdir('/home/harold/Escritorio/proyectos/S03-26-Equipo-09-Web-App-Development/Frontend')
+
+# Buscar y eliminar archivos que comienzan con "ql"
+for f in glob.glob('ql*'):
+    try:
+        os.remove(f)
+        print(f"✅ Eliminado: {f}")
+    except Exception as e:
+        print(f"❌ Error eliminando {f}: {e}")
+
+print("✅ Limpieza completada")
+EOF
+ find /home/harold/Escritorio/proyectos/S03-26-Equipo-09-Web-App-Development/Frontend -maxdepth 1 -name "ql*" -delete -print
+ cd /home/harold/Escritorio/proyectos/S03-26-Equipo-09-Web-App-Development && git status --short | head -20
+ cd /home/harold/Escritorio/proyectos/S03-26-Equipo-09-Web-App-Development && git clean -fd Frontend/ 2>&1 | grep -E "Removing|error" || echo "Git clean completed"
+ ls -1 | head -5
+ cd /home/harold/Escritorio/proyectos/S03-26-Equipo-09-Web-App-Development && find Frontend -maxdepth 1 -type f -name "*ql*" -o -name "*SELECT*" 2>/dev/null
+ cd /home/harold/Escritorio/proyectos/S03-26-Equipo-09-Web-App-Development && git reset --hard HEAD 2>&1 | tail -5
+ PAGER=cat cd /home/harold/Escritorio/proyectos/S03-26-Equipo-09-Web-App-Development && git clean -fd Frontend/ && echo "✅ Limpieza completada"
+ bash << 'SCRIPT'
+export PAGER=cat
+cd /home/harold/Escritorio/proyectos/S03-26-Equipo-09-Web-App-Development
+pwd
+echo "Intentando limpiar..."
+git --no-pager clean -fd Frontend/
+echo "Done"
+SCRIPT
+ killall less; killall more; true
+ nohup bash -c 'cd /home/harold/Escritorio/proyectos/S03-26-Equipo-09-Web-App-Development && git clean -fd Frontend/ && echo Limpio' > /tmp/clean.log 2>&1 &
+ ls -la | grep -E "^-" | head -10
+ cd /home/harold/Escritorio/proyectos/S03-26-Equipo-09-Web-App-Development/Backend/crm-backend && ./mvnw clean compile -q 2>&1 | tail -3
+ cd /home/harold/Escritorio/proyectos/S03-26-Equipo-09-Web-App-Development/Backend/crm-backend && nohup ./mvnw spring-boot:run -DskipTests > /tmp/backend.log 2>&1 &
+ sleep 30 && curl -s http://localhost:8080/api/conversaciones 2>&1 | head -5
+ ps aux | grep -E "java|mvnw" | grep -v grep | head -3
+ cd /home/harold/Escritorio/proyectos/S03-26-Equipo-09-Web-App-Development && git reset --hard 62e0e76
+ lsof -i :8080 2>/dev/null || echo "Backend NO está en puerto 8080"
+ PAGER=cat curl -s http://localhost:8080/api/usuarios 2>&1 | head -20
+ ps aux | grep -i java
+ pgrep -a java
+ cd /home/harold/Escritorio/proyectos/S03-26-Equipo-09-Web-App-Development/Backend/crm-backend && ss -tlnp 2>/dev/null | grep 8080
+ find /home/harold/Escritorio/proyectos/S03-26-Equipo-09-Web-App-Development/Backend/crm-backend -name "*.log" -type f 2>/dev/null | head -10
+ psql -h localhost -U postgres -d crm_backend -c "\dt" 2>&1 | head -30
+ wc -l /home/harold/Escritorio/proyectos/S03-26-Equipo-09-Web-App-Development/Backend/crm-backend/src/main/resources/data.sql
+ PGPASSWORD=crm123456 psql -U postgres -h localhost -d crm_backend << 'SQL'
+-- Dropear todas las tablas
+DROP TABLE IF EXISTS seguimientos CASCADE;
+DROP TABLE IF EXISTS plantillas CASCADE;
+DROP TABLE IF EXISTS conversaciones CASCADE;
+DROP TABLE IF EXISTS contactos CASCADE;
+DROP TABLE IF EXISTS usuarios CASCADE;
+DROP TABLE IF EXISTS flyway_schema_history CASCADE;
+
+SELECT 'Base de datos limpia' as estado;
+SQL
+ PGPASSWORD=crm123456 psql -U postgres -h localhost -d crm_backend -c "DROP TABLE IF EXISTS seguimientos, plantillas, conversaciones, contactos, usuarios, flyway_schema_history CASCADE;" 2>&1
+ export PAGER=cat && PGPASSWORD=crm123456 psql -U postgres -h localhost -d crm_backend -c "DROP TABLE IF EXISTS seguimientos, plantillas, conversaciones, contactos, usuarios CASCADE; SELECT 'LIMPIO' as estado;" && echo "✅ Base de datos limpiada"
+ lsof -i :8080 2>/dev/null | grep -v COMMAND || echo "❌ Backend NO está corriendo en puerto 8080"
+ ps aux | grep -i "spring-boot\|java" | grep -v grep | head -3
+ timeout 3 curl -s -I http://localhost:8080/api/usuarios 2>&1 | head -1 || echo "❌ No hay respuesta del backend"
+ ps aux | grep java | grep -v grep | awk '{print $2}' | xargs kill -9 2>/dev/null; echo "Procesos Java detenidos"
+ ps aux | grep -i java | grep -v grep
+ psql -U postgres -d crm_backend -c "\dt" 2>&1 | head -20
+ cd /home/harold/Escritorio/proyectos/S03-26-Equipo-09-Web-App-Development/Backend/crm-backend && ./mvnw clean compile 2>&1 | tail -50
+ cd /home/harold/Escritorio/proyectos/S03-26-Equipo-09-Web-App-Development/Backend/crm-backend && timeout 120 ./mvnw clean compile -q 2>&1 | grep -i "error\|exception\|failed" | head -30
+ lsof -i :5432 2>/dev/null | grep -i postgres || echo "No PostgreSQL encontrado en puerto 5432"
+ ss -tlnp 2>/dev/null | grep -E "8080|5432" || echo "No services found"
+ lsof -i :8080 2>/dev/null || echo "Port 8080 is free - backend is not running"
+ ss -tlnp 2>/dev/null | grep 8080 || echo "Backend no está corriendo en puerto 8080"
+ pkill -f "java.*spring-boot" || pkill -9 -f "java.*crm" || echo "No Java processes found to kill"
+ ps aux | head -20
+ pgrep -f java
+ PAGER=cat ps aux 2>&1 | grep -E "java|backend" | grep -v grep
+ killall -9 java 2>&1 || true
+ echo "Backend terminado" && sleep 2 && date
+ cd /home/harold/Escritorio/proyectos/S03-26-Equipo-09-Web-App-Development/Backend/crm-backend && PGPASSWORD=crm123456 psql -U postgres -h localhost -d crm_backend -c "DELETE FROM contactos CASCADE;"
+ PGPASSWORD=crm123456 psql -U postgres -h localhost -d crm_backend << 'EOF'
+DELETE FROM contactos CASCADE;
+ALTER SEQUENCE contactos_id_seq RESTART WITH 1;
+\dt contactos
+EOF
+ cd /home/harold/Escritorio/proyectos/S03-26-Equipo-09-Web-App-Development/Backend/crm-backend && PGPASSWORD=crm123456 psql -U postgres -h localhost << 'SQL'
+DROP DATABASE IF EXISTS crm_backend;
+CREATE DATABASE crm_backend;
+SQL
+echo "✅ Base de datos limpiada y recreada"
+

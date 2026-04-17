@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import jsPDF from 'jspdf';
 import { obtenerPlantillasActivas, reemplazarVariables, incrementarUsoPlantilla } from '../../../common/plantillasHelper';
+import { conversacionService } from '../../../common/apiClient';
 
 interface Mensaje {
   id: number;
@@ -51,165 +52,34 @@ export const InboxVendedor: React.FC<InboxVendedorProps> = ({ vendedorId, vended
   const cargarDatos = async () => {
     setLoading(true);
     try {
-      // Mock data realista con múltiples conversaciones y mensajes
-      const conversacionesMock: Conversacion[] = [
-        {
-          id: 1,
-          canal: 'WhatsApp',
-          contenido: '¿Cuál es el precio de vuestro producto premium?',
-          fechaHora: new Date(Date.now() - 3600000).toISOString(),
-          contactoId: 101,
-          contactoNombre: 'Juan García',
-          contactoEmail: 'juan@example.com',
-          estado: 'pendiente',
-          etiqueta: 'Lead Activo',
-          mensajes: [
-            {
-              id: 1,
-              contenido: '¿Cuál es el precio de vuestro producto premium?',
-              fechaHora: new Date(Date.now() - 3600000).toISOString(),
-              tipo: 'entrada',
-              remitente: 'Juan García'
-            },
-            {
-              id: 2,
-              contenido: 'Hola Juan, el producto premium tiene un costo de $299.99 al mes. Incluye soporte 24/7 💪',
-              fechaHora: new Date(Date.now() - 3500000).toISOString(),
-              tipo: 'salida',
-              remitente: vendedorNombre
-            },
-            {
-              id: 3,
-              contenido: '¿Hay descuento por pago anual?',
-              fechaHora: new Date(Date.now() - 3400000).toISOString(),
-              tipo: 'entrada',
-              remitente: 'Juan García'
-            },
-            {
-              id: 4,
-              contenido: 'Sí, si pagas anual te damos 20% de descuento. ¿Te interesa iniciar una prueba gratuita?',
-              fechaHora: new Date(Date.now() - 3300000).toISOString(),
-              tipo: 'salida',
-              remitente: vendedorNombre
-            }
-          ]
-        },
-        {
-          id: 2,
-          canal: 'Email',
-          contenido: 'Solicitud de información sobre plan empresarial',
-          fechaHora: new Date(Date.now() - 7200000).toISOString(),
-          contactoId: 102,
-          contactoNombre: 'María Rodríguez',
-          contactoEmail: 'maria.r@company.com',
-          estado: 'respondido',
-          etiqueta: 'Cliente',
-          mensajes: [
-            {
-              id: 1,
-              contenido: 'Solicitud de información sobre plan empresarial',
-              fechaHora: new Date(Date.now() - 7200000).toISOString(),
-              tipo: 'entrada',
-              remitente: 'María Rodríguez'
-            }
-          ]
-        },
-        {
-          id: 3,
-          canal: 'WhatsApp',
-          contenido: 'Demanda de soporte técnico para integración',
-          fechaHora: new Date(Date.now() - 1800000).toISOString(),
-          contactoId: 103,
-          contactoNombre: 'Roberto Martínez',
-          contactoEmail: 'rob.martinez@startup.io',
-          estado: 'cerrado',
-          etiqueta: 'Cliente',
-          mensajes: [
-            {
-              id: 1,
-              contenido: 'Tengo un problema con la integración de API',
-              fechaHora: new Date(Date.now() - 1800000).toISOString(),
-              tipo: 'entrada',
-              remitente: 'Roberto Martínez'
-            },
-            {
-              id: 2,
-              contenido: 'Hola Roberto, te envío la documentación y un video tutorial. ¿Qué error específico recibes?',
-              fechaHora: new Date(Date.now() - 1700000).toISOString(),
-              tipo: 'salida',
-              remitente: vendedorNombre
-            },
-            {
-              id: 3,
-              contenido: 'Perfecto, ya funcionó! Muchas gracias',
-              fechaHora: new Date(Date.now() - 1600000).toISOString(),
-              tipo: 'entrada',
-              remitente: 'Roberto Martínez'
-            },
-            {
-              id: 4,
-              contenido: 'De nada! Cualquier otra duda contactame. ¡Que disfrutes! 🚀',
-              fechaHora: new Date(Date.now() - 1500000).toISOString(),
-              tipo: 'salida',
-              remitente: vendedorNombre
-            }
-          ]
-        },
-        {
-          id: 4,
-          canal: 'Email',
-          contenido: 'Renovación de suscripción - Facturación',
-          fechaHora: new Date(Date.now() - 5400000).toISOString(),
-          contactoId: 104,
-          contactoNombre: 'David López',
-          contactoEmail: 'david.lopez@enterprise.com',
-          estado: 'cerrado',
-          etiqueta: 'Cliente',
-          mensajes: [
-            {
-              id: 1,
-              contenido: 'Hola, necesito renovar mi suscripción. ¿Cómo procedo?',
-              fechaHora: new Date(Date.now() - 5400000).toISOString(),
-              tipo: 'entrada',
-              remitente: 'David López'
-            },
-            {
-              id: 2,
-              contenido: 'Hola David, tu suscripción se renueva automáticamente el próximo mes. Te enviaré el detalle por correo.',
-              fechaHora: new Date(Date.now() - 5300000).toISOString(),
-              tipo: 'salida',
-              remitente: vendedorNombre
-            }
-          ]
-        },
-        {
-          id: 5,
-          canal: 'WhatsApp',
-          contenido: 'Ya no quiero el producto, muchas gracias',
-          fechaHora: new Date(Date.now() - 2700000).toISOString(),
-          contactoId: 105,
-          contactoNombre: 'Laura Fernández',
-          contactoEmail: 'laura.f@techstartup.co',
-          estado: 'cerrado',
-          etiqueta: 'Inactivo',
-          mensajes: [
-            {
-              id: 1,
-              contenido: 'Ya no quiero el producto, muchas gracias',
-              fechaHora: new Date(Date.now() - 2700000).toISOString(),
-              tipo: 'entrada',
-              remitente: 'Laura Fernández'
-            }
-          ]
-        }
-      ];
+      // Cargar conversaciones del vendedor desde la API real
+      const conversacionesData = await conversacionService.getByVendedor(vendedorId);
 
-      setConversaciones(conversacionesMock);
+      // Mapear datos de API al formato del componente
+      const conversacionesMapeadas: Conversacion[] = (conversacionesData || []).map((conv: any) => ({
+        id: conv.id,
+        canal: conv.canal,
+        contenido: conv.contenido,
+        fechaHora: conv.fechaHora,
+        contactoId: conv.contactoId,
+        contactoNombre: conv.contactoNombre,
+        contactoEmail: conv.contactoEmail,
+        estado: conv.estado || 'pendiente',
+        etiqueta: conv.estado === 'respondido' ? 'Cliente' : 'Lead Activo',
+        mensajes: [] // Los mensajes se pueden cargar por separado si es necesario
+      }));
+
+      setConversaciones(conversacionesMapeadas);
+      
       // Cargar plantillas desde el helper
       const plantillasActivas = obtenerPlantillasActivas();
       setPlantillas(plantillasActivas);
+      
+      console.log(`✅ Cargadas ${conversacionesMapeadas.length} conversaciones del vendedor desde API`);
     } catch (error) {
       console.error('Error cargando datos:', error);
+      // Fallback: mostrar mensaje amigable
+      console.warn('⚠️ No se pudieron cargar las conversaciones');
     } finally {
       setLoading(false);
     }
@@ -240,28 +110,67 @@ export const InboxVendedor: React.FC<InboxVendedorProps> = ({ vendedorId, vended
   const handleEnviarRespuesta = async () => {
     if (!selectedConversacion || !respuesta.trim()) return;
 
-    // Agregar mensaje a la conversación
-    const nuevoMensaje: Mensaje = {
-      id: (selectedConversacion.mensajes?.length || 0) + 1,
-      contenido: respuesta,
-      fechaHora: new Date().toISOString(),
-      tipo: 'salida',
-      remitente: vendedorNombre
-    };
+    try {
+      // Agregar mensaje a la conversación
+      const nuevoMensaje: Mensaje = {
+        id: (selectedConversacion.mensajes?.length || 0) + 1,
+        contenido: respuesta,
+        fechaHora: new Date().toISOString(),
+        tipo: 'salida',
+        remitente: vendedorNombre
+      };
 
-    const conversacionActualizada: Conversacion = {
-      ...selectedConversacion,
-      mensajes: [...(selectedConversacion.mensajes || []), nuevoMensaje],
-      estado: selectedConversacion.estado || 'pendiente'
-    };
+      const conversacionActualizada: Conversacion = {
+        ...selectedConversacion,
+        mensajes: [...(selectedConversacion.mensajes || []), nuevoMensaje],
+        estado: 'respondido'
+      };
 
-    setSelectedConversacion(conversacionActualizada);
-    setRespuesta('');
+      // Actualizar en backend: marcar como respondido automáticamente
+      await conversacionService.marcarRespondido(selectedConversacion.id);
+      console.log('✅ Conversación marcada como RESPONDIDO en backend');
 
-    // Actualizar en lista
-    setConversaciones(conversaciones.map(c => 
-      c.id === selectedConversacion.id ? conversacionActualizada : c
-    ));
+      setSelectedConversacion(conversacionActualizada);
+      setRespuesta('');
+
+      // Actualizar en lista
+      setConversaciones(conversaciones.map(c => 
+        c.id === selectedConversacion.id ? conversacionActualizada : c
+      ));
+    } catch (error) {
+      console.error('❌ Error al enviar respuesta:', error);
+    }
+  };
+
+  const handleCerrarConversacion = async () => {
+    if (!selectedConversacion) return;
+
+    // Confirmar antes de cerrar
+    if (!window.confirm('¿Estás seguro de que deseas cerrar esta conversación?')) {
+      return;
+    }
+
+    try {
+      // Llamar a backend para cerrar
+      await conversacionService.cerrar(selectedConversacion.id);
+      console.log('🔒 Conversación cerrada en backend');
+
+      // Actualizar estado localmente
+      const conversacionActualizada: Conversacion = {
+        ...selectedConversacion,
+        estado: 'cerrado'
+      };
+
+      setSelectedConversacion(conversacionActualizada);
+
+      // Actualizar en lista
+      setConversaciones(conversaciones.map(c => 
+        c.id === selectedConversacion.id ? conversacionActualizada : c
+      ));
+    } catch (error) {
+      console.error('❌ Error al cerrar conversación:', error);
+      alert('Error al cerrar la conversación. Intenta nuevamente.');
+    }
   };
 
   const descargarPDF = (conversacion: Conversacion) => {
@@ -661,6 +570,17 @@ export const InboxVendedor: React.FC<InboxVendedorProps> = ({ vendedorId, vended
                   className="flex-1 px-1.5 py-1 lg:px-4 lg:py-2 bg-[#006c49] text-white rounded lg:rounded-lg hover:bg-[#005236] font-semibold disabled:bg-slate-400 disabled:cursor-not-allowed text-xs transition-colors"
                 >
                   ✉️ Enviar
+                </button>
+              </div>
+
+              {/* Botón Cerrar Conversación - Centrado */}
+              <div className="flex justify-center">
+                <button
+                  onClick={handleCerrarConversacion}
+                  disabled={selectedConversacion?.estado === 'cerrado'}
+                  className="px-6 py-1.5 lg:py-2 lg:px-8 bg-red-500 text-white rounded lg:rounded-lg hover:bg-red-600 font-semibold disabled:bg-slate-400 disabled:cursor-not-allowed text-xs transition-colors"
+                >
+                  🔒 Cerrar Conversación
                 </button>
               </div>
             </div>

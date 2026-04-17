@@ -36,6 +36,7 @@ export interface Usuario {
   id: number;
   nombre: string;
   email: string;
+  password?: string;
   telefono?: string;
   role: 'ADMIN' | 'VENDEDOR';
   activo: boolean;
@@ -95,9 +96,13 @@ export const contactoService = {
 
   // Crear contacto
   create: async (contacto: { nombre: string; email: string; telefono: string; estado: string; vendedorAsignadoId?: number }): Promise<Contacto> => {
+    const token = localStorage.getItem('authToken');
     const response = await fetch(`${API_BASE_URL}/contactos`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
       body: JSON.stringify(contacto)
     });
     
@@ -111,7 +116,7 @@ export const contactoService = {
           .join('\n');
         throw new Error(validationErrors || 'Error de validación en la creación');
       }
-      throw new Error(data.error || 'Error al crear el contacto');
+      throw new Error((data as any)['error'] || 'Error al crear el contacto');
     }
     
     return data.data || { id: 0, nombre: '', email: '', telefono: '', estado: 'LEAD_ACTIVO' };
@@ -119,9 +124,13 @@ export const contactoService = {
 
   // Actualizar contacto
   update: async (id: number, contacto: Partial<Contacto>): Promise<Contacto> => {
+    const token = localStorage.getItem('authToken');
     const response = await fetch(`${API_BASE_URL}/contactos/${id}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
       body: JSON.stringify(contacto)
     });
     const data = (await response.json()) as ApiResponse<Contacto>;
@@ -130,7 +139,13 @@ export const contactoService = {
 
   // Eliminar contacto
   delete: async (id: number): Promise<void> => {
-    await fetch(`${API_BASE_URL}/contactos/${id}`, { method: 'DELETE' });
+    const token = localStorage.getItem('authToken');
+    await fetch(`${API_BASE_URL}/contactos/${id}`, { 
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
   },
 
   // Segmentación: Obtener por estado
@@ -196,9 +211,31 @@ export const contactoService = {
 
 export const conversacionService = {
   getAll: async (): Promise<Conversacion[]> => {
-    const response = await fetch(`${API_BASE_URL}/conversaciones`);
-    const data = (await response.json()) as ApiResponse<Conversacion[]>;
-    return data.data || [];
+    const token = localStorage.getItem('authToken');
+    const response = await fetch(`${API_BASE_URL}/conversaciones`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    const data = (await response.json()) as any;
+    // El backend devuelve paginación de Spring: data.data.content tiene el array
+    const conversaciones = data.data?.content || data.data || [];
+    return conversaciones;
+  },
+
+  getAllAdmin: async (): Promise<Conversacion[]> => {
+    const token = localStorage.getItem('authToken');
+    const response = await fetch(`${API_BASE_URL}/admin/conversaciones/todas`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    const data = (await response.json()) as any;
+    // El backend devuelve paginación de Spring: data.data.content tiene el array
+    const conversaciones = data.data?.content || data.data || [];
+    console.log('🔍 getAllAdmin() raw response:', data);
+    console.log('✅ getAllAdmin() extracted conversaciones:', conversaciones);
+    return conversaciones;
   },
 
   getById: async (id: number): Promise<Conversacion> => {
@@ -208,9 +245,16 @@ export const conversacionService = {
   },
 
   getByVendedor: async (vendedorId: number): Promise<Conversacion[]> => {
-    const response = await fetch(`${API_BASE_URL}/conversaciones/por-vendedor/${vendedorId}`);
-    const data = (await response.json()) as ApiResponse<Conversacion[]>;
-    return data.data || [];
+    const token = localStorage.getItem('authToken');
+    const response = await fetch(`${API_BASE_URL}/conversaciones/por-vendedor/${vendedorId}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    const data = (await response.json()) as any;
+    // El backend devuelve paginación de Spring: data.data.content tiene el array
+    const conversaciones = data.data?.content || data.data || [];
+    return conversaciones;
   },
 
   getByContacto: async (contactoId: number): Promise<Conversacion[]> => {
@@ -235,6 +279,56 @@ export const conversacionService = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ conversacionId, nuevoVendedorId })
     });
+    const data = (await response.json()) as ApiResponse<Conversacion>;
+    return data.data || { id: 0, canal: 'Email', contenido: '', fechaHora: '', contactoId: 0 };
+  },
+
+  // ========== AUTOMATIZACIÓN DE ESTADOS ==========
+
+  // Marcar como respondido (automático al enviar respuesta)
+  marcarRespondido: async (conversacionId: number): Promise<Conversacion> => {
+    const token = localStorage.getItem('authToken');
+    const response = await fetch(`${API_BASE_URL}/conversaciones/${conversacionId}/respuesta-enviada`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    if (!response.ok) {
+      throw new Error('Error al marcar como respondido');
+    }
+    const data = (await response.json()) as ApiResponse<Conversacion>;
+    return data.data || { id: 0, canal: 'Email', contenido: '', fechaHora: '', contactoId: 0 };
+  },
+
+  // Procesar mensaje externo (reabre si está cerrada)
+  procesarMensajeExterno: async (conversacionId: number): Promise<Conversacion> => {
+    const token = localStorage.getItem('authToken');
+    const response = await fetch(`${API_BASE_URL}/conversaciones/${conversacionId}/mensaje-externo`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    if (!response.ok) {
+      throw new Error('Error al procesar mensaje externo');
+    }
+    const data = (await response.json()) as ApiResponse<Conversacion>;
+    return data.data || { id: 0, canal: 'Email', contenido: '', fechaHora: '', contactoId: 0 };
+  },
+
+  // Cerrar conversación (manual)
+  cerrar: async (conversacionId: number): Promise<Conversacion> => {
+    const token = localStorage.getItem('authToken');
+    const response = await fetch(`${API_BASE_URL}/conversaciones/${conversacionId}/cerrar`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    if (!response.ok) {
+      throw new Error('Error al cerrar conversación');
+    }
     const data = (await response.json()) as ApiResponse<Conversacion>;
     return data.data || { id: 0, canal: 'Email', contenido: '', fechaHora: '', contactoId: 0 };
   }

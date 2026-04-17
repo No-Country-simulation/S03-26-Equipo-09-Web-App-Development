@@ -1,15 +1,15 @@
 import { createRouter, createRoute, createRootRoute, Outlet } from '@tanstack/react-router';
-import { Home } from '../pages/Home';
-import { Login } from '../pages/Login';
-import { Register } from '../pages/Register';
-import { DashboardPage } from '../pages/Dashboard';
-import { ContactosPage } from '../pages/Contactos';
-import { MetricasPage } from '../pages/Metricas';
-import InboxPage from '../pages/Inbox';
-import MiInboxPage from '../pages/MiInbox';
-import Vendedores from '../pages/Vendedores';
-import Plantillas from '../features/plantillas/pages/Plantillas';
-import { DashboardLayout } from '../components/layout/DashboardLayout';
+import { Home } from './pages/Home';
+import { Login } from './pages/Login';
+import { Register } from './pages/Register';
+import { DashboardPage } from './pages/Dashboard';
+import { ContactosPage } from './pages/Contactos';
+import { MetricasPage } from './pages/Metricas';
+import InboxPage from './pages/Inbox';
+import MiInboxPage from './pages/MiInbox';
+import Vendedores from './pages/Vendedores';
+import Plantillas from './features/plantillas/pages/Plantillas';
+import { DashboardLayout } from './components/layout/DashboardLayout';
 
 const rootRoute = createRootRoute({
   component: () => <Outlet />,
@@ -97,10 +97,3 @@ const routeTree = rootRoute.addChildren([
 ]);
 
 export const router = createRouter({ routeTree });
-
-// Registro para seguridad de tipos
-declare module '@tanstack/react-router' {
-  interface Register {
-    router: typeof router;
-  }
-}

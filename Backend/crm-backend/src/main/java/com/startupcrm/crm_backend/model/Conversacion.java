@@ -48,11 +48,16 @@ public class Conversacion {
     @JoinColumn(name = "vendedor_asignado_id")
     private Usuario vendedorAsignado; // Puede ser null si es mensaje entrante sin asignar
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private EstadoConversacion estado = EstadoConversacion.NO_LEIDO;
+
     /**
      * MEJORAS FUTURAS (POST-MVP):
      * - tipoOrigen: WEBHOOK_WHATSAPP | WEBHOOK_BREVO | MANUAL_SENDGRID
      * - timestampRecibido vs timestampEnviado
      * - id_externo para rastrear en sistemas terceros
-     * - estado: ENVIADO | FALLIDO | LEÍDO
+     * - etiquetas para filtrado avanzado
      */
 }

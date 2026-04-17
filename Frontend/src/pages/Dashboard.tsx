@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { useAuth } from '../hooks/useAuth';
 import { dashboardMockData, MOCK_DASHBOARD_STATS } from '../features/dashboard/mocks/dashboardData';
-import { metricasService, Metricas } from '../common/apiClient';
+import { metricasService, Metricas, usuarioService } from '../common/apiClient';
 import { LineChart } from '../components/charts/line/Line';
 import { BarChart } from '../components/charts/bar/bar';
 import { PieChart } from '../components/charts/pie/pie';
@@ -20,12 +20,27 @@ interface MetricasVendedor {
   tasaConversion: number;
 }
 
+interface DatosGraficoVendedor {
+  fuente: string;
+  leads: number;
+}
+
+interface DatosDistribucionLeads {
+  id: string;
+  label: string;
+  value: number;
+}
+
 export const DashboardPage = () => {
   const navigate = useNavigate();
   const { isVendedor, userName, userId } = useAuth();
   const [isDevelopmentModalOpen, setIsDevelopmentModalOpen] = useState(false);
   const [metricas, setMetricas] = useState<Metricas | null>(null);
   const [metricasVendedor, setMetricasVendedor] = useState<MetricasVendedor | null>(null);
+  const [datosGraficoTasaConversion, setDatosGraficoTasaConversion] = useState<DatosGraficoVendedor[]>([]);
+  const [cargandoGrafico, setCargandoGrafico] = useState(false);
+  const [datosDistribucionLeads, setDatosDistribucionLeads] = useState<DatosDistribucionLeads[]>([]);
+  const [cargandoDistribucion, setCargandoDistribucion] = useState(false);
 
   useEffect(() => {
     const cargarMetricas = async () => {
@@ -38,6 +53,12 @@ export const DashboardPage = () => {
           // Cargar resumen general (solo para admin)
           const metricsData = await metricasService.getResumen();
           setMetricas(metricsData);
+          
+          // Cargar datos de tasa de conversión por vendedor (solo para admin)
+          await cargarDatosGraficoTasaConversion();
+          
+          // Cargar distribución de leads por estado
+          await cargarDistribucionLeads(metricsData);
         }
       } catch (error) {
         console.error('Error cargando métricas:', error);
@@ -45,6 +66,71 @@ export const DashboardPage = () => {
     };
     cargarMetricas();
   }, [isVendedor, userId]);
+
+  /**
+   * Cargar distribución de leads por estado del pipeline
+   */
+  const cargarDistribucionLeads = async (metricsData: Metricas) => {
+    setCargandoDistribucion(true);
+    try {
+      if (metricsData.contactosPorEstado) {
+        const datosDistribucion = Object.entries(metricsData.contactosPorEstado).map(
+          ([estado, cantidad]) => ({
+            id: estado,
+            label: estado,
+            value: cantidad
+          })
+        );
+        setDatosDistribucionLeads(datosDistribucion);
+        console.log('✅ Datos de distribución de leads cargados:', datosDistribucion);
+      }
+    } catch (error) {
+      console.error('❌ Error cargando distribución de leads:', error);
+      setDatosDistribucionLeads([]);
+    } finally {
+      setCargandoDistribucion(false);
+    }
+  };
+
+  /**
+   * Cargar tasas de conversión de todos los vendedores para el gráfico
+   */
+  const cargarDatosGraficoTasaConversion = async () => {
+    setCargandoGrafico(true);
+    try {
+      // Obtener todos los vendedores activos
+      const vendedores = await usuarioService.getVendedores();
+      console.log(`📊 Cargando datos de ${vendedores.length} vendedores...`);
+
+      // Para cada vendedor, obtener sus métricas de conversión
+      const datosGrafico = await Promise.all(
+        vendedores.map(async (vendedor) => {
+          try {
+            const metricas = await metricasService.getMetricasVendedor(vendedor.id);
+            return {
+              fuente: vendedor.nombre,
+              leads: Math.round(metricas?.tasaConversion || 0)
+            };
+          } catch (error) {
+            console.error(`Error obteniendo métricas de ${vendedor.nombre}:`, error);
+            return {
+              fuente: vendedor.nombre,
+              leads: 0
+            };
+          }
+        })
+      );
+
+      setDatosGraficoTasaConversion(datosGrafico);
+      console.log('✅ Datos de tasa de conversión cargados:', datosGrafico);
+    } catch (error) {
+      console.error('❌ Error cargando datos del gráfico:', error);
+      // Si falla, mantener datos vacíos para que no muestre el gráfico mock
+      setDatosGraficoTasaConversion([]);
+    } finally {
+      setCargandoGrafico(false);
+    }
+  };
 
   const mockStats = MOCK_DASHBOARD_STATS;
 
@@ -58,7 +144,7 @@ export const DashboardPage = () => {
         }))
       }
     ],
-    pieData: dashboardMockData.leadsByStatus.map(item => ({
+    pieData: datosDistribucionLeads.length > 0 ? datosDistribucionLeads : dashboardMockData.leadsByStatus.map(item => ({
       id: item.estado,
       label: item.estado,
       value: item.cantidad
@@ -238,12 +324,17 @@ export const DashboardPage = () => {
             </p>
           </div>
           <div style={{ minHeight: '300px' }}>
-            <BarChart data={[
-              { fuente: 'Juan García', leads: 34 },
-              { fuente: 'María López', leads: 38 },
-              { fuente: 'Carlos Ruiz', leads: 29 },
-              { fuente: 'Ana Chen', leads: 32 }
-            ]} />
+            {cargandoGrafico ? (
+              <div className="flex items-center justify-center h-full text-slate-500">
+                <span>Cargando datos...</span>
+              </div>
+            ) : datosGraficoTasaConversion.length > 0 ? (
+              <BarChart data={datosGraficoTasaConversion} />
+            ) : (
+              <div className="flex items-center justify-center h-full text-slate-400">
+                <span>No hay datos disponibles</span>
+              </div>
+            )}
           </div>
         </Card>
 
@@ -297,7 +388,17 @@ export const DashboardPage = () => {
             </p>
           </div>
           <div className="flex-grow" style={{ minHeight: '300px' }}>
-            <PieChart data={chartData.pieData} />
+            {cargandoDistribucion ? (
+              <div className="flex items-center justify-center h-full text-gray-500">
+                Cargando distribución de leads...
+              </div>
+            ) : datosDistribucionLeads.length > 0 ? (
+              <PieChart data={chartData.pieData} />
+            ) : (
+              <div className="flex items-center justify-center h-full text-gray-500">
+                No hay datos disponibles
+              </div>
+            )}
           </div>
         </Card>
       </section>

@@ -30,18 +30,48 @@ export const LoginForm = () => {
   const onSubmit = async (data: LoginFormValues) => {
     setIsLoading(true);
     setServerError(null);
-    
-    // Simulación de llamada a API
-    // Aquí es donde capturarías el error 401 del backend
-    setTimeout(() => {
-      if (data.email !== 'admin@crm.com' || data.password !== '123456') {
-        setServerError('El correo o la contraseña son incorrectos. Por favor, verifica tus datos.');
+
+    try {
+      // Llamar a API real
+      const API_BASE_URL = (import.meta.env['VITE_API_URL'] as string) || 'http://localhost:8080/api';
+      
+      const response = await fetch(`${API_BASE_URL}/usuarios/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: data.email,
+          password: data.password,
+        }),
+      });
+
+      const result = await response.json() as { success: boolean; data?: { token: string; userId: number; role: string; nombre: string; email: string }; error?: string };
+
+      if (!response.ok || !result.success) {
+        setServerError(result.error || 'El correo o la contraseña son incorrectos.');
         setIsLoading(false);
-      } else {
-        console.log('Login exitoso', data);
-        setIsLoading(false);
+        return;
       }
-    }, 1000);
+
+      // ✅ Login exitoso - Guardar en localStorage
+      const { token, userId, role, nombre, email } = result.data || {};
+      
+      localStorage.setItem('authToken', token || '');
+      localStorage.setItem('userId', userId?.toString() || '');
+      localStorage.setItem('userEmail', email || data.email);
+      localStorage.setItem('userName', nombre || '');
+      localStorage.setItem('userRole', role || 'VENDEDOR');
+      localStorage.setItem('userCompany', nombre || '');
+
+      console.log('✅ Login exitoso', { userId, role, email });
+      setIsLoading(false);
+      
+      // Trigger navigation via window event
+      window.dispatchEvent(new Event('login-success'));
+    } catch (error) {
+      console.error('Error en login:', error);
+      setServerError('Error al conectar con el servidor.');
+      setIsLoading(false);
+    }
   };
 
   return (

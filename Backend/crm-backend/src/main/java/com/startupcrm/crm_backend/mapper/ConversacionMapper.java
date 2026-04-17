@@ -26,18 +26,31 @@ public class ConversacionMapper {
                 .contactoId(c.getContacto() != null ? c.getContacto().getId() : null)
                 .vendedorAsignadoId(c.getVendedorAsignado() != null ? c.getVendedorAsignado().getId() : null)
                 .vendedorAsignadoNombre(c.getVendedorAsignado() != null ? c.getVendedorAsignado().getNombre() : null)
+                .estado(c.getEstado() != null ? c.getEstado().toString() : "NO_LEIDO")
                 .build();
     }
 
     public static Conversacion toEntity(ConversacionDTO dto) {
         if (dto == null) return null;
 
-        return Conversacion.builder()
+        Conversacion.ConversacionBuilder builder = Conversacion.builder()
                 .id(dto.getId())
                 .canal(dto.getCanal())
                 .contenido(dto.getContenido())
-                .fechaHora(dto.getFechaHora())
-                // Note: contactoId y vendedorAsignadoId deben ser resueltos en el service
-                .build();
+                .fechaHora(dto.getFechaHora());
+        
+        // Mapear el estado si está presente en el DTO
+        if (dto.getEstado() != null && !dto.getEstado().isEmpty()) {
+            try {
+                builder.estado(com.startupcrm.crm_backend.model.EstadoConversacion.valueOf(dto.getEstado()));
+            } catch (IllegalArgumentException e) {
+                builder.estado(com.startupcrm.crm_backend.model.EstadoConversacion.NO_LEIDO);
+            }
+        } else {
+            builder.estado(com.startupcrm.crm_backend.model.EstadoConversacion.NO_LEIDO);
+        }
+        
+        // Note: contactoId y vendedorAsignadoId deben ser resueltos en el service
+        return builder.build();
     }
 }
