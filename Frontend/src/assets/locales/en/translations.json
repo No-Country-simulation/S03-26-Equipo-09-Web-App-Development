@@ -1,5 +1,174 @@
 {
-    "home": {
-        "greeting": "Hello, world!"
+  "nav": {
+    "summary": "Summary",
+    "contacts": "Contacts",
+    "inbox": "Unified Inbox",
+    "pipeline": "Pipeline",
+    "followups": "Follow-ups",
+    "templates": "Templates",
+    "logout": "Log Out"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "loading": "Loading...",
+    "noResults": "No results found",
+    "confirm": "Confirm",
+    "actions": "Actions",
+    "status": "Status",
+    "date": "Date",
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "all": "All",
+    "active": "Active",
+    "inactive": "Inactive",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "daysAgo": "{{count}} days ago"
+  },
+  "estado": {
+    "LEAD_ACTIVO": "Active Lead",
+    "EN_SEGUIMIENTO": "In Follow-up",
+    "CLIENTE": "Client",
+    "PERDIDO": "Lost"
+  },
+  "canal": {
+    "WhatsApp": "WhatsApp",
+    "Email": "Email"
+  },
+  "contactos": {
+    "title": "Contacts",
+    "subtitle": "{{count}} contacts total",
+    "new": "New Contact",
+    "search": "Search by name, email or phone...",
+    "created": "Created",
+    "editTitle": "Edit Contact",
+    "createTitle": "New Contact",
+    "fullName": "Full name",
+    "namePlaceholder": "Carlos Pérez",
+    "emailPlaceholder": "carlos@company.com",
+    "phonePlaceholder": "+57 310 123 4567",
+    "statusLabel": "Status",
+    "saveChanges": "Save Changes",
+    "deleteTitle": "Delete contact?",
+    "deleteWarning": "This action cannot be undone. The contact and all associated conversations will be deleted.",
+    "columns": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "status": "Status",
+      "created": "Created"
     }
+  },
+  "pipeline": {
+    "title": "Sales Pipeline",
+    "subtitle": "{{count}} contacts in the funnel · Click a card to move it to another stage",
+    "noContacts": "No contacts",
+    "moveToStage": "Move to stage:",
+    "currentStatus": "Current status",
+    "columns": {
+      "LEAD_ACTIVO": "Active Lead",
+      "EN_SEGUIMIENTO": "In Follow-up",
+      "CLIENTE": "Client",
+      "PERDIDO": "Lost"
+    }
+  },
+  "seguimientos": {
+    "title": "Follow-ups",
+    "subtitle_one": "{{count}} pending",
+    "subtitle_other": "{{count}} pending",
+    "overdue_one": "{{count}} overdue",
+    "overdue_other": "{{count}} overdue",
+    "new": "New Task",
+    "taskDescription": "Task description",
+    "taskPlaceholder": "Call contact for follow-up...",
+    "dueDate": "Due date",
+    "contact": "Contact",
+    "selectContact": "Select contact...",
+    "createTask": "Create Task",
+    "noTasks": "No tasks in this category",
+    "filters": {
+      "all": "All",
+      "pending": "Pending",
+      "overdue": "Overdue",
+      "completed": "Completed"
+    },
+    "kpi": {
+      "pending": "Pending",
+      "overdue": "Overdue",
+      "completed": "Completed"
+    },
+    "badge": {
+      "overdue": "Overdue",
+      "today": "Today",
+      "done": "Done"
+    }
+  },
+  "inbox": {
+    "title": "Unified Inbox",
+    "subtitle": "WhatsApp + Email in one place",
+    "unread_one": "{{count}} unread",
+    "unread_other": "{{count}} unread",
+    "noMessages": "No messages",
+    "selectConversation": "Select a conversation",
+    "replyPlaceholder": "Reply via {{canal}}...",
+    "send": "Send",
+    "filters": {
+      "all": "All",
+      "whatsapp": "WhatsApp",
+      "email": "Email"
+    }
+  },
+  "plantillas": {
+    "title": "Templates",
+    "subtitle": "{{active}} active of {{total}} total",
+    "new": "New Template",
+    "templateName": "Template name",
+    "namePlaceholder": "Ex: WhatsApp Welcome",
+    "channel": "Channel",
+    "content": "Content",
+    "contentHint": "Use {{nombre}}, {{empresa}} as variables",
+    "contentPlaceholder": "Hello {{nombre}}! ...",
+    "createTemplate": "Create Template",
+    "noTemplates": "No templates in this category",
+    "variablesNote": "Variables between {{ }} will be replaced with contact data when sending.",
+    "badge": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "filters": {
+      "all": "All"
+    }
+  },
+  "auth": {
+    "login": "Sign In",
+    "logout": "Log Out",
+    "email": "Email",
+    "password": "Password",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot password?",
+    "noAccount": "Don't have an account?",
+    "register": "Register",
+    "loginSuccess": "Login successful! Redirecting...",
+    "invalidCredentials": "Incorrect email or password.",
+    "hint": "Demo: admin@crm.com / 123456"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome back",
+    "kpi": {
+      "totalContacts": "Total Contacts",
+      "newLeadsToday": "New Leads Today",
+      "pendingTasks": "Pending Tasks",
+      "unreadMessages": "Unread Messages"
+    }
+  },
+  "home": {
+    "greeting": "Hello, world!"
+  }
 }

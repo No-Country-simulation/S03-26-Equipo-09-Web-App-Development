@@ -1,106 +1,111 @@
-¡Claro que sí! Aquí tienes el contenido completo del **README.md** listo para copiar, pegar y que tu repositorio luzca como un proyecto de nivel senior.
+# CRM Backend
 
-```markdown
-# 🚀 Startup CRM - Backend Engine
-
-Este es el motor de backend para un CRM inteligente diseñado para startups. A diferencia de un CRUD tradicional, este sistema incluye **automatización de tareas**, **analítica en tiempo real** y una **arquitectura desacoplada** de alto rendimiento.
+Proyecto backend para un CRM básico con **Spring Boot** y **PostgreSQL**.  
+Incluye entidades de **Contacto**, **Conversación** y **Seguimiento**, con endpoints CRUD listos para probar en Postman.
 
 ---
 
-## 🌟 Características Principales
+## 🚀 Requisitos
 
-* **Arquitectura de Capas Profesional:** Uso estricto de **DTOs** (Data Transfer Objects) y **Mappers** para proteger el modelo de datos, optimizar las respuestas de la API y evitar recursividad infinita.
-* **Motor de Automatización (Scheduler):** Procesos en segundo plano que despiertan automáticamente para revisar seguimientos pendientes y disparar alertas de negocio.
-* **Dashboard de Analítica:** Endpoint centralizado (`/stats`) que provee KPIs críticos: conteo de leads, mensajes sin leer, tareas pendientes y distribución segmentada por estados.
-* **Gestión de Errores Global:** Respuestas estandarizadas mediante un envoltorio `ApiResponse<T>` y manejo de excepciones centralizado para un consumo de API más sencillo desde el Frontend.
-* **Modelo Colaborativo:** Soporte para múltiples **Usuarios (Agentes)**, permitiendo asignar responsables a cada contacto para trazabilidad total.
-
----
-
-## 🛠️ Requisitos Técnicos
-
-* **Java 17+** (LTS)
-* **Maven 3.8+**
-* **PostgreSQL 15+**
-* **Lombok:** (Asegúrate de tener el plugin en tu IDE)
+- Java 17+
+- Maven
+- PostgreSQL (ejemplo: versión 15)
+- pgAdmin4 (opcional, para inspección de la base)
 
 ---
 
-## ⚙️ Configuración e Instalación
+## ⚙️ Configuración
 
-1.  **Base de Datos:**
-    Crear la base de datos en PostgreSQL:
-    ```sql
-    CREATE DATABASE crm_backend;
-    ```
+1. Crear la base de datos en PostgreSQL:
+   ```sql
+   CREATE DATABASE crm_backend;
+   ```
 
-2.  **Variables de Entorno (`src/main/resources/application.properties`):**
-    ```properties
-    spring.datasource.url=jdbc:postgresql://localhost:5432/crm_backend
-    spring.datasource.username=tu_usuario
-    spring.datasource.password=tu_password
-    
-    # Hibernate Config
-    spring.jpa.hibernate.ddl-auto=update
-    spring.jpa.show-sql=false
-    
-    # Configuración de Logs para el Scheduler
-    logging.level.com.startupcrm.crm_backend.scheduler=INFO
-    
+2. Configurar `src/main/resources/application.properties`:
+   ```properties
+   spring.datasource.url=jdbc:postgresql://localhost:5432/crm_backend
+   spring.datasource.username=postgres
+   spring.datasource.password=tu_password
+   spring.jpa.hibernate.ddl-auto=update
+   spring.jpa.show-sql=true
+   ```
 
-3.  **Compilar y Ejecutar:**
-    bash
-    mvn clean install
-    mvn spring-boot:run
-  
+3. (Opcional) Poblar datos iniciales con `data.sql`:
+   ```sql
+   INSERT INTO contactos (id, nombre, email, telefono, estado)
+   VALUES
+   (1, 'Carlos Pérez', 'carlos.perez@example.com', '555-1234', 'LEAD_ACTIVO'),
+   (2, 'María López', 'maria.lopez@example.com', '555-5678', 'EN_SEGUIMIENTO'),
+   (3, 'Juan García', 'juan.garcia@example.com', '555-9012', 'CLIENTE');
 
-## 📡 Arquitectura de la API (Endpoints Clave)
+   INSERT INTO conversaciones (id, canal, contenido, fecha_hora, contacto_id)
+   VALUES
+   (1, 'WhatsApp', 'Primera conversación con Carlos', '2026-03-20 10:00:00', 1),
+   (2, 'Email', 'Propuesta enviada a María', '2026-03-21 15:30:00', 2);
 
-### 📊 Dashboard & Métricas
-* `GET /api/dashboard/stats` → Retorna el objeto de analítica consolidado para gráficas y KPIs.
+   INSERT INTO seguimientos (id, completado, fecha, tarea, contacto_id)
+   VALUES
+   (1, false, '2026-03-25', 'Llamar a Carlos para seguimiento', 1),
+   (2, false, '2026-03-28', 'Revisar propuesta enviada a María', 2),
+   (3, true, '2026-03-23', 'Confirmar entrega con Juan', 3);
+   ```
 
-### 👥 Gestión de Contactos (DTO Powered)
-* `GET /api/contactos` → Lista detallada con estados y agentes responsables.
-* `POST /api/contactos` → Creación con validaciones de campos obligatorios.
+---
 
-### 🕒 Seguimientos & Automatización
-* `GET /api/seguimientos` → Lista de tareas programadas.
-* *Nota: El sistema cuenta con un Scheduler que monitorea tareas vencidas cada 60 segundos.*
-
+## ▶️ Levantar el backend
 
 
-## 🏗️ Estructura del Proyecto
+El backend quedará disponible en `http://localhost:8080`.
 
-text
-src/main/java/com/startupcrm/crm_backend/
-├── controller/   # Controladores REST y Dashboard
-├── dto/          # Objetos de transferencia de datos (Lombok)
-├── mapper/       # Lógica de conversión Entidad <-> DTO
-├── model/        # Entidades JPA (Usuario, Contacto, Seguimiento, Plantilla)
-├── repository/   # Capa de persistencia (Spring Data JPA)
-├── scheduler/    # Tareas automáticas de segundo plano
-└── exception/    # Manejo de errores y respuestas estandarizadas
+---
 
+## 📡 Endpoints disponibles
 
-## 🧪 Formato de Respuesta Estándar
+### Contactos
+- `GET /api/contactos` → lista todos los contactos
+- `GET /api/contactos/{id}` → obtiene un contacto por ID
+- `POST /api/contactos` → crea un nuevo contacto
+- `PUT /api/contactos/{id}` → actualiza un contacto
+- `DELETE /api/contactos/{id}` → elimina un contacto
 
-Para garantizar la consistencia, todas las respuestas siguen esta estructura:
+### Conversaciones
+- `GET /api/conversaciones`
+- `POST /api/conversaciones`
+- `PUT /api/conversaciones/{id}`
+- `DELETE /api/conversaciones/{id}`
 
-json
+### Seguimientos
+- `GET /api/seguimientos`
+- `POST /api/seguimientos`
+- `PUT /api/seguimientos/{id}`
+- `DELETE /api/seguimientos/{id}`
+
+---
+
+## 🧪 Pruebas rápidas en Postman
+
+Ejemplo `GET`:
+```
+http://localhost:8080/api/contactos
+```
+
+Ejemplo `POST` (crear seguimiento):
+```json
 {
-  "success": true,
-  "data": {
-    "totalContactos": 45,
-    "nuevosLeadsHoy": 12,
-    "contactosPorEstado": {
-      "NUEVO": 20,
-      "EN_SEGUIMIENTO": 15,
-      "CLIENTE": 10
-    }
-  },
-  "error": null
+  "tarea": "Revisar contrato con Pedro",
+  "fecha": "2026-04-01",
+  "completado": false,
+  "contacto": {
+    "id": 1
+  }
 }
+```
 
-## 💡 Notas de Desarrollo
-Al iniciar la aplicación, el **SeguimientoScheduler** se activará automáticamente. Si existen tareas cuya fecha ya pasó y no han sido completadas, verás logs de tipo `ALERTA AUTOMÁTICA` en la terminal, simulando la notificación al agente encargado.
+## 📌 Notas
+
+- La seguridad está deshabilitada para pruebas (`permitAll()` en `SecurityConfig`).
+- Para producción, se recomienda configurar usuarios y roles.
+- Evita subir contraseñas reales en `application.properties`. Usa variables de entorno si es necesario.
+```
+
 

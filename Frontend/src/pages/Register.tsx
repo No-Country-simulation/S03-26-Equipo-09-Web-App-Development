@@ -1,0 +1,226 @@
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useNavigate } from '@tanstack/react-router';
+import type { RegisterFormValues } from '../features/auth/schemas/registerSchema';
+import { registerSchema } from '../features/auth/schemas/registerSchema';
+import { Input } from '../components/ui/Input/Input';
+import { Checkbox } from '../components/ui/Checkbox/Checkbox';
+import { Button } from '../components/ui/Button/Button';
+import { Card } from '../components/ui/Card/Card';
+import { Badge } from '../components/ui/Badge/Badge';
+
+export const Register = () => {
+  const navigate = useNavigate();
+  const [serverError, setServerError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<RegisterFormValues>({
+    resolver: zodResolver(registerSchema),
+    mode: 'onBlur',
+    defaultValues: {
+      acceptTerms: false
+    }
+  });
+
+  const onSubmit = async (data: RegisterFormValues) => {
+    setServerError(null);
+    setSuccessMessage(null);
+
+    try {
+      // Esperar 500ms para simular llamada a API
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Validación simple de email duplicado (simulada)
+      if (data.email === 'admin@crm.com') {
+        setServerError('Este correo ya está registrado. Intenta con otro.');
+        return;
+      }
+
+      // ✅ Registro exitoso - Guardar datos en localStorage
+      const mockToken = `mock-jwt-${Date.now()}`;
+      localStorage.setItem('authToken', mockToken);
+      localStorage.setItem('userCompany', data.companyName);
+      localStorage.setItem('userEmail', data.email);
+
+      setSuccessMessage('¡Registro exitoso! Tu empresa ha sido creada. Redirigiendo...');
+      
+      // Redirigir al dashboard después de 1 segundo
+      setTimeout(() => {
+        navigate({ to: '/dashboard' });
+      }, 1000);
+    } catch (error) {
+      setServerError('Error al conectar con el servidor. Por favor intenta de nuevo.');
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        {/* Card Principal */}
+        <Card className="shadow-2xl border-0">
+          {/* Header */}
+          <div className="mb-8 text-center border-b border-slate-100 pb-6">
+            <div className="flex justify-center mb-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#008f60] to-[#006c49] flex items-center justify-center">
+                <span className="material-symbols-outlined text-white text-xl">
+                  business
+                </span>
+              </div>
+            </div>
+            
+            <h1 className="text-2xl font-bold text-slate-900 mb-2">Crea tu Cuenta</h1>
+            <p className="text-sm text-slate-500 flex items-center justify-center gap-2">
+              Registra tu empresa y comienza hoy
+              <Badge className="ml-auto" variant="success">Gratis</Badge>
+            </p>
+          </div>
+
+          {/* Mensajes de Error */}
+          {serverError && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex gap-3">
+              <span className="material-symbols-outlined text-red-600 text-xl flex-shrink-0">
+                error
+              </span>
+              <div>
+                <p className="text-sm font-semibold text-red-900">Error</p>
+                <p className="text-sm text-red-700">{serverError}</p>
+              </div>
+            </div>
+          )}
+
+          {/* Mensaje de Éxito */}
+          {successMessage && (
+            <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex gap-3">
+              <span className="material-symbols-outlined text-green-600 text-xl flex-shrink-0">
+                check_circle
+              </span>
+              <div>
+                <p className="text-sm font-semibold text-green-900">Éxito</p>
+                <p className="text-sm text-green-700">{successMessage}</p>
+              </div>
+            </div>
+          )}
+
+          {/* Formulario */}
+          <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
+            {/* Company Name Input */}
+            <div>
+              <Input
+                error={errors.companyName?.message}
+                icon="business"
+                id="companyName"
+                label="Nombre de la Empresa"
+                placeholder="Mi Empresa S.A.S."
+                type="text"
+                {...register('companyName')}
+                disabled={isSubmitting}
+              />
+            </div>
+
+            {/* Email Input */}
+            <div>
+              <Input
+                error={errors.email?.message}
+                icon="mail"
+                id="email"
+                label="Correo Corporativo"
+                placeholder="contacto@empresa.com"
+                type="email"
+                {...register('email')}
+                disabled={isSubmitting}
+              />
+            </div>
+
+            {/* Password Input */}
+            <div>
+              <Input
+                error={errors.password?.message}
+                icon="lock"
+                id="password"
+                label="Contraseña"
+                placeholder="••••••••"
+                type="password"
+                {...register('password')}
+                disabled={isSubmitting}
+              />
+            </div>
+
+            {/* Confirm Password Input */}
+            <div>
+              <Input
+                error={errors.confirmPassword?.message}
+                icon="lock_check"
+                id="confirmPassword"
+                label="Confirmar Contraseña"
+                placeholder="••••••••"
+                type="password"
+                {...register('confirmPassword')}
+                disabled={isSubmitting}
+              />
+            </div>
+
+            {/* Accept Terms Checkbox */}
+            <div className="pt-2">
+              <Checkbox
+                id="acceptTerms"
+                label="Acepto los términos y condiciones"
+                {...register('acceptTerms')}
+                disabled={isSubmitting}
+              />
+              {errors.acceptTerms && (
+                <p className="text-xs text-red-500 font-medium mt-1">
+                  {errors.acceptTerms.message}
+                </p>
+              )}
+            </div>
+
+            {/* Submit Button */}
+            <Button
+              className="w-full h-12 mt-8"
+              disabled={isSubmitting}
+              isLoading={isSubmitting}
+              type="submit"
+            >
+              {isSubmitting ? 'Registrando...' : 'Crear Cuenta'}
+            </Button>
+
+            {/* Footer - Login Link */}
+            <div className="mt-6 text-center">
+              <p className="text-xs text-slate-600">
+                ¿Ya tienes cuenta?{' '}
+                <button
+                  className="font-bold text-[#008f60] hover:text-[#006c49] hover:underline underline-offset-2 transition-colors"
+                  type="button"
+                  onClick={() => navigate({ to: '/login' })}
+                >
+                  Inicia sesión aquí
+                </button>
+              </p>
+            </div>
+          </form>
+
+          {/* Footer Info */}
+          <div className="mt-8 pt-6 border-t border-slate-100 text-center">
+            <p className="text-[10px] text-slate-500 mb-3 uppercase tracking-widest font-bold">
+              ¿Necesitas ayuda?
+            </p>
+            <p className="text-xs text-slate-600">
+              Contáctanos en{' '}
+              <span className="font-semibold text-[#008f60]">soporte@crmintelligent.com</span>
+            </p>
+          </div>
+        </Card>
+
+        {/* Bottom Text */}
+        <p className="text-center text-xs text-slate-500 mt-6">
+          © 2026 CRM Intelligent. Todos los derechos reservados.
+        </p>
+      </div>
+    </div>
+  );
+};

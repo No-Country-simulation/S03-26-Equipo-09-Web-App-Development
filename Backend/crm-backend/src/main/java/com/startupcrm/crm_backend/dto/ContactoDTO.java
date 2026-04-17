@@ -1,13 +1,20 @@
 package com.startupcrm.crm_backend.dto;
 
+import com.startupcrm.crm_backend.model.EstadoLead;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
+@Getter
+@Setter
 public class ContactoDTO {
 
     private Long id;
+
     @NotBlank(message = "El nombre es obligatorio")
     private String nombre;
 
@@ -18,57 +25,12 @@ public class ContactoDTO {
     @NotBlank(message = "El teléfono es obligatorio")
     private String telefono;
 
+    private String estado;
+    private LocalDateTime fechaCreacion;
+    private String nombreResponsable; // Para mostrar quién lo atiende
 
     private List<ConversacionDTO> conversaciones;
     private List<SeguimientoDTO> seguimientos;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getTelefono() {
-        return telefono;
-    }
-
-    public void setTelefono(String telefono) {
-        this.telefono = telefono;
-    }
-
-    public List<ConversacionDTO> getConversaciones() {
-        return conversaciones;
-    }
-
-    public void setConversaciones(List<ConversacionDTO> conversaciones) {
-        this.conversaciones = conversaciones;
-    }
-
-    public List<SeguimientoDTO> getSeguimientos() {
-        return seguimientos;
-    }
-
-    public void setSeguimientos(List<SeguimientoDTO> seguimientos) {
-        this.seguimientos = seguimientos;
-    }
-
+    private List<String> etiquetas;
 }
 

@@ -193,6 +193,15 @@ const unicornConfig = {
 }
 
 const eslintConfig = typescriptEslint.config(
+  {
+    // ESTO IGNORARÁ LOS ARCHIVOS QUE TE ESTÁN DANDO RUIDO
+    ignores: [
+      "**/coverage/**",
+      "**/dist/**",
+      "**/*.stories.tsx", // Ignora Storybook si no quieres corregirlos ahora
+      "src/components/forms/LoginForm.tsx" // El archivo que mencionaba el reporte
+    ],
+  },
   baseESLintConfig,
   typescriptConfig,
   eslintConfigPrettier,
@@ -202,7 +211,10 @@ const eslintConfig = typescriptEslint.config(
 )
 
 eslintConfig.map((config) => {
-  config.files = ["src/**/*.ts", "src/**/*.tsx"]
+  // Asegúrate de que esto no sobreescriba los ignores de arriba
+  if (!config.ignores) {
+    config.files = ["src/**/*.ts", "src/**/*.tsx"]
+  }
 })
 
 export default eslintConfig

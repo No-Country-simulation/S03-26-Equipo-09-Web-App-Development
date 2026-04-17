@@ -16,7 +16,8 @@ const i18nOptions: InitOptions<HttpBackendOptions> = {
 	defaultNS,
 	ns: [defaultNS],
 	debug: !isProduction,
-	fallbackLng: "en",
+	supportedLngs: ["en", "es"],
+	fallbackLng: "es",
 	interpolation: {
 		escapeValue: false, // not needed for react as it escapes by default
 	},

@@ -1,5 +1,174 @@
 {
-    "home": {
-        "greeting": "¡Hola, Mundo!"
+  "nav": {
+    "summary": "Resumen",
+    "contacts": "Contactos",
+    "inbox": "Inbox Unificado",
+    "pipeline": "Pipeline",
+    "followups": "Seguimientos",
+    "templates": "Plantillas",
+    "logout": "Cerrar Sesión"
+  },
+  "common": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "create": "Crear",
+    "search": "Buscar",
+    "loading": "Cargando...",
+    "noResults": "No se encontraron resultados",
+    "confirm": "Confirmar",
+    "actions": "Acciones",
+    "status": "Estado",
+    "date": "Fecha",
+    "name": "Nombre",
+    "email": "Correo",
+    "phone": "Teléfono",
+    "all": "Todos",
+    "active": "Activo",
+    "inactive": "Inactivo",
+    "today": "Hoy",
+    "yesterday": "Ayer",
+    "daysAgo": "Hace {{count}} días"
+  },
+  "estado": {
+    "LEAD_ACTIVO": "Lead Activo",
+    "EN_SEGUIMIENTO": "En Seguimiento",
+    "CLIENTE": "Cliente",
+    "PERDIDO": "Perdido"
+  },
+  "canal": {
+    "WhatsApp": "WhatsApp",
+    "Email": "Email"
+  },
+  "contactos": {
+    "title": "Contactos",
+    "subtitle": "{{count}} contactos en total",
+    "new": "Nuevo Contacto",
+    "search": "Buscar por nombre, email o teléfono...",
+    "created": "Creado",
+    "editTitle": "Editar Contacto",
+    "createTitle": "Nuevo Contacto",
+    "fullName": "Nombre completo",
+    "namePlaceholder": "Carlos Pérez",
+    "emailPlaceholder": "carlos@empresa.com",
+    "phonePlaceholder": "+57 310 123 4567",
+    "statusLabel": "Estado",
+    "saveChanges": "Guardar Cambios",
+    "deleteTitle": "¿Eliminar contacto?",
+    "deleteWarning": "Esta acción no se puede deshacer. El contacto y todas sus conversaciones asociadas serán eliminados.",
+    "columns": {
+      "name": "Nombre",
+      "email": "Email",
+      "phone": "Teléfono",
+      "status": "Estado",
+      "created": "Creado"
     }
+  },
+  "pipeline": {
+    "title": "Pipeline de Ventas",
+    "subtitle": "{{count}} contactos en el funnel · Haz click en una tarjeta para moverla de etapa",
+    "noContacts": "Sin contactos",
+    "moveToStage": "Mover a etapa:",
+    "currentStatus": "Estado actual",
+    "columns": {
+      "LEAD_ACTIVO": "Lead Activo",
+      "EN_SEGUIMIENTO": "En Seguimiento",
+      "CLIENTE": "Cliente",
+      "PERDIDO": "Perdido"
+    }
+  },
+  "seguimientos": {
+    "title": "Seguimientos",
+    "subtitle_one": "{{count}} pendiente",
+    "subtitle_other": "{{count}} pendientes",
+    "overdue_one": "{{count}} vencida",
+    "overdue_other": "{{count}} vencidas",
+    "new": "Nueva Tarea",
+    "taskDescription": "Descripción de la tarea",
+    "taskPlaceholder": "Llamar a contacto para seguimiento...",
+    "dueDate": "Fecha límite",
+    "contact": "Contacto",
+    "selectContact": "Seleccionar contacto...",
+    "createTask": "Crear Tarea",
+    "noTasks": "Sin tareas en esta categoría",
+    "filters": {
+      "all": "Todas",
+      "pending": "Pendiente",
+      "overdue": "Vencido",
+      "completed": "Completado"
+    },
+    "kpi": {
+      "pending": "Pendientes",
+      "overdue": "Vencidas",
+      "completed": "Completadas"
+    },
+    "badge": {
+      "overdue": "Vencida",
+      "today": "Hoy",
+      "done": "Listo"
+    }
+  },
+  "inbox": {
+    "title": "Inbox Unificado",
+    "subtitle": "WhatsApp + Email en un solo lugar",
+    "unread_one": "{{count}} sin leer",
+    "unread_other": "{{count}} sin leer",
+    "noMessages": "Sin mensajes",
+    "selectConversation": "Selecciona una conversación",
+    "replyPlaceholder": "Responder por {{canal}}...",
+    "send": "Enviar",
+    "filters": {
+      "all": "Todos",
+      "whatsapp": "WhatsApp",
+      "email": "Email"
+    }
+  },
+  "plantillas": {
+    "title": "Plantillas",
+    "subtitle": "{{active}} activas de {{total}} totales",
+    "new": "Nueva Plantilla",
+    "templateName": "Nombre de la plantilla",
+    "namePlaceholder": "Ej: Bienvenida WhatsApp",
+    "channel": "Canal",
+    "content": "Contenido",
+    "contentHint": "Usa {{nombre}}, {{empresa}} como variables",
+    "contentPlaceholder": "Hola {{nombre}}! ...",
+    "createTemplate": "Crear Plantilla",
+    "noTemplates": "No hay plantillas en esta categoría",
+    "variablesNote": "Las variables entre {{ }} se reemplazarán con datos del contacto al enviar.",
+    "badge": {
+      "active": "Activa",
+      "inactive": "Inactiva"
+    },
+    "filters": {
+      "all": "Todos"
+    }
+  },
+  "auth": {
+    "login": "Iniciar Sesión",
+    "logout": "Cerrar Sesión",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "rememberMe": "Recordarme",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "noAccount": "¿No tienes cuenta?",
+    "register": "Regístrate",
+    "loginSuccess": "¡Login exitoso! Redirigiendo...",
+    "invalidCredentials": "El correo o la contraseña son incorrectos.",
+    "hint": "Demo: admin@crm.com / 123456"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Bienvenido de nuevo",
+    "kpi": {
+      "totalContacts": "Total Contactos",
+      "newLeadsToday": "Nuevos Leads Hoy",
+      "pendingTasks": "Tareas Pendientes",
+      "unreadMessages": "Mensajes sin Leer"
+    }
+  },
+  "home": {
+    "greeting": "¡Hola, Mundo!"
+  }
 }
