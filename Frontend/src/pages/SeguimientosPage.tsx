@@ -4,10 +4,9 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { tx } from '../common/tx';
 import { getSeguimientos, createSeguimiento, completarSeguimiento, deleteSeguimiento } from '../services/seguimientosService';
 import { getContactos } from '../services/contactosService';
-import type { Seguimiento, Contacto } from '../types/models';
+import type { Seguimiento } from '../types/models';
 import { Card } from '../components/ui/Card/Card';
 import { Button } from '../components/ui/Button/Button';
-import { Badge } from '../components/ui/Badge/Badge';
 import { Modal } from '../components/ui/Modal/Modal';
 import { Input } from '../components/ui/Input/Input';
 
@@ -20,6 +19,13 @@ const getEstadoTarea = (seg: Seguimiento): 'vencida' | 'hoy' | 'pendiente' | 'co
   if (seg.fecha === hoy) return 'hoy';
   return 'pendiente';
 };
+
+const ESTADO_LABEL_KEY = {
+  vencida: 'seguimientos.badge.overdue',
+  hoy: 'seguimientos.badge.today',
+  pendiente: 'seguimientos.badge.pending',
+  completada: 'seguimientos.badge.done',
+} as const;
 
 export const SeguimientosPage = () => {
   const { t } = useTranslation();
@@ -116,7 +122,7 @@ export const SeguimientosPage = () => {
       </header>
 
       {/* KPI row */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
           { key: 'pendiente', value: counts.pendiente, color: 'text-yellow-600', bg: 'bg-yellow-50', icon: 'pending', label: t('seguimientos.kpi.pending') },
           { key: 'vencido', value: counts.vencido, color: 'text-red-600', bg: 'bg-red-50', icon: 'warning', label: t('seguimientos.kpi.overdue') },
@@ -161,7 +167,7 @@ export const SeguimientosPage = () => {
               return (
                 <Card key={seg.id} className={`flex items-center gap-4 transition-all ${seg.completado ? 'opacity-60' : ''}`}>
                   <button
-                    className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${seg.completado ? 'bg-green-500 border-green-500' : estado === 'vencida' ? 'border-red-400 hover:border-red-500' : 'border-outline-variant hover:border-primary'}`}
+                    className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${seg.completado ? 'bg-green-500 border-green-500' : estado === 'vencida' ? 'border-red-400 hover:border-red-500' : 'border-outline-variant hover:border-primary'}`}
                     onClick={() => { if (!seg.completado) void handleCompletar(seg.id); }}
                     disabled={completarMutation.isPending}
                   >
@@ -169,11 +175,11 @@ export const SeguimientosPage = () => {
                   </button>
                   <div className="flex-1">
                     <p className={`text-sm font-semibold ${seg.completado ? 'line-through text-on-surface-variant' : 'text-primary'}`}>{seg.tarea}</p>
-                    <p className="text-xs text-on-surface-variant mt-0.5">{seg.contacto?.nombre || t('common.unknown')}</p>
+                    <p className="text-xs text-on-surface-variant mt-0.5">{seg.contacto?.nombre || '-'}</p>
                   </div>
-                  <div className="text-right flex-shrink-0">
+                  <div className="text-right shrink-0">
                     <p className={`text-xs font-medium ${estado === 'vencida' ? 'text-red-600' : estado === 'hoy' ? 'text-yellow-600' : 'text-on-surface-variant'}`}>{seg.fecha}</p>
-                    <p className="text-[10px] text-on-surface-variant mt-1">{t(`seguimientos.estado.${estado}`)}</p>
+                    <p className="text-[10px] text-on-surface-variant mt-1">{t(ESTADO_LABEL_KEY[estado])}</p>
                   </div>
                   <button
                     className="p-1.5 rounded-lg hover:bg-red-50 text-red-400 transition-colors ml-2"
@@ -192,10 +198,10 @@ export const SeguimientosPage = () => {
       {/* Modal Crear */}
       <Modal isOpen={modalOpen} title={t('seguimientos.new')} onClose={() => { setModalOpen(false); }}>
         <div className="space-y-4">
-          <Input id="tarea" label={t('seguimientos.taskLabel')} placeholder={t('seguimientos.taskPlaceholder')} type="text" value={formData.tarea} onChange={e => { setFormData(p => ({ ...p, tarea: e.target.value })); }} />
-          <Input id="fecha" label={t('seguimientos.dateLabel')} type="date" value={formData.fecha} onChange={e => { setFormData(p => ({ ...p, fecha: e.target.value })); }} />
+          <Input id="tarea" label={t('seguimientos.taskDescription')} placeholder={t('seguimientos.taskPlaceholder')} type="text" value={formData.tarea} onChange={e => { setFormData(p => ({ ...p, tarea: e.target.value })); }} />
+          <Input id="fecha" label={t('seguimientos.dueDate')} type="date" value={formData.fecha} onChange={e => { setFormData(p => ({ ...p, fecha: e.target.value })); }} />
           <div>
-            <label className="block text-sm font-semibold text-primary mb-2">{t('seguimientos.contactLabel')}</label>
+            <label className="block text-sm font-semibold text-primary mb-2">{t('seguimientos.contact')}</label>
             <select className="w-full rounded-xl border border-outline-variant/30 bg-surface px-4 py-2.5 text-sm text-primary focus:outline-none focus:border-primary" value={formData.contactoId} onChange={e => { setFormData(p => ({ ...p, contactoId: e.target.value })); }}>
               <option value="">{t('seguimientos.selectContact')}</option>
               {contactos.map(c => <option key={c.id} value={c.id}>{c.nombre}</option>)}

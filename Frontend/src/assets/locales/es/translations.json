@@ -106,6 +106,7 @@
     "badge": {
       "overdue": "Vencida",
       "today": "Hoy",
+      "pending": "Pendiente",
       "done": "Listo"
     }
   },

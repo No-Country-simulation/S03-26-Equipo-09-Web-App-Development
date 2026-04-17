@@ -2,8 +2,7 @@ import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getConversaciones, marcarLeido, createConversacion } from '../services/conversacionesService';
-import { getContactos } from '../services/contactosService';
-import type { Conversacion, Contacto, Canal } from '../types/models';
+import type { Conversacion, Canal } from '../types/models';
 import { Card } from '../components/ui/Card/Card';
 import { Badge } from '../components/ui/Badge/Badge';
 
@@ -33,12 +32,6 @@ export const InboxPage = () => {
   const { data: conversaciones = [], isLoading: loadingConv } = useQuery({
     queryKey: ['conversaciones'],
     queryFn: getConversaciones,
-  });
-
-  // TanStack Query - GET contactos
-  const { data: contactos = [] } = useQuery({
-    queryKey: ['contactos'],
-    queryFn: getContactos,
   });
 
   // TanStack Query - marcar como leído
@@ -117,7 +110,7 @@ export const InboxPage = () => {
           <div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4" style={{ height: '65vh' }}>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 min-h-[60vh] lg:h-[65vh]">
           {/* Lista */}
           <div className="lg:col-span-4 overflow-y-auto space-y-2 pr-1">
             {filtradas.length === 0 ? (
@@ -136,14 +129,14 @@ export const InboxPage = () => {
                     onClick={() => { void seleccionar(conv); }}
                   >
                     <div className="flex items-start gap-3">
-                      <div className={`w-9 h-9 rounded-full ${canalCfg.bg} flex items-center justify-center flex-shrink-0`}>
+                      <div className={`w-9 h-9 rounded-full ${canalCfg.bg} flex items-center justify-center shrink-0`}>
                         <span className={`material-symbols-outlined text-[18px] ${canalCfg.color}`}>{canalCfg.icon}</span>
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-2">
-                          <p className={`text-sm font-bold truncate ${conv.leido ? 'text-on-surface-variant' : 'text-primary'}`}>{conv.contacto?.nombre || t('common.unknown')}</p>
-                          <div className="flex items-center gap-1.5 flex-shrink-0">
-                            {!conv.leido && <span className="w-2 h-2 rounded-full bg-primary flex-shrink-0" />}
+                          <p className={`text-sm font-bold truncate ${conv.leido ? 'text-on-surface-variant' : 'text-primary'}`}>{conv.contacto?.nombre || '-'}</p>
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            {!conv.leido && <span className="w-2 h-2 rounded-full bg-primary shrink-0" />}
                             <span className="text-[10px] text-on-surface-variant">{timeAgo(conv.fechaHora)}</span>
                           </div>
                         </div>
@@ -165,7 +158,7 @@ export const InboxPage = () => {
                     {seleccionada.contacto?.nombre?.charAt(0) || '?'}
                   </div>
                   <div>
-                    <p className="font-bold text-primary">{seleccionada.contacto?.nombre || t('common.unknown')}</p>
+                    <p className="font-bold text-primary">{seleccionada.contacto?.nombre || '-'}</p>
                     <p className="text-xs text-on-surface-variant">{seleccionada.contacto?.email || '-'}</p>
                   </div>
                   <div className="ml-auto">

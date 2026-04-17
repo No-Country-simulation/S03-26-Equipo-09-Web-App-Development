@@ -106,6 +106,7 @@
     "badge": {
       "overdue": "Overdue",
       "today": "Today",
+      "pending": "Pending",
       "done": "Done"
     }
   },
