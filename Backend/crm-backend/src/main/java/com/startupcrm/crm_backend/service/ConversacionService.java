@@ -104,6 +104,89 @@ public class ConversacionService {
         return conversacionRepository.save(conversacion);
     }
 
+    // ========== AUTOMATIZACIÓN DE ESTADOS (FLUJO OMNICANAL) ==========
+
+    /**
+     * AUTOMÁTICO: Cuando llega un mensaje externo
+     * - Si está en CERRADO → reabre a NO_LEIDO (PENDIENTE)
+     * - Si está en otro estado → mantiene o cambia a NO_LEIDO si es necesario
+     */
+    public Conversacion procesarMensajeExterno(Long conversacionId) {
+        Conversacion conversacion = getById(conversacionId);
+        
+        // Si la conversación estaba cerrada, reabre automáticamente
+        if (conversacion.getEstado() == EstadoConversacion.CERRADO) {
+            conversacion.setEstado(EstadoConversacion.NO_LEIDO);
+            System.out.println("🔄 Conversación #" + conversacionId + " reabierta (estaba CERRADA, nuevo mensaje entrante)");
+        } else if (conversacion.getEstado() != EstadoConversacion.NO_LEIDO) {
+            // Si no es NO_LEIDO, asegurarse que esté en NO_LEIDO para indicar pendencia
+            conversacion.setEstado(EstadoConversacion.NO_LEIDO);
+        }
+        
+        return conversacionRepository.save(conversacion);
+    }
+
+    /**
+     * AUTOMÁTICO: Cuando se envía una respuesta desde el sistema
+     * - Cambia automáticamente a RESPONDIDO
+     * - Se usa desde ConversacionController cuando se envía un mensaje
+     */
+    public Conversacion procesarRespuestaEnviada(Long conversacionId) {
+        Conversacion conversacion = getById(conversacionId);
+        
+        if (conversacion.getEstado() != EstadoConversacion.RESPONDIDO) {
+            conversacion.setEstado(EstadoConversacion.RESPONDIDO);
+            System.out.println("✅ Conversación #" + conversacionId + " marcada como RESPONDIDO");
+        }
+        
+        return conversacionRepository.save(conversacion);
+    }
+
+    /**
+     * MANUAL: Cierre de conversación por usuario
+     * - Solo permite cerrar desde RESPONDIDO o LEIDO
+     * - Cambia a CERRADO
+     */
+    public Conversacion cerrarConversacion(Long conversacionId) {
+        Conversacion conversacion = getById(conversacionId);
+        
+        // Validar que solo se pueda cerrar desde RESPONDIDO, LEIDO o NO_LEIDO
+        if (conversacion.getEstado() == EstadoConversacion.CERRADO) {
+            throw new IllegalStateException("La conversación ya está cerrada");
+        }
+        
+        if (conversacion.getEstado() == EstadoConversacion.FALLIDO) {
+            throw new IllegalStateException("No se puede cerrar una conversación con error");
+        }
+        
+        conversacion.setEstado(EstadoConversacion.CERRADO);
+        System.out.println("🔒 Conversación #" + conversacionId + " cerrada manualmente");
+        
+        return conversacionRepository.save(conversacion);
+    }
+
+    /**
+     * Obtener conversaciones PENDIENTES (NO_LEIDO) por vendedor
+     * - Útil para badge de notificaciones
+     */
+    public Page<Conversacion> getPendientesPorVendedor(Long vendedorId, Pageable pageable) {
+        return conversacionRepository.findByVendedorAsignadoIdAndEstado(vendedorId, EstadoConversacion.NO_LEIDO, pageable);
+    }
+
+    /**
+     * Obtener conversaciones RESPONDIDAS por vendedor
+     */
+    public Page<Conversacion> getRespondidosPorVendedor(Long vendedorId, Pageable pageable) {
+        return conversacionRepository.findByVendedorAsignadoIdAndEstado(vendedorId, EstadoConversacion.RESPONDIDO, pageable);
+    }
+
+    /**
+     * Obtener conversaciones CERRADAS por vendedor
+     */
+    public Page<Conversacion> getCerradosPorVendedor(Long vendedorId, Pageable pageable) {
+        return conversacionRepository.findByVendedorAsignadoIdAndEstado(vendedorId, EstadoConversacion.CERRADO, pageable);
+    }
+
     // ========== CRUD Básico ==========
 
     public Conversacion save(Conversacion conversacion) {

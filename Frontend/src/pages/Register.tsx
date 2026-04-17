@@ -32,28 +32,69 @@ export const Register = () => {
     setSuccessMessage(null);
 
     try {
-      // Esperar 500ms para simular llamada a API
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // API URL (mismo que apiClient.ts usa)
+      const API_BASE_URL = (import.meta.env['VITE_API_URL'] as string) || 'http://localhost:8080/api';
 
-      // Validación simple de email duplicado (simulada)
-      if (data.email === 'admin@crm.com') {
-        setServerError('Este correo ya está registrado. Intenta con otro.');
+      // Paso 1: Crear usuario
+      const createResponse = await fetch(`${API_BASE_URL}/usuarios`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nombre: data.companyName,
+          email: data.email,
+          password: data.password,
+        }),
+      });
+
+      const createResult = await createResponse.json() as { success: boolean; data?: { token?: string; id?: number }; error?: string };
+
+      if (!createResponse.ok || !createResult.success) {
+        setServerError(createResult.error || 'Error al registrar. Por favor intenta de nuevo.');
         return;
       }
 
-      // ✅ Registro exitoso - Guardar datos en localStorage
-      const mockToken = `mock-jwt-${Date.now()}`;
-      localStorage.setItem('authToken', mockToken);
-      localStorage.setItem('userCompany', data.companyName);
-      localStorage.setItem('userEmail', data.email);
+      // Paso 2: Si el backend devolvió token directamente, usarlo
+      let token = createResult.data?.token;
+      let userId = createResult.data?.id;
 
-      setSuccessMessage('¡Registro exitoso! Tu empresa ha sido creada. Redirigiendo...');
+      // Paso 3: Si no hay token, hacer login
+      if (!token) {
+        const loginResponse = await fetch(`${API_BASE_URL}/usuarios/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: data.email,
+            password: data.password,
+          }),
+        });
+
+        const loginResult = await loginResponse.json() as { success: boolean; data?: { token: string; userId: number; role: string }; error?: string };
+
+        if (!loginResponse.ok || !loginResult.success) {
+          setServerError(loginResult.error || 'Error al iniciar sesión. Por favor intenta manualmente.');
+          return;
+        }
+
+        token = loginResult.data?.token;
+        userId = loginResult.data?.userId;
+      }
+
+      // ✅ Guardar datos en localStorage
+      localStorage.setItem('authToken', token || '');
+      if (userId) localStorage.setItem('userId', userId.toString());
+      localStorage.setItem('userEmail', data.email);
+      localStorage.setItem('userName', data.companyName);
+      localStorage.setItem('userCompany', data.companyName);
+      localStorage.setItem('userRole', 'VENDEDOR'); // Default para new registrations
+
+      setSuccessMessage('¡Registro exitoso! Iniciando sesión...');
       
       // Redirigir al dashboard después de 1 segundo
       setTimeout(() => {
         navigate({ to: '/dashboard' });
       }, 1000);
     } catch (error) {
+      console.error('Error en registro:', error);
       setServerError('Error al conectar con el servidor. Por favor intenta de nuevo.');
     }
   };

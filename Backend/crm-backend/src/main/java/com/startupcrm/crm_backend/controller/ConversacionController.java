@@ -97,13 +97,42 @@ public class ConversacionController {
     }
 
     /**
-     * GET /api/conversaciones/por-vendedor/{vendedorId}/no-leidos
-     * Contar conversaciones no leídas
+     * GET /api/conversaciones/por-vendedor/{vendedorId}/cerrar
+     * Contar conversaciones cerradas por vendedor
      */
-    @GetMapping("/por-vendedor/{vendedorId}/no-leidos")
-    public ApiResponse<Long> countNoLeidosPorVendedor(@PathVariable Long vendedorId) {
-        long count = conversacionService.countNoLeidosPorVendedor(vendedorId);
-        return new ApiResponse<>(true, count, null);
+    @GetMapping("/por-vendedor/{vendedorId}/cerrados")
+    public ApiResponse<Page<ConversacionDTO>> getCerradosPorVendedor(
+            @PathVariable Long vendedorId,
+            @PageableDefault(size = 20, sort = "fechaHora", direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<ConversacionDTO> data = conversacionService.getCerradosPorVendedor(vendedorId, pageable)
+                .map(ConversacionMapper::toDTO);
+        return new ApiResponse<>(true, data, null);
+    }
+
+    /**
+     * GET /api/conversaciones/por-vendedor/{vendedorId}/respondidos
+     * Obtener conversaciones ya respondidas por vendedor
+     */
+    @GetMapping("/por-vendedor/{vendedorId}/respondidos")
+    public ApiResponse<Page<ConversacionDTO>> getRespondidosPorVendedor(
+            @PathVariable Long vendedorId,
+            @PageableDefault(size = 20, sort = "fechaHora", direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<ConversacionDTO> data = conversacionService.getRespondidosPorVendedor(vendedorId, pageable)
+                .map(ConversacionMapper::toDTO);
+        return new ApiResponse<>(true, data, null);
+    }
+
+    /**
+     * GET /api/conversaciones/por-vendedor/{vendedorId}/pendientes
+     * Obtener conversaciones PENDIENTES (NO_LEIDO) por vendedor
+     */
+    @GetMapping("/por-vendedor/{vendedorId}/pendientes")
+    public ApiResponse<Page<ConversacionDTO>> getPendientesPorVendedor(
+            @PathVariable Long vendedorId,
+            @PageableDefault(size = 20, sort = "fechaHora", direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<ConversacionDTO> data = conversacionService.getPendientesPorVendedor(vendedorId, pageable)
+                .map(ConversacionMapper::toDTO);
+        return new ApiResponse<>(true, data, null);
     }
 
     // ========== ENDPOINTS SIN PAGINACIÓN (COMPATIBILIDAD HACIA ATRÁS) ==========
@@ -154,6 +183,46 @@ public class ConversacionController {
     @PutMapping("/{id}/marcar-no-leido")
     public ApiResponse<ConversacionDTO> marcarComoNoLeido(@PathVariable Long id) {
         Conversacion updated = conversacionService.marcarComoNoLeido(id);
+        return new ApiResponse<>(true, ConversacionMapper.toDTO(updated), null);
+    }
+
+    // ========== AUTOMATIZACIÓN DE ESTADOS ==========
+
+    /**
+     * PUT /api/conversaciones/{id}/mensaje-externo
+     * 
+     * AUTOMÁTICO: Procesa la llegada de un mensaje externo (webhook)
+     * - Si estaba CERRADO → reabre a NO_LEIDO (PENDIENTE)
+     * - Notifica al vendedor que hay nuevo mensaje
+     */
+    @PutMapping("/{id}/mensaje-externo")
+    public ApiResponse<ConversacionDTO> procesarMensajeExterno(@PathVariable Long id) {
+        Conversacion updated = conversacionService.procesarMensajeExterno(id);
+        return new ApiResponse<>(true, ConversacionMapper.toDTO(updated), null);
+    }
+
+    /**
+     * PUT /api/conversaciones/{id}/respuesta-enviada
+     * 
+     * AUTOMÁTICO: Se llama cuando se envía una respuesta desde el sistema
+     * - Cambia estado a RESPONDIDO automáticamente
+     */
+    @PutMapping("/{id}/respuesta-enviada")
+    public ApiResponse<ConversacionDTO> procesarRespuestaEnviada(@PathVariable Long id) {
+        Conversacion updated = conversacionService.procesarRespuestaEnviada(id);
+        return new ApiResponse<>(true, ConversacionMapper.toDTO(updated), null);
+    }
+
+    /**
+     * PUT /api/conversaciones/{id}/cerrar
+     * 
+     * MANUAL: Cierra una conversación (solo puede hacer el usuario)
+     * - Valida que no esté ya cerrada
+     * - Cambia estado a CERRADO
+     */
+    @PutMapping("/{id}/cerrar")
+    public ApiResponse<ConversacionDTO> cerrarConversacion(@PathVariable Long id) {
+        Conversacion updated = conversacionService.cerrarConversacion(id);
         return new ApiResponse<>(true, ConversacionMapper.toDTO(updated), null);
     }
 

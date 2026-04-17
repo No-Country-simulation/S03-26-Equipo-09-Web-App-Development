@@ -38,6 +38,13 @@ public class UsuarioService {
     }
 
     public Usuario save(Usuario usuario) {
+        // Establecer defaults si no están presentes
+        if (usuario.getActivo() == null) {
+            usuario.setActivo(true);
+        }
+        if (usuario.getRole() == null) {
+            usuario.setRole(Usuario.Role.VENDEDOR);
+        }
         return usuarioRepository.save(usuario);
     }
 

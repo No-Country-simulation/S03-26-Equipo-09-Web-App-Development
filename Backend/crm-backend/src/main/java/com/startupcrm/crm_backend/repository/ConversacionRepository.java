@@ -40,6 +40,9 @@ public interface ConversacionRepository extends JpaRepository<Conversacion, Long
     // Contar conversaciones no leídas por vendedor
     long countByVendedorAsignadoIdAndEstado(Long vendedorId, EstadoConversacion estado);
 
+    // Filtrar por vendedor y estado (con paginación)
+    Page<Conversacion> findByVendedorAsignadoIdAndEstado(Long vendedorId, EstadoConversacion estado, Pageable pageable);
+
     // Búsqueda por texto en contenido y contacto
     @Query("SELECT c FROM Conversacion c WHERE " +
            "LOWER(c.contenido) LIKE LOWER(CONCAT('%', :busqueda, '%')) OR " +
