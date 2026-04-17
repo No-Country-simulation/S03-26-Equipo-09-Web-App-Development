@@ -23,5 +23,17 @@ export const logout = async (): Promise<void> => {
 export const getMe = async (): Promise<Usuario> => {
   // TODO_INTEGRATION: return apiGet<Usuario>('/api/auth/me');
   await new Promise(resolve => setTimeout(resolve, 200));
-  return MOCK_USER;
+
+  const persistedAuth = localStorage.getItem('crm-auth-storage');
+  if (!persistedAuth) {
+    throw new Error('No hay sesion activa');
+  }
+
+  const parsed = JSON.parse(persistedAuth) as { state?: { user?: Usuario | null } };
+  const user = parsed.state?.user;
+  if (!user) {
+    throw new Error('No se encontro usuario autenticado');
+  }
+
+  return user;
 };

@@ -19,6 +19,8 @@ export const DashboardPage = () => {
    * Transforma datos del backend al formato esperado por Nivo
    */
   const chartData = useMemo(() => {
+    const totalInteracciones = stats?.interaccionesTotales ?? 0;
+
     if (!stats) return {
       lineData: [],
       pieData: [],
@@ -30,12 +32,12 @@ export const DashboardPage = () => {
         {
           id: 'Interacciones',
           data: [
-            { x: 'Ene', y: Math.floor(stats.interaccionesTotales * 0.3) },
-            { x: 'Feb', y: Math.floor(stats.interaccionesTotales * 0.4) },
-            { x: 'Mar', y: Math.floor(stats.interaccionesTotales * 0.5) },
-            { x: 'Abr', y: Math.floor(stats.interaccionesTotales * 0.6) },
-            { x: 'May', y: Math.floor(stats.interaccionesTotales * 0.7) },
-            { x: 'Jun', y: Math.floor(stats.interaccionesTotales * 0.8) }
+            { x: 'Ene', y: Math.floor(totalInteracciones * 0.3) },
+            { x: 'Feb', y: Math.floor(totalInteracciones * 0.4) },
+            { x: 'Mar', y: Math.floor(totalInteracciones * 0.5) },
+            { x: 'Abr', y: Math.floor(totalInteracciones * 0.6) },
+            { x: 'May', y: Math.floor(totalInteracciones * 0.7) },
+            { x: 'Jun', y: Math.floor(totalInteracciones * 0.8) }
           ]
         }
       ],
@@ -52,10 +54,51 @@ export const DashboardPage = () => {
     };
   }, [stats]);
 
+  const isEmpty = !stats || (
+    stats.totalContactos === 0 &&
+    (stats.interaccionesTotales ?? 0) === 0 &&
+    stats.mensajesSinLeer === 0 &&
+    stats.nuevosLeadsHoy === 0
+  );
+
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-96">
-        <div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+      <div className="space-y-8 animate-fade-in p-2 md:p-6">
+        <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-2">
+            <div className="h-8 w-72 bg-slate-200 rounded animate-pulse" />
+            <div className="h-4 w-96 bg-slate-200 rounded animate-pulse" />
+          </div>
+          <div className="h-7 w-32 bg-slate-200 rounded-full animate-pulse" />
+        </header>
+
+        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Card key={`kpi-skeleton-${i}`} className="space-y-4">
+              <div className="h-6 w-28 bg-slate-200 rounded animate-pulse" />
+              <div className="h-8 w-12 bg-slate-200 rounded animate-pulse" />
+              <div className="h-3 w-full bg-slate-200 rounded animate-pulse" />
+            </Card>
+          ))}
+        </section>
+
+        <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card className="flex flex-col min-h-72 sm:min-h-80 lg:min-h-96">
+            <div className="h-5 w-40 bg-slate-200 rounded animate-pulse mb-4" />
+            <div className="flex-1 h-52 sm:h-60 lg:h-72 rounded-2xl bg-slate-100 animate-pulse" />
+          </Card>
+          <Card className="flex flex-col min-h-72 sm:min-h-80 lg:min-h-96">
+            <div className="h-5 w-44 bg-slate-200 rounded animate-pulse mb-4" />
+            <div className="flex-1 h-52 sm:h-60 lg:h-72 rounded-2xl bg-slate-100 animate-pulse" />
+          </Card>
+        </section>
+
+        <section>
+          <Card className="flex flex-col min-h-72 sm:min-h-80 lg:min-h-96">
+            <div className="h-5 w-36 bg-slate-200 rounded animate-pulse mb-4" />
+            <div className="flex-1 h-52 sm:h-60 lg:h-72 rounded-2xl bg-slate-100 animate-pulse" />
+          </Card>
+        </section>
       </div>
     );
   }
@@ -141,24 +184,46 @@ export const DashboardPage = () => {
         </section>
       )}
 
-      {/* 3. Gráficos */}
-      <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="flex flex-col">
-          <h3 className="text-sm font-bold text-primary mb-4">Interacciones por Mes</h3>
-          <LineChart data={chartData.lineData} />
+      {isEmpty && (
+        <Card className="text-center py-12">
+          <div className="mx-auto w-14 h-14 rounded-2xl bg-secondary/10 text-secondary flex items-center justify-center mb-4">
+            <span className="material-symbols-outlined text-3xl">query_stats</span>
+          </div>
+          <h3 className="text-xl font-bold text-primary mb-2">Aún no hay datos para mostrar</h3>
+          <p className="text-on-surface-variant max-w-xl mx-auto">
+            Cuando tengas interacciones y contactos registrados, aquí verás métricas, gráficas y tendencias de tu CRM.
+          </p>
         </Card>
-        <Card className="flex flex-col">
-          <h3 className="text-sm font-bold text-primary mb-4">Contactos por Estado</h3>
-          <PieChart data={chartData.pieData} />
-        </Card>
-      </section>
+      )}
 
-      <section>
-        <Card className="flex flex-col">
-          <h3 className="text-sm font-bold text-primary mb-4">Fuentes de Leads</h3>
-          <BarChart data={chartData.barData} />
-        </Card>
-      </section>
+      {/* 3. Gráficos */}
+      {!isEmpty && (
+        <>
+          <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card className="flex flex-col min-h-72 sm:min-h-80 lg:min-h-96">
+              <h3 className="text-sm font-bold text-primary mb-4">Interacciones por Mes</h3>
+              <div className="h-52 sm:h-60 lg:h-72">
+                <LineChart data={chartData.lineData} />
+              </div>
+            </Card>
+            <Card className="flex flex-col min-h-72 sm:min-h-80 lg:min-h-96">
+              <h3 className="text-sm font-bold text-primary mb-4">Contactos por Estado</h3>
+              <div className="h-52 sm:h-60 lg:h-72">
+                <PieChart data={chartData.pieData} />
+              </div>
+            </Card>
+          </section>
+
+          <section>
+            <Card className="flex flex-col min-h-72 sm:min-h-80 lg:min-h-96">
+              <h3 className="text-sm font-bold text-primary mb-4">Fuentes de Leads</h3>
+              <div className="h-52 sm:h-60 lg:h-72">
+                <BarChart data={chartData.barData} />
+              </div>
+            </Card>
+          </section>
+        </>
+      )}
 
       {/* 4. Sección de Acciones Rápidas */}
       <section>
